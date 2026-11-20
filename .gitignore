@@ -1,0 +1,14 @@
+# Secrets
+.env
+
+# Generated data (kept local for now)
+data/
+data-mock/
+
+# Kill switch file
+STOP
+
+# Python
+__pycache__/
+*.pyc
+.venv/

@@ -1,0 +1,53 @@
+# Model and tool settings. No secrets here: API keys go in .env.
+# Owner-only limits (budget, request caps, resource share) live in core/limits.toml.
+#
+# Prices are USD per million tokens. Free-tier models cost 0.
+# Check that the model ids exist with:  python run.py --list-models
+
+[models.A]
+label = "Gemini"                  # short name used in logs
+lab = "Google"
+provider = "gemini"
+model = "gemini-flash-latest"     # Google's alias for its newest Flash model
+key_env = "GEMINI_API_KEY"        # name of the variable in .env
+input_price_per_mtok = 0.0
+output_price_per_mtok = 0.0
+max_output_tokens = 8192
+requests_per_minute = 5           # free-tier limits; check yours in AI Studio
+requests_per_day = 20
+supports_tools = true
+web_search = true                 # Gemini's built-in Google Search grounding
+
+[models.B]
+label = "Nemotron"
+lab = "NVIDIA"
+provider = "openai_compatible"    # any API that speaks OpenAI's chat format
+base_url = "https://openrouter.ai/api/v1"
+model = "nvidia/nemotron-3-ultra:free"   # UNVERIFIED id: confirm with --list-models
+key_env = "OPENROUTER_API_KEY"
+input_price_per_mtok = 0.0
+output_price_per_mtok = 0.0
+max_output_tokens = 8192
+requests_per_minute = 10
+requests_per_day = 50             # OpenRouter free pool: 50/day (1000 after a $10 top-up)
+supports_tools = true
+web_search = false                # no free built-in search; uses Wikipedia/arXiv lookups
+
+[sandbox]
+# Python executor: a throwaway Docker container with no network, a read-only
+# filesystem, no mounted files and no environment variables.
+image = "python:3.13-slim"
+timeout_seconds = 30
+memory = "256m"
+max_output_chars = 4000
+
+[lookup]
+# Free public lookups available to every worker (Wikipedia and arXiv APIs).
+user_agent = "AbsoluteTruthResearchBot/0.1"
+timeout_seconds = 20
+max_results = 5
+
+[context]
+# How much of the knowledge base and history each prompt includes.
+max_findings_chars = 30000
+recent_cycle_logs = 3
