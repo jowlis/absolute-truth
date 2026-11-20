@@ -19,11 +19,11 @@ supports_tools = true
 web_search = true                 # Gemini's built-in Google Search grounding
 
 [models.B]
-label = "Nemotron"
-lab = "NVIDIA"
+label = "Ling"
+lab = "InclusionAI (Ant Group)"
 provider = "openai_compatible"    # any API that speaks OpenAI's chat format
 base_url = "https://openrouter.ai/api/v1"
-model = "nvidia/nemotron-3-ultra:free"   # UNVERIFIED id: confirm with --list-models
+model = "inclusionai/ling-3.2-flash:free"  # free on OpenRouter; supports tools, 1M context
 key_env = "OPENROUTER_API_KEY"
 input_price_per_mtok = 0.0
 output_price_per_mtok = 0.0

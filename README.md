@@ -51,8 +51,7 @@ in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
    still works, but the agents get no code execution.
 
 4. Check which models your keys can use, and fix `config.toml` if a model id is
-   missing. The id for model B (Nemotron) has not been checked against the live
-   list yet.
+   missing. Free model lineups change often.
 
    ```bash
    python run.py --list-models
