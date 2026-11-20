@@ -15,6 +15,7 @@ output_price_per_mtok = 0.0
 max_output_tokens = 8192
 requests_per_minute = 5           # free-tier limits; check yours in AI Studio
 requests_per_day = 20
+timeout_seconds = 300             # give up on one request after 5 minutes
 supports_tools = true
 web_search = true                 # Gemini's built-in Google Search grounding
 
@@ -30,6 +31,7 @@ output_price_per_mtok = 0.0
 max_output_tokens = 8192
 requests_per_minute = 10
 requests_per_day = 50             # OpenRouter free pool: 50/day (1000 after a $10 top-up)
+timeout_seconds = 300             # give up on one request after 5 minutes
 supports_tools = true
 web_search = false                # no free built-in search; uses Wikipedia/arXiv lookups
 

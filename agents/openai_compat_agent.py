@@ -9,7 +9,7 @@ import re
 
 import openai
 
-from agents.base import Agent, RateLimited, Reply, ToolCall
+from agents.base import Agent, RateLimited, Reply, ToolCall, Transient
 
 THINK_BLOCK = re.compile(r"<think>.*?</think>", re.DOTALL)
 
@@ -17,7 +17,9 @@ THINK_BLOCK = re.compile(r"<think>.*?</think>", re.DOTALL)
 class OpenAICompatAgent(Agent):
     def __init__(self, key, cfg, budget, api_key: str, on_usage=None):
         super().__init__(key, cfg, budget, on_usage)
-        self.client = openai.OpenAI(base_url=cfg["base_url"], api_key=api_key)
+        # The library's own retries are off: all retries happen in Agent._guarded.
+        self.client = openai.OpenAI(base_url=cfg["base_url"], api_key=api_key,
+                                    timeout=cfg["timeout_seconds"], max_retries=0)
 
     def _chat(self, system: str, messages: list, tools: list) -> Reply:
         request = {
@@ -31,6 +33,8 @@ class OpenAICompatAgent(Agent):
             response = self.client.chat.completions.create(**request)
         except openai.RateLimitError as e:
             raise RateLimited(str(e)) from e
+        except (openai.InternalServerError, openai.APIConnectionError) as e:  # incl. timeouts
+            raise Transient(f"{type(e).__name__}: {e}") from e
 
         if not response.choices:
             raise RuntimeError(f"Empty response from {self.cfg['model']}")

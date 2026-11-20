@@ -7,13 +7,25 @@ works alongside our own tools on every Gemini model.
 from google import genai
 from google.genai import errors, types
 
-from agents.base import Agent, RateLimited, Reply, ToolCall
+from agents.base import Agent, RateLimited, Reply, ToolCall, Transient
+
+try:  # the HTTP library google-genai uses (httpx2 in recent versions, httpx before)
+    import httpx2 as _http
+except ImportError:
+    import httpx as _http
+
+NETWORK_ERRORS = (_http.TimeoutException, _http.TransportError, TimeoutError, ConnectionError)
 
 
 class GeminiAgent(Agent):
     def __init__(self, key, cfg, budget, api_key: str, on_usage=None):
         super().__init__(key, cfg, budget, on_usage)
-        self.client = genai.Client(api_key=api_key)
+        # The timeout (in ms) also tells Google's servers how long they may take.
+        # The library's own retries are off: all retries happen in Agent._guarded,
+        # where every attempt is counted against the daily quota.
+        self.client = genai.Client(api_key=api_key, http_options=types.HttpOptions(
+            timeout=int(cfg["timeout_seconds"] * 1000),
+            retry_options=types.HttpRetryOptions(attempts=1)))
 
     def _chat(self, system: str, messages: list, tools: list) -> Reply:
         config = types.GenerateContentConfig(
@@ -71,7 +83,11 @@ class GeminiAgent(Agent):
         except errors.APIError as e:
             if e.code == 429:
                 raise RateLimited(str(e)) from e
+            if e.code and e.code >= 500:
+                raise Transient(str(e)) from e
             raise
+        except NETWORK_ERRORS as e:
+            raise Transient(f"{type(e).__name__}: {e}") from e
 
 
 def _usage(response) -> dict:

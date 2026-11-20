@@ -17,7 +17,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from agents import make_agents
-from agents.base import RateLimited
+from agents.base import ProviderUnavailable
 from core import budget as budget_module
 from core import killswitch
 from core.budget import Budget, BudgetExceeded, DailyQuotaReached
@@ -27,6 +27,11 @@ from loop.cycle import CycleRunner
 from tools.sandbox import docker_available
 
 ROOT = Path(__file__).resolve().parent
+
+
+def say(message: str) -> None:
+    """Print a progress line with the time, straight away."""
+    print(f"    {datetime.now().strftime('%H:%M:%S')}  {message}", flush=True)
 
 
 def main() -> int:
@@ -79,7 +84,7 @@ def main() -> int:
     kb = KnowledgeBase(data_dir / "knowledge.db")
     runner = CycleRunner(config=config, limits=limits, agents=agents, kb=kb,
                          roadmap=Roadmap(data_dir), budget=budget, run_id=run_id,
-                         data_dir=data_dir, sandbox_ok=sandbox_ok)
+                         data_dir=data_dir, sandbox_ok=sandbox_ok, say=say)
 
     print(f"Run {run_id}: up to {args.cycles} cycle(s); data in {data_dir}")
     for key, agent in agents.items():
@@ -87,7 +92,8 @@ def main() -> int:
     for _ in range(args.cycles):
         try:
             log = runner.run_cycle()
-        except (killswitch.StopRequested, BudgetExceeded, DailyQuotaReached, RateLimited) as e:
+        except (killswitch.StopRequested, BudgetExceeded, DailyQuotaReached,
+                ProviderUnavailable) as e:
             print(f"Run halted: {e}")
             break
         u = log["usage"]

@@ -37,7 +37,15 @@ class Reply:
 
 
 class RateLimited(Exception):
-    """The provider said "too many requests"."""
+    """The provider said "too many requests". Worth retrying after a wait."""
+
+
+class Transient(Exception):
+    """A temporary failure: server error (5xx), timeout or lost connection. Worth retrying."""
+
+
+class ProviderUnavailable(Exception):
+    """A provider kept failing after all retries. Ends the run; try again later."""
 
 
 class Agent:
@@ -46,6 +54,7 @@ class Agent:
         self.cfg = cfg              # this model's section of config.toml
         self.budget = budget
         self.on_usage = on_usage    # callback(agent, purpose, in_tokens, out_tokens, cost)
+        self.say = lambda message: None   # progress messages; the runner sets this
 
     @property
     def name(self) -> str:
@@ -74,21 +83,27 @@ class Agent:
 
     def _guarded(self, call, estimated_input_tokens: int, purpose: str) -> Reply:
         limits = self.budget.limits
-        waits = limits["rate_limit_wait_seconds"]
-        for attempt in range(limits["rate_limit_retries"] + 1):
+        waits = limits["retry_wait_seconds"]
+        attempts = limits["retry_attempts"]
+        for attempt in range(attempts + 1):
             self.budget.before_call(self.cfg, estimated_input_tokens)
             try:
                 reply = call()
-            except RateLimited:
-                if attempt == limits["rate_limit_retries"]:
-                    raise
-                time.sleep(waits[min(attempt, len(waits) - 1)])
+            except (RateLimited, Transient) as e:
+                if attempt == attempts:
+                    raise ProviderUnavailable(
+                        f"{self.cfg['label']} kept failing after {attempts} retries "
+                        f"({type(e).__name__}: {str(e)[:200]}). Try again later.") from e
+                wait = waits[min(attempt, len(waits) - 1)]
+                self.say(f"{self.cfg['label']}: {type(e).__name__} ({str(e)[:120]}); "
+                         f"retrying in {wait} s")
+                time.sleep(wait)
                 continue
             cost = self.budget.after_call(self.cfg, reply.input_tokens, reply.output_tokens)
             if self.on_usage:
                 self.on_usage(self, purpose, reply.input_tokens, reply.output_tokens, cost)
             return reply
-        raise RateLimited("still rate limited after retries")
+        raise AssertionError("unreachable")
 
     # ---- a full turn, including tool use -------------------------------------
 
@@ -112,6 +127,8 @@ class Agent:
                 if steps > max_tool_steps:
                     result = "[limit] Tool step limit reached. Give your final answer now."
                 else:
+                    self.say(f"{self.cfg['label']} uses {call.name}: "
+                             f"{str(next(iter(call.args.values()), ''))[:70]!r}")
                     result = toolbox.run(call.name, call.args)
                 messages.append({"role": "tool", "tool_call_id": call.id,
                                  "name": call.name, "content": result})

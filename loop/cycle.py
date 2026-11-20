@@ -17,7 +17,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agents.base import RateLimited, transcript_safe
+from agents.base import ProviderUnavailable, transcript_safe
 from core import verdicts
 from core.budget import BudgetExceeded, DailyQuotaReached
 from core.killswitch import StopRequested
@@ -26,7 +26,7 @@ from loop.roles import roles_for
 from tools.toolbox import Toolbox
 
 # Exceptions that end the run (they are re-raised after the cycle log is saved).
-HALTING = (StopRequested, BudgetExceeded, DailyQuotaReached, RateLimited)
+HALTING = (StopRequested, BudgetExceeded, DailyQuotaReached, ProviderUnavailable)
 
 
 def now() -> str:
@@ -35,7 +35,7 @@ def now() -> str:
 
 class CycleRunner:
     def __init__(self, *, config: dict, limits: dict, agents: dict, kb, roadmap, budget,
-                 run_id: str, data_dir: Path, sandbox_ok: bool):
+                 run_id: str, data_dir: Path, sandbox_ok: bool, say=None):
         self.config = config
         self.limits = limits
         self.agents = agents            # {"A": Agent, "B": Agent}
@@ -46,8 +46,10 @@ class CycleRunner:
         self.data_dir = Path(data_dir)
         self.sandbox_ok = sandbox_ok
         self.current_cycle = 0
+        self.say = say or (lambda message: None)   # progress messages (run.py prints them)
         for agent in agents.values():
             agent.on_usage = self.record_usage
+            agent.say = self.say
 
     def record_usage(self, agent, purpose: str, input_tokens: int, output_tokens: int,
                      cost: float) -> None:
@@ -319,6 +321,7 @@ class CycleRunner:
              keep_messages=None) -> dict | None:
         """Ask for a JSON reply; if it is invalid, explain the problems and ask once more."""
         system = prompts.system_prompt(agent, other, role)
+        self.say(f"{stage}: {agent.cfg['label']} is working ({role})")
         messages = keep_messages if keep_messages is not None else []
         messages.append({"role": "user", "content": prompt})
         obj, errors = None, ["no reply"]
@@ -332,6 +335,7 @@ class CycleRunner:
                     errors = extra_check(obj)
                 if not errors:
                     return obj
+                self.say(f"{stage}: reply from {agent.cfg['label']} was not usable; asking again")
                 messages.append({"role": "user", "content":
                                  "Your reply could not be used:\n- " + "\n- ".join(errors[:10]) +
                                  "\nReply again with the corrected JSON object in a ```json block."})

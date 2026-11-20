@@ -74,6 +74,39 @@ class MockRunTests(unittest.TestCase):
         plan_messages = transcript[0]["messages"]
         self.assertIn("could not be used", plan_messages[2]["content"])
 
+    def test_temporary_server_errors_are_retried(self):
+        from agents.base import Transient
+        d = temp_dir()
+        runner = mock_runner(d, limits=dict(load_limits(), retry_wait_seconds=[0]))
+        agent = runner.agents["A"]
+        real_chat, failures = agent._chat, iter([True, True])
+
+        def flaky_chat(system, messages, tools):
+            if next(failures, False):
+                raise Transient("503 UNAVAILABLE (test)")
+            return real_chat(system, messages, tools)
+
+        messages = []
+        agent.say = messages.append
+        with mock.patch.object(agent, "_chat", flaky_chat):
+            log = runner.run_cycle()
+        self.assertEqual(log["outcome"], "productive")
+        self.assertEqual(sum("retrying" in m for m in messages), 2)
+
+    def test_provider_that_stays_down_ends_the_run_cleanly(self):
+        from agents.base import ProviderUnavailable, Transient
+        d = temp_dir()
+        runner = mock_runner(d, limits=dict(load_limits(), retry_wait_seconds=[0]))
+
+        def always_down(system, messages, tools):
+            raise Transient("503 UNAVAILABLE (test)")
+
+        with mock.patch.object(runner.agents["A"], "_chat", always_down):
+            with self.assertRaises(ProviderUnavailable):
+                runner.run_cycle()
+        self.assertEqual(runner.budget.requests, 4)   # first try + 3 retries, all counted
+        self.assertEqual(runner.kb.cycle_logs()[0]["outcome"], "interrupted")
+
     def test_stop_file_halts_before_any_api_call(self):
         d = temp_dir()
         runner = mock_runner(d)
