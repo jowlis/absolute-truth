@@ -53,13 +53,14 @@ def main() -> int:
 
     if args.list_models:
         for key, agent in agents.items():
-            print(f"\n[{key}] {agent.cfg['provider']} models available to your key:")
+            print(f"\n[{key}] {agent.cfg['provider']} models available to your key "
+                  f"(configured: {agent.cfg['model']}):")
             models = agent.list_models()
-            free = [m for m in models if m.endswith(":free")]
-            for m in (free or models):
-                print("  ", m)
+            free = agent.free_models() if hasattr(agent, "free_models") else []
+            for line in (free or models):
+                print("  ", line)
             if free:
-                print(f"   ({len(models) - len(free)} paid models not shown)")
+                print(f"   (only free models shown; {len(models) - len(free)} paid models hidden)")
         return 0
 
     if not args.mock:

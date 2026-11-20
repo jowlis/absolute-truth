@@ -8,7 +8,7 @@
 label = "Gemini"                  # short name used in logs
 lab = "Google"
 provider = "gemini"
-model = "gemini-flash-latest"     # Google's alias for its newest Flash model
+model = "gemini-3.8-flash"        # newest Flash model; Flash models have a free tier
 key_env = "GEMINI_API_KEY"        # name of the variable in .env
 input_price_per_mtok = 0.0
 output_price_per_mtok = 0.0

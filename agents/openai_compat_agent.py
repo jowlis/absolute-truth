@@ -51,6 +51,24 @@ class OpenAICompatAgent(Agent):
     def list_models(self) -> list[str]:
         return sorted(m.id for m in self.client.models.list())
 
+    def free_models(self) -> list[str]:
+        """Free models with details, for `run.py --list-models`.
+
+        Free means a ":free" id or a price of 0 (OpenRouter publishes prices per model).
+        """
+        lines = []
+        for m in sorted(self.client.models.list(), key=lambda m: m.id):
+            pricing = getattr(m, "pricing", None) or {}
+            zero_price = (str(pricing.get("prompt")) in ("0", "0.0")
+                          and str(pricing.get("completion")) in ("0", "0.0"))
+            if not (m.id.endswith(":free") or zero_price):
+                continue
+            tools = "tools" in (getattr(m, "supported_parameters", None) or [])
+            context = getattr(m, "context_length", None)
+            lines.append(f"{m.id}   (context {context or '?'} tokens, "
+                         f"{'supports tools' if tools else 'NO tool support'})")
+        return lines
+
 
 def _to_openai(messages: list) -> list:
     out = []
