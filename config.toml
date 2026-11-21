@@ -13,7 +13,7 @@ fallback_models = ["gemini-3.6-flash", "gemini-3.5-flash-lite"]  # used in order
 key_env = "GEMINI_API_KEY"        # name of the variable in .env
 input_price_per_mtok = 0.0
 output_price_per_mtok = 0.0
-max_output_tokens = 8192
+max_output_tokens = 16384         # includes thinking; keeps the JSON from being cut off
 requests_per_minute = 5           # free-tier limits; check yours in AI Studio
 requests_per_day = 20
 timeout_seconds = 600             # give up on one request after 10 minutes
@@ -21,16 +21,16 @@ supports_tools = true
 web_search = true                 # Gemini's built-in Google Search grounding
 
 [models.B]
-label = "TO-BE-CHOSEN"            # set after choosing a model from --list-models
-lab = "TO-BE-CHOSEN"              # the lab that made the model (must not be Google)
+label = "Kimi"
+lab = "Moonshot AI"               # the lab that made the model (must not be Google)
 provider = "openai_compatible"    # any API that speaks OpenAI's chat format
 base_url = "https://integrate.api.nvidia.com/v1"   # NVIDIA's free developer API
-model = "TO-BE-CHOSEN"            # pick from: python run.py --list-models
-fallback_models = []
+model = "moonshotai/kimi-k3.1-pro"   # Moonshot's flagship, hosted free by NVIDIA
+fallback_models = []              # backups must be from the same lab; Moonshot has no other here
 key_env = "NVIDIA_API_KEY"
 input_price_per_mtok = 0.0
 output_price_per_mtok = 0.0
-max_output_tokens = 8192
+max_output_tokens = 16384         # includes thinking; keeps the JSON from being cut off
 requests_per_minute = 20          # NVIDIA free accounts: reportedly 40 per minute
 requests_per_day = 200            # self-imposed pace, to make the free credits last
 timeout_seconds = 300             # give up on one request after 5 minutes
@@ -39,7 +39,8 @@ web_search = false                # no built-in search; uses Wikipedia/arXiv loo
 
 # Earlier choices, kept for reference:
 # - OpenRouter free pool (inclusionai/ling-3.2-flash:free): too often overloaded (429).
-# - Mistral: no free API plan anymore (only pay-as-you-go).
+# - Mistral: no free API plan anymore (only pay-as-you-go). Mistral Large 4 is on NVIDIA:
+#   model = "mistralai/mistral-large-4-1t-a52b", label = "Mistral", lab = "Mistral AI".
 
 [sandbox]
 # Python executor: a throwaway Docker container with no network, a read-only
