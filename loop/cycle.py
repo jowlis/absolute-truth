@@ -13,6 +13,7 @@ Every cycle ends with a structured log, a full transcript, and its token count a
 even if it was interrupted.
 """
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -105,10 +106,14 @@ class CycleRunner:
             log["usage"] = self.kb.cycle_usage(n)
             log["usage"]["failed_attempts"] = len(self.failures)
             log["problems"] += [f"failed attempt: {f}" for f in self.failures]
-            # A cycle stopped before any model replied produced nothing: keep its files,
-            # but don't give it a number in the path (the next attempt reuses it).
-            log["counted"] = not (log["outcome"] in ("interrupted", "failed")
-                                  and log["usage"]["api_calls"] == 0)
+            # A cycle stopped before it recorded anything keeps its files, but gets no
+            # number in the path: the next attempt reuses the number, and the replies
+            # already received (see _ask).
+            recorded = (log["results"] or log["status_changes"] or log["proposals"]
+                        or log["roadmap_changes"])
+            log["counted"] = bool(recorded) or log["outcome"] not in ("interrupted", "failed")
+            if log["outcome"] != "interrupted":
+                self._cache_path().unlink(missing_ok=True)
             self._save(log, transcript)
         return log
 
@@ -334,6 +339,24 @@ class CycleRunner:
              keep_messages=None) -> dict | None:
         """Ask for a JSON reply; if it is invalid, explain the problems and ask once more."""
         system = prompts.system_prompt(agent, other, role)
+
+        # Reuse a valid reply received for exactly this request before an interruption.
+        # (Only for turns without tools; those cannot be replayed from one reply.)
+        key = hashlib.sha256(f"{stage}|{system}|{prompt}".encode("utf-8")).hexdigest()
+        cache = self._load_cache() if toolbox is None else {}
+        if key in cache:
+            obj, parse_error = schemas.parse_reply(cache[key]["text"])
+            if not parse_error and not schemas.check(obj, schemas.SPECS[stage]) and (
+                    not extra_check or not extra_check(obj)):
+                self.say(f"{stage}: reusing {agent.cfg['label']}'s reply from an interrupted "
+                         f"attempt (run {cache[key]['run_id']})")
+                transcript.append({"stage": stage, "role": role, "model": cache[key]["model"],
+                                   "system": system, "reused_from_run": cache[key]["run_id"],
+                                   "messages": [{"role": "user", "content": prompt},
+                                                {"role": "assistant", "content": cache[key]["text"]}],
+                                   "valid": True, "errors": []})
+                return obj
+
         self.say(f"{stage}: {agent.cfg['label']} is working ({role})")
         messages = keep_messages if keep_messages is not None else []
         messages.append({"role": "user", "content": prompt})
@@ -347,6 +370,8 @@ class CycleRunner:
                 if not errors and extra_check:
                     errors = extra_check(obj)
                 if not errors:
+                    if toolbox is None:
+                        self._store_in_cache(key, text, agent)
                     return obj
                 self.say(f"{stage}: reply from {agent.cfg['label']} was not usable; asking again")
                 messages.append({"role": "user", "content":
@@ -404,6 +429,25 @@ class CycleRunner:
         with open(self.data_dir / "path.md", "a", encoding="utf-8") as path_file:   # the whole path, cycle by cycle
             path_file.write(md + "\n---\n\n")
         self.kb.record_cycle(log, self.run_id)
+
+    def _cache_path(self) -> Path:
+        return self.data_dir / "reply_cache.json"
+
+    def _load_cache(self) -> dict:
+        """Replies from an interrupted attempt at the current cycle number, if any."""
+        path = self._cache_path()
+        if not path.exists():
+            return {}
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data["replies"] if data.get("cycle") == self.current_cycle else {}
+
+    def _store_in_cache(self, key: str, text: str, agent) -> None:
+        replies = self._load_cache()
+        replies[key] = {"text": text, "model": agent.name, "run_id": self.run_id}
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self._cache_path().write_text(json.dumps(
+            {"cycle": self.current_cycle, "replies": replies}, indent=2, ensure_ascii=False),
+            encoding="utf-8")
 
     def _write_proposals_md(self) -> None:
         lines = ["# Resource proposals for the owner", "",

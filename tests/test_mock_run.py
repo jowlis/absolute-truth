@@ -112,6 +112,35 @@ class MockRunTests(unittest.TestCase):
         self.assertTrue(list((d / "runs" / "test").glob("cycle_0001_not_counted")))
         self.assertEqual(runner.kb.next_cycle_number(), 1)
 
+    def test_interrupted_genesis_reuses_finished_drafts(self):
+        from agents.base import ProviderUnavailable, Transient
+        d = temp_dir()
+        limits = dict(load_limits(), retry_wait_seconds=[0])
+        runner = mock_runner(d, limits=limits)
+
+        def always_down(system, messages, tools):
+            raise Transient("429 provider overloaded (test)")
+
+        # Attempt 1: model A drafts, then model B is down for good.
+        with mock.patch.object(runner.agents["B"], "_chat", always_down):
+            with self.assertRaises(ProviderUnavailable):
+                runner.run_cycle()
+        self.assertEqual(runner.kb.cycle_logs(), [])          # nothing recorded: no number
+        self.assertTrue((d / "reply_cache.json").exists())
+
+        # Attempt 2 (a new run): A's draft is reused, so A only has to merge.
+        runner2 = mock_runner(d, limits=limits)
+        messages = []
+        runner2.say = messages.append
+        log = runner2.run_cycle()
+        self.assertEqual(log["cycle"], 1)
+        self.assertEqual(log["outcome"], "productive")
+        self.assertEqual(sum("reusing" in m for m in messages), 1)
+        transcript = json.loads((d / "runs" / "test" / "cycle_0001" / "transcript.json")
+                                .read_text(encoding="utf-8"))
+        self.assertIn("reused_from_run", transcript[0])
+        self.assertFalse((d / "reply_cache.json").exists())  # cleared once the cycle completed
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()
@@ -163,7 +192,10 @@ class MockRunTests(unittest.TestCase):
             for _ in range(10):
                 runner.run_cycle()
         self.assertLessEqual(runner.budget.spent_usd, 0.05)
-        self.assertEqual(runner.kb.cycle_logs()[-1]["outcome"], "interrupted")
+        # The stopped cycle is logged: numbered if it had recorded something, else not counted.
+        last = runner.kb.cycle_logs()[-1]["outcome"] if runner.kb.cycle_logs() else None
+        not_counted = list((d / "runs" / "test").glob("*_not_counted"))
+        self.assertTrue(last == "interrupted" or not_counted)
 
 
 if __name__ == "__main__":

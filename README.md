@@ -45,7 +45,9 @@ in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
 
 2. Copy `.env.example` to `.env` and add your free keys:
    - `GEMINI_API_KEY` from Google AI Studio (https://aistudio.google.com/apikey)
-   - `OPENROUTER_API_KEY` from https://openrouter.ai/keys
+   - `MISTRAL_API_KEY` from Mistral's console (https://console.mistral.ai), on the
+     free Experiment plan
+   - `OPENROUTER_API_KEY` is optional (only if you switch model B back to OpenRouter)
 
 3. Install Docker and start it. The Python sandbox needs it. Without Docker the runner
    still works, but the agents get no code execution.
@@ -82,9 +84,11 @@ python -m unittest discover -s tests -t .   # run the tests
   quota, the agent switches to its `fallback_models` from the same lab (set in
   `config.toml`). The cycle log lists which models actually replied. If every model
   fails, the run stops cleanly; try again later.
-- **Attempts that produced nothing:** if a cycle is stopped before any model replied
-  (an outage, or the kill switch), its files are kept in a `cycle_NNNN_not_counted`
-  folder, but it gets no cycle number. The next attempt reuses the number.
+- **Interrupted attempts:** if a cycle is stopped before it recorded anything (an
+  outage, the kill switch, a used-up quota), its files are kept in a
+  `cycle_NNNN_not_counted` folder, but it gets no cycle number. The next attempt
+  reuses the number, and also reuses the replies already received
+  (`data/reply_cache.json`), so finished work isn't thrown away.
 
 ## Reading the results
 
