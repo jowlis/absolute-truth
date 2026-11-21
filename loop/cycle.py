@@ -47,8 +47,10 @@ class CycleRunner:
         self.sandbox_ok = sandbox_ok
         self.current_cycle = 0
         self.say = say or (lambda message: None)   # progress messages (run.py prints them)
+        self.failures: list[str] = []              # failed API attempts in this cycle
         for agent in agents.values():
             agent.on_usage = self.record_usage
+            agent.on_failure = self.record_failure
             agent.say = self.say
 
     def record_usage(self, agent, purpose: str, input_tokens: int, output_tokens: int,
@@ -58,11 +60,16 @@ class CycleRunner:
                                 input_tokens=input_tokens, output_tokens=output_tokens,
                                 cost_usd=cost)
 
+    def record_failure(self, agent, purpose: str, error: Exception) -> None:
+        self.failures.append(f"{agent.cfg['model']} ({purpose}): {type(error).__name__}: "
+                             f"{str(error)[:150]}")
+
     # ---- running a cycle -----------------------------------------------------
 
     def run_cycle(self) -> dict:
         n = self.kb.next_cycle_number()
         self.current_cycle = n
+        self.failures = []
         roles = roles_for(n, tuple(self.agents))
         log = {
             "cycle": n, "run_id": self.run_id, "started_at": now(), "ended_at": None,
@@ -96,6 +103,12 @@ class CycleRunner:
             self.roadmap.commit(n)
             log["ended_at"] = now()
             log["usage"] = self.kb.cycle_usage(n)
+            log["usage"]["failed_attempts"] = len(self.failures)
+            log["problems"] += [f"failed attempt: {f}" for f in self.failures]
+            # A cycle stopped before any model replied produced nothing: keep its files,
+            # but don't give it a number in the path (the next attempt reuses it).
+            log["counted"] = not (log["outcome"] in ("interrupted", "failed")
+                                  and log["usage"]["api_calls"] == 0)
             self._save(log, transcript)
         return log
 
@@ -378,13 +391,16 @@ class CycleRunner:
     # ---- saving ----------------------------------------------------------------
 
     def _save(self, log: dict, transcript: list) -> None:
-        cycle_dir = self.data_dir / "runs" / self.run_id / f"cycle_{log['cycle']:04d}"
+        name = f"cycle_{log['cycle']:04d}" + ("" if log["counted"] else "_not_counted")
+        cycle_dir = self.data_dir / "runs" / self.run_id / name
         cycle_dir.mkdir(parents=True, exist_ok=True)
         (cycle_dir / "transcript.json").write_text(
             json.dumps(transcript, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
         (cycle_dir / "log.json").write_text(json.dumps(log, indent=2, ensure_ascii=False), encoding="utf-8")
         md = render_log_md(log)
         (cycle_dir / "log.md").write_text(md, encoding="utf-8")
+        if not log["counted"]:
+            return
         with open(self.data_dir / "path.md", "a", encoding="utf-8") as path_file:   # the whole path, cycle by cycle
             path_file.write(md + "\n---\n\n")
         self.kb.record_cycle(log, self.run_id)
@@ -436,7 +452,8 @@ def render_log_md(log: dict) -> str:
 - Worker: {log['roles'].get('worker')}
 - Reviewer: {log['roles'].get('reviewer')}
 - Time: {log['started_at']} to {log['ended_at']}
-- Usage: {u.get('api_calls', 0)} API calls, {u.get('input_tokens', 0)} input tokens, {u.get('output_tokens', 0)} output tokens, ${u.get('cost_usd', 0):.4f}
+- Models that replied: {', '.join(u.get('models', [])) or 'none'}
+- Usage: {u.get('api_calls', 0)} API calls ({u.get('failed_attempts', 0)} failed attempts), {u.get('input_tokens', 0)} input tokens, {u.get('output_tokens', 0)} output tokens, ${u.get('cost_usd', 0):.4f}
 
 **Task:** {log.get('task') or '-'}
 

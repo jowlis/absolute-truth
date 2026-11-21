@@ -75,9 +75,16 @@ python -m unittest discover -s tests -t .   # run the tests
   tool steps per turn, and the resource-work ceiling. Every call is checked first
   against the worst case.
 - **Free-tier quotas:** each model's daily request limit in `config.toml` is counted
-  across runs (UTC days). When a model runs out, the run stops cleanly. Gemini's
-  free tier is small (about 20 requests a day on Flash), so expect only a few
-  cycles a day.
+  across runs (UTC days). Gemini's free tier is small (about 20 requests a day on
+  Flash), so expect only a few cycles a day.
+- **Busy servers:** server errors, timeouts and "too many requests" are retried
+  after 15, 45 and 90 seconds. If a model stays unavailable, or has used its daily
+  quota, the agent switches to its `fallback_models` from the same lab (set in
+  `config.toml`). The cycle log lists which models actually replied. If every model
+  fails, the run stops cleanly; try again later.
+- **Attempts that produced nothing:** if a cycle is stopped before any model replied
+  (an outage, or the kill switch), its files are kept in a `cycle_NNNN_not_counted`
+  folder, but it gets no cycle number. The next attempt reuses the number.
 
 ## Reading the results
 

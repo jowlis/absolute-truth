@@ -12,7 +12,8 @@ def make_agents(config: dict, budget, mock: bool = False) -> dict[str, Agent]:
             from agents.mock_agent import MockAgent
             # The mock has no rate limits and its own daily counter.
             cfg = dict(cfg, model=f"mock-{cfg['model']}", requests_per_minute=600_000,
-                       requests_per_day=10**9)
+                       requests_per_day=10**9,
+                       fallback_models=[f"mock-{m}" for m in cfg.get("fallback_models", [])])
             agents[key] = MockAgent(key, cfg, budget)
             continue
 

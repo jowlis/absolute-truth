@@ -253,8 +253,10 @@ class KnowledgeBase:
         row = self.conn.execute(
             "SELECT COUNT(*), COALESCE(SUM(input_tokens),0), COALESCE(SUM(output_tokens),0),"
             " COALESCE(SUM(cost_usd),0) FROM api_calls WHERE cycle = ?", (cycle,)).fetchone()
+        models = [r[0] for r in self.conn.execute(
+            "SELECT DISTINCT model FROM api_calls WHERE cycle = ? ORDER BY model", (cycle,))]
         return {"api_calls": row[0], "input_tokens": row[1], "output_tokens": row[2],
-                "cost_usd": round(row[3], 6)}
+                "cost_usd": round(row[3], 6), "models": models}
 
     def total_usage(self) -> dict:
         row = self.conn.execute(

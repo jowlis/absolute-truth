@@ -17,7 +17,7 @@ import json
 import time
 from dataclasses import dataclass, field
 
-from core.budget import Budget
+from core.budget import Budget, DailyQuotaReached
 
 
 @dataclass
@@ -51,9 +51,13 @@ class ProviderUnavailable(Exception):
 class Agent:
     def __init__(self, key: str, cfg: dict, budget: Budget, on_usage=None):
         self.key = key              # "A" or "B"
-        self.cfg = cfg              # this model's section of config.toml
+        self.cfg = dict(cfg)        # this model's section of config.toml (a copy)
+        # The main model first, then backups from the same lab, used in order when the
+        # current one stays unavailable or has used up its daily quota.
+        self.models = [cfg["model"]] + list(cfg.get("fallback_models", []))
         self.budget = budget
         self.on_usage = on_usage    # callback(agent, purpose, in_tokens, out_tokens, cost)
+        self.on_failure = None      # callback(agent, purpose, error) for failed attempts
         self.say = lambda message: None   # progress messages; the runner sets this
 
     @property
@@ -82,28 +86,55 @@ class Agent:
         return reply.text
 
     def _guarded(self, call, estimated_input_tokens: int, purpose: str) -> Reply:
+        """Make one API call with retries; switch to a backup model if needed.
+
+        `call` reads self.cfg["model"] when it runs, so after a switch it uses the backup.
+        """
         limits = self.budget.limits
         waits = limits["retry_wait_seconds"]
         attempts = limits["retry_attempts"]
-        for attempt in range(attempts + 1):
-            self.budget.before_call(self.cfg, estimated_input_tokens)
-            try:
-                reply = call()
-            except (RateLimited, Transient) as e:
-                if attempt == attempts:
-                    raise ProviderUnavailable(
-                        f"{self.cfg['label']} kept failing after {attempts} retries "
-                        f"({type(e).__name__}: {str(e)[:200]}). Try again later.") from e
-                wait = waits[min(attempt, len(waits) - 1)]
-                self.say(f"{self.cfg['label']}: {type(e).__name__} ({str(e)[:120]}); "
-                         f"retrying in {wait} s")
-                time.sleep(wait)
-                continue
-            cost = self.budget.after_call(self.cfg, reply.input_tokens, reply.output_tokens)
-            if self.on_usage:
-                self.on_usage(self, purpose, reply.input_tokens, reply.output_tokens, cost)
-            return reply
-        raise AssertionError("unreachable")
+        while True:
+            last_error = None
+            for attempt in range(attempts + 1):
+                try:
+                    self.budget.before_call(self.cfg, estimated_input_tokens)
+                except DailyQuotaReached as e:
+                    last_error = e
+                    break                      # try a backup model instead
+                try:
+                    reply = call()
+                except (RateLimited, Transient) as e:
+                    last_error = e
+                    if self.on_failure:
+                        self.on_failure(self, purpose, e)
+                    if attempt == attempts:
+                        break
+                    wait = waits[min(attempt, len(waits) - 1)]
+                    self.say(f"{self.cfg['model']}: {type(e).__name__} ({str(e)[:120]}); "
+                             f"retrying in {wait} s")
+                    time.sleep(wait)
+                    continue
+                cost = self.budget.after_call(self.cfg, reply.input_tokens, reply.output_tokens)
+                if self.on_usage:
+                    self.on_usage(self, purpose, reply.input_tokens, reply.output_tokens, cost)
+                return reply
+
+            if not self._switch_to_backup():
+                if isinstance(last_error, DailyQuotaReached):
+                    raise last_error
+                raise ProviderUnavailable(
+                    f"{self.cfg['label']} kept failing after {attempts} retries on every model "
+                    f"({type(last_error).__name__}: {str(last_error)[:200]}). Try again later."
+                ) from last_error
+
+    def _switch_to_backup(self) -> bool:
+        position = self.models.index(self.cfg["model"])
+        if position + 1 >= len(self.models):
+            return False
+        old = self.cfg["model"]
+        self.cfg["model"] = self.models[position + 1]
+        self.say(f"{old} is unavailable; switching to backup model {self.cfg['model']}")
+        return True
 
     # ---- a full turn, including tool use -------------------------------------
 

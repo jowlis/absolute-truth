@@ -101,11 +101,46 @@ class MockRunTests(unittest.TestCase):
         def always_down(system, messages, tools):
             raise Transient("503 UNAVAILABLE (test)")
 
-        with mock.patch.object(runner.agents["A"], "_chat", always_down):
+        agent = runner.agents["A"]
+        self.assertEqual(len(agent.models), 3)        # main model + 2 backups in config.toml
+        with mock.patch.object(agent, "_chat", always_down):
             with self.assertRaises(ProviderUnavailable):
                 runner.run_cycle()
-        self.assertEqual(runner.budget.requests, 4)   # first try + 3 retries, all counted
-        self.assertEqual(runner.kb.cycle_logs()[0]["outcome"], "interrupted")
+        self.assertEqual(runner.budget.requests, 12)  # 3 models x (first try + 3 retries)
+        # No model replied, so the attempt is kept on disk but gets no cycle number.
+        self.assertEqual(runner.kb.cycle_logs(), [])
+        self.assertTrue(list((d / "runs" / "test").glob("cycle_0001_not_counted")))
+        self.assertEqual(runner.kb.next_cycle_number(), 1)
+
+    def test_busy_model_switches_to_backup(self):
+        from agents.base import Transient
+        d = temp_dir()
+        runner = mock_runner(d, limits=dict(load_limits(), retry_wait_seconds=[0]))
+        agent = runner.agents["A"]
+        main, real_chat = agent.models[0], agent._chat
+
+        def main_model_down(system, messages, tools):
+            if agent.cfg["model"] == main:
+                raise Transient("503 high demand (test)")
+            return real_chat(system, messages, tools)
+
+        with mock.patch.object(agent, "_chat", main_model_down):
+            log = runner.run_cycle()
+        self.assertEqual(log["outcome"], "productive")
+        self.assertIn(agent.models[1], log["usage"]["models"])
+        self.assertNotIn(main, log["usage"]["models"])
+        self.assertEqual(log["usage"]["failed_attempts"], 4)
+
+    def test_used_up_daily_quota_switches_to_backup(self):
+        d = temp_dir()
+        runner = mock_runner(d)
+        agent = runner.agents["A"]
+        agent.cfg["requests_per_day"] = 2           # each model may make 2 requests a day...
+        for _ in range(2):                          # ...and the main model has used both
+            runner.budget._bump_daily(agent.models[0])
+        log = runner.run_cycle()
+        self.assertEqual(log["outcome"], "productive")
+        self.assertEqual(agent.cfg["model"], agent.models[1])
 
     def test_stop_file_halts_before_any_api_call(self):
         d = temp_dir()
@@ -116,7 +151,10 @@ class MockRunTests(unittest.TestCase):
             with self.assertRaises(killswitch.StopRequested):
                 runner.run_cycle()
         self.assertEqual(runner.budget.requests, 0)
-        self.assertEqual(runner.kb.cycle_logs()[0]["outcome"], "interrupted")
+        self.assertEqual(runner.kb.cycle_logs(), [])          # nothing happened: no number
+        log = json.loads(next((d / "runs" / "test").glob("cycle_0001_not_counted")).joinpath(
+            "log.json").read_text(encoding="utf-8"))
+        self.assertEqual(log["outcome"], "interrupted")
 
     def test_budget_cap_halts_run_and_logs_interruption(self):
         d = temp_dir()

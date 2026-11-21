@@ -75,6 +75,11 @@ def main() -> int:
                 print(f"Model {key}: {agent.cfg['model']!r} is not available to your key. "
                       f"Run 'python run.py --list-models' and fix config.toml.")
                 return 1
+            missing = [m for m in agent.models[1:] if m not in available]
+            if missing:
+                print(f"Warning: backup model(s) {missing} for {key} are not available; "
+                      f"they will be skipped.")
+                agent.models = [m for m in agent.models if m not in missing]
 
     sandbox_ok = docker_available()
     if not sandbox_ok:
@@ -97,6 +102,8 @@ def main() -> int:
             print(f"Run halted: {e}")
             break
         u = log["usage"]
+        if u["failed_attempts"]:
+            print(f"    ({u['failed_attempts']} failed attempt(s); see the cycle log)")
         print(f"  cycle {log['cycle']}: {log['track']}, {log['outcome']}, "
               f"{len(log['results'])} new finding(s), {u['api_calls']} calls, ${u['cost_usd']:.4f}")
         if log["problems"]:
