@@ -44,7 +44,7 @@ class Toolbox:
         self.definitions = [WIKIPEDIA_SEARCH, ARXIV_SEARCH]
         if sandbox_ok:
             self.definitions.insert(0, RUN_PYTHON)
-        if agent.cfg.get("web_search"):
+        if agent.cfg.get("web_search") and not agent.web_search_off:
             self.definitions.insert(0, WEB_SEARCH)
 
     def names(self) -> list[str]:

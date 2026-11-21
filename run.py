@@ -141,8 +141,9 @@ def main() -> int:
             print(f"    ({u['failed_attempts']} failed attempt(s); see the cycle log)")
         print(f"  cycle {log['cycle']}: {log['track']}, {log['outcome']}, "
               f"{len(log['results'])} new finding(s), {u['api_calls']} calls, ${u['cost_usd']:.4f}")
-        if log["problems"]:
-            print("    problems:", "; ".join(log["problems"]))
+        problems = [p for p in log["problems"] if not p.startswith("failed attempt")]
+        if problems:
+            print("    problems:", "; ".join(problems))
 
     print(f"Done. Spent ${budget.spent_usd:.4f} of ${limits['budget_usd_per_run']:.2f}; "
           f"{budget.requests} API requests. See: python show.py --help")

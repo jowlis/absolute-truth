@@ -72,6 +72,8 @@ class CycleRunner:
         n = self.kb.next_cycle_number()
         self.current_cycle = n
         self.failures = []
+        for agent in self.agents.values():   # a switch to a backup lasts one cycle at most
+            agent.cfg["model"] = agent.models[0]
         roles = roles_for(n, tuple(self.agents))
         log = {
             "cycle": n, "run_id": self.run_id, "started_at": now(), "ended_at": None,

@@ -172,6 +172,34 @@ class MockRunTests(unittest.TestCase):
         self.assertEqual(transcript[0]["model"].split(", ")[-1].rstrip(")"), a.models[1])
         self.assertIn("reused_from_run", transcript[0])
 
+    def test_failing_web_search_never_switches_the_model(self):
+        from agents.base import RateLimited
+        from tools.toolbox import Toolbox
+        d = temp_dir()
+        runner = mock_runner(d)
+        agent = runner.agents["A"]
+        main = agent.cfg["model"]
+
+        def no_quota(query):
+            raise RateLimited("429 RESOURCE_EXHAUSTED (test)")
+
+        with mock.patch.object(agent, "_web_search", no_quota):
+            first = agent.web_search("anything")
+            second = agent.web_search("anything else")
+        self.assertIn("wikipedia_search", first)
+        self.assertIn("unavailable for the rest of this run", second)
+        self.assertEqual(agent.cfg["model"], main)               # still the main model
+        self.assertEqual(runner.budget.requests, 1)              # one attempt, no retries
+        self.assertNotIn("web_search", Toolbox(agent, runner.config, False).names())
+
+    def test_each_cycle_starts_on_the_main_model(self):
+        d = temp_dir()
+        runner = mock_runner(d)
+        agent = runner.agents["A"]
+        agent.cfg["model"] = agent.models[2]                     # left on a backup
+        runner.run_cycle()
+        self.assertEqual(runner.kb.cycle_usage(1)["models"].count(agent.models[0]), 1)
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()

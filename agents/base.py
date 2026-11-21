@@ -58,6 +58,7 @@ class Agent:
         self.budget = budget
         self.on_usage = on_usage    # callback(agent, purpose, in_tokens, out_tokens, cost)
         self.on_failure = None      # callback(agent, purpose, error) for failed attempts
+        self.web_search_off = ""    # reason, once web search has failed for good in this run
         self.say = lambda message: None   # progress messages; the runner sets this
 
     @property
@@ -82,7 +83,32 @@ class Agent:
         return self._guarded(lambda: self._chat(system, messages, tools), estimate, purpose)
 
     def web_search(self, query: str) -> str:
-        reply = self._guarded(lambda: self._web_search(query), estimate_tokens(query), "web_search")
+        """A tool, not the agent's main work: one attempt, no retries, no model switching.
+
+        If the quota is used up ("too many requests"), web search is switched off for the
+        rest of the run, so no time or quota is wasted on it.
+        """
+        if self.web_search_off:
+            return f"[web search is unavailable for the rest of this run: {self.web_search_off}]"
+        try:
+            self.budget.before_call(self.cfg, estimate_tokens(query))
+        except DailyQuotaReached as e:
+            self.web_search_off = str(e)
+            return f"[web search unavailable: {e}] Use wikipedia_search or arxiv_search instead."
+        try:
+            reply = self._web_search(query)
+        except (RateLimited, Transient) as e:
+            if self.on_failure:
+                self.on_failure(self, "web_search", e)
+            if isinstance(e, RateLimited):
+                self.web_search_off = "quota used up"
+            self.say(f"{self.cfg['model']}: web search failed ({type(e).__name__})"
+                     + ("; switched off for this run" if self.web_search_off else ""))
+            return (f"[web search failed: {type(e).__name__}: {str(e)[:120]}] "
+                    "Use wikipedia_search or arxiv_search instead.")
+        cost = self.budget.after_call(self.cfg, reply.input_tokens, reply.output_tokens)
+        if self.on_usage:
+            self.on_usage(self, "web_search", reply.input_tokens, reply.output_tokens, cost)
         return reply.text
 
     def _guarded(self, call, estimated_input_tokens: int, purpose: str) -> Reply:

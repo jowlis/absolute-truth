@@ -18,7 +18,7 @@ requests_per_minute = 5           # free-tier limits; check yours in AI Studio
 requests_per_day = 20
 timeout_seconds = 600             # give up on one request after 10 minutes
 supports_tools = true
-web_search = true                 # Gemini's built-in Google Search grounding
+web_search = true                 # Google Search grounding; may not be free (then switched off per run)
 
 [models.B]
 label = "Nemotron"
