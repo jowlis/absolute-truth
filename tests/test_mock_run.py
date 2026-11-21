@@ -141,6 +141,37 @@ class MockRunTests(unittest.TestCase):
         self.assertIn("reused_from_run", transcript[0])
         self.assertFalse((d / "reply_cache.json").exists())  # cleared once the cycle completed
 
+    def test_reply_from_backup_model_is_reused_on_next_run(self):
+        from agents.base import ProviderUnavailable, Transient
+        d = temp_dir()
+        limits = dict(load_limits(), retry_wait_seconds=[0])
+        runner = mock_runner(d, limits=limits)
+        a = runner.agents["A"]
+        main, real_chat = a.models[0], a._chat
+
+        def main_down(system, messages, tools):
+            if a.cfg["model"] == main:
+                raise Transient("503 (test)")
+            return real_chat(system, messages, tools)
+
+        def always_down(system, messages, tools):
+            raise Transient("timeout (test)")
+
+        # Run 1: A's main model is busy, its backup drafts; then B is down for good.
+        with mock.patch.object(a, "_chat", main_down), \
+                mock.patch.object(runner.agents["B"], "_chat", always_down):
+            with self.assertRaises(ProviderUnavailable):
+                runner.run_cycle()
+
+        # Run 2 starts on A's main model again, yet still reuses the backup's draft.
+        runner2 = mock_runner(d, limits=limits)
+        log = runner2.run_cycle()
+        self.assertEqual(log["outcome"], "productive")
+        transcript = json.loads((d / "runs" / "test" / "cycle_0001" / "transcript.json")
+                                .read_text(encoding="utf-8"))
+        self.assertEqual(transcript[0]["model"].split(", ")[-1].rstrip(")"), a.models[1])
+        self.assertIn("reused_from_run", transcript[0])
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()

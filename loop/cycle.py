@@ -49,6 +49,7 @@ class CycleRunner:
         self.current_cycle = 0
         self.say = say or (lambda message: None)   # progress messages (run.py prints them)
         self.failures: list[str] = []              # failed API attempts in this cycle
+        self.last_author = ""                      # model that wrote the last accepted reply
         for agent in agents.values():
             agent.on_usage = self.record_usage
             agent.on_failure = self.record_failure
@@ -128,7 +129,7 @@ class CycleRunner:
             draft = self._ask(agent, self._other(agent), "drafter", "genesis_draft",
                               prompts.genesis_draft(n), None, transcript)
             if draft:
-                drafts[agent.name] = draft
+                drafts[self.last_author] = draft
             else:
                 log["problems"].append(f"{agent.name} produced no valid draft")
         if not drafts:
@@ -342,7 +343,8 @@ class CycleRunner:
 
         # Reuse a valid reply received for exactly this request before an interruption.
         # (Only for turns without tools; those cannot be replayed from one reply.)
-        key = hashlib.sha256(f"{stage}|{system}|{prompt}".encode("utf-8")).hexdigest()
+        # The key leaves out the system prompt, which names the current (maybe backup) model.
+        key = hashlib.sha256(f"{stage}|{agent.key}|{role}|{prompt}".encode("utf-8")).hexdigest()
         cache = self._load_cache() if toolbox is None else {}
         if key in cache:
             obj, parse_error = schemas.parse_reply(cache[key]["text"])
@@ -350,6 +352,7 @@ class CycleRunner:
                     not extra_check or not extra_check(obj)):
                 self.say(f"{stage}: reusing {agent.cfg['label']}'s reply from an interrupted "
                          f"attempt (run {cache[key]['run_id']})")
+                self.last_author = cache[key]["model"]
                 transcript.append({"stage": stage, "role": role, "model": cache[key]["model"],
                                    "system": system, "reused_from_run": cache[key]["run_id"],
                                    "messages": [{"role": "user", "content": prompt},
@@ -372,6 +375,7 @@ class CycleRunner:
                 if not errors:
                     if toolbox is None:
                         self._store_in_cache(key, text, agent)
+                    self.last_author = agent.name
                     return obj
                 self.say(f"{stage}: reply from {agent.cfg['label']} was not usable; asking again")
                 messages.append({"role": "user", "content":

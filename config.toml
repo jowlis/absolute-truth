@@ -33,7 +33,8 @@ output_price_per_mtok = 0.0
 max_output_tokens = 16384         # includes thinking; keeps the JSON from being cut off
 requests_per_minute = 20          # NVIDIA free accounts: reportedly 40 per minute
 requests_per_day = 200            # self-imposed pace, to make the free credits last
-timeout_seconds = 300             # give up on one request after 5 minutes
+timeout_seconds = 300             # give up if the model sends nothing for 5 minutes
+max_reply_seconds = 1800          # ...or if one answer takes longer than 30 minutes in total
 supports_tools = true
 web_search = false                # no built-in search; uses Wikipedia/arXiv lookups
 
