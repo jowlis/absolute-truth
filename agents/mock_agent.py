@@ -21,6 +21,8 @@ from agents.base import Agent, Reply, ToolCall, estimate_tokens
 class MockAgent(Agent):
     def _chat(self, system: str, messages: list, tools: list) -> Reply:
         first = messages[0]["content"]
+        if "STAGE:" not in first:                     # e.g. run.py --ping
+            return Reply(text="OK", input_tokens=10, output_tokens=1)
         stage = re.search(r"STAGE: (\w+)", first).group(1)
         cycle = int(re.search(r"CYCLE: (\d+)", first).group(1))
         used_tool = any(m["role"] == "tool" for m in messages)

@@ -10,6 +10,7 @@ limits in core/limits.toml.
 
 import argparse
 import sys
+import time
 import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,11 +35,42 @@ def say(message: str) -> None:
     print(f"    {datetime.now().strftime('%H:%M:%S')}  {message}", flush=True)
 
 
+def ping(agents: dict, budget, key: str, models: list) -> int:
+    """Send each model a tiny question and report how quickly (and whether) it answers.
+
+    Uses one request per model, counted against the daily limits like any other.
+    No retries, so a busy model shows up as busy.
+    """
+    if key not in agents:
+        print(f"Unknown model key {key!r}; use one of {list(agents)}.")
+        return 1
+    agent = agents[key]
+    question = [{"role": "user", "content": "Reply with just the word OK."}]
+    for model in models or agent.models:
+        agent.cfg["model"] = model
+        started = time.monotonic()
+        try:
+            budget.before_call(agent.cfg, 50)
+            reply = agent._chat("You are being tested for availability.", question, [])
+            print(f"  OK    {model}: answered in {time.monotonic() - started:.0f} s: "
+                  f"{reply.text.strip()[:40]!r}")
+        except (killswitch.StopRequested, BudgetExceeded, DailyQuotaReached) as e:
+            print(f"  STOP  {e}")
+            return 1
+        except Exception as e:
+            print(f"  FAIL  {model}: after {time.monotonic() - started:.0f} s: "
+                  f"{type(e).__name__}: {str(e)[:120]}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run cycles of the Absolute Truth mission.")
     parser.add_argument("--cycles", type=int, default=1, help="number of cycles to run")
     parser.add_argument("--mock", action="store_true", help="dry run with pretend models")
     parser.add_argument("--list-models", action="store_true", help="list models your keys can use")
+    parser.add_argument("--ping", nargs="+", metavar="A|B [MODEL]",
+                        help="test how quickly models answer, e.g. --ping B (configured models) "
+                             "or --ping B some/model other/model")
     parser.add_argument("--data-dir", help="where to keep data (default: data/ or data-mock/)")
     args = parser.parse_args()
 
@@ -67,6 +99,9 @@ def main() -> int:
             if free:
                 print(f"   (only free models shown; {len(models) - len(free)} paid models hidden)")
         return 0
+
+    if args.ping:
+        return ping(agents, budget, args.ping[0], args.ping[1:])
 
     if not args.mock:
         for key, agent in agents.items():

@@ -63,6 +63,9 @@ in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
 On Windows, type `py` instead of `python` in the commands below.
 
 ```bash
+python run.py --list-models        # which models your keys can use
+python run.py --ping B             # does model B answer right now, and how fast?
+python run.py --ping B some/model other/model   # compare candidate models
 python run.py --mock --cycles 6    # dry run: pretend models, no API calls, writes to data-mock/
 python run.py --cycles 3           # real run: writes to data/
 python -m unittest discover -s tests -t .   # run the tests
