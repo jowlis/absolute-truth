@@ -45,8 +45,7 @@ in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
 
 2. Copy `.env.example` to `.env` and add your free keys:
    - `GEMINI_API_KEY` from Google AI Studio (https://aistudio.google.com/apikey)
-   - `MISTRAL_API_KEY` from Mistral's console (https://console.mistral.ai), on the
-     free Experiment plan
+   - `NVIDIA_API_KEY` from NVIDIA's free developer API (https://build.nvidia.com)
    - `OPENROUTER_API_KEY` is optional (only if you switch model B back to OpenRouter)
 
 3. Install Docker and start it. The Python sandbox needs it. Without Docker the runner

@@ -21,25 +21,25 @@ supports_tools = true
 web_search = true                 # Gemini's built-in Google Search grounding
 
 [models.B]
-label = "Mistral"
-lab = "Mistral AI"
+label = "TO-BE-CHOSEN"            # set after choosing a model from --list-models
+lab = "TO-BE-CHOSEN"              # the lab that made the model (must not be Google)
 provider = "openai_compatible"    # any API that speaks OpenAI's chat format
-base_url = "https://api.mistral.ai/v1"
-model = "mistral-large-latest"    # Mistral's strongest model; free on the Experiment plan
-fallback_models = ["mistral-medium-latest", "mistral-small-latest"]
-key_env = "MISTRAL_API_KEY"
+base_url = "https://integrate.api.nvidia.com/v1"   # NVIDIA's free developer API
+model = "TO-BE-CHOSEN"            # pick from: python run.py --list-models
+fallback_models = []
+key_env = "NVIDIA_API_KEY"
 input_price_per_mtok = 0.0
 output_price_per_mtok = 0.0
 max_output_tokens = 8192
-requests_per_minute = 20          # Experiment plan: about 1 request per second
-requests_per_day = 500
+requests_per_minute = 20          # NVIDIA free accounts: reportedly 40 per minute
+requests_per_day = 200            # self-imposed pace, to make the free credits last
 timeout_seconds = 300             # give up on one request after 5 minutes
 supports_tools = true
 web_search = false                # no built-in search; uses Wikipedia/arXiv lookups
 
-# Earlier choice, kept for reference: OpenRouter's free pool was too often overloaded.
-# base_url = "https://openrouter.ai/api/v1", model = "inclusionai/ling-3.2-flash:free",
-# key_env = "OPENROUTER_API_KEY", requests_per_day = 50
+# Earlier choices, kept for reference:
+# - OpenRouter free pool (inclusionai/ling-3.2-flash:free): too often overloaded (429).
+# - Mistral: no free API plan anymore (only pay-as-you-go).
 
 [sandbox]
 # Python executor: a throwaway Docker container with no network, a read-only
