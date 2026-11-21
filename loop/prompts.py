@@ -41,6 +41,16 @@ ROADMAP_OPS_HELP = """Roadmap operations (a list; each change needs a reason):
 - {"op": "set_foundation", "field": "interpretation" | "method" (text) or "knowable" | "unknowable" (list of texts), "value": ..., "reason": "..."}"""
 
 
+VERDICT_HELP = """Verdicts for claims:
+- accept: correct and precise as stated, with honest confidence.
+- accept_lower_confidence: correct and precise as stated, but less certain than claimed
+  (give the lower "confidence").
+- contested: imprecise, overstated, needing to be restated, or open to reasonable doubt.
+- reject: wrong, unsupported or meaningless; it should not be recorded.
+Your verdict must match your criticism: if you say a claim is imprecise or should be
+restated, do not accept it. The statement is recorded exactly as written."""
+
+
 def system_prompt(agent, other, role: str) -> str:
     return f"""{CONSTITUTION}
 
@@ -101,7 +111,7 @@ include every milestone and task you want to keep.
 {_reply_shape("genesis_merge")}"""
 
 
-def genesis_review(cycle: int, drafts: dict, merged: dict, merger: str) -> str:
+def genesis_review(cycle: int, drafts: dict, merged: dict, merger: str, roadmap_md: str) -> str:
     shown = "\n\n".join(f"## Draft by {name}\n```json\n{json.dumps(d, indent=2, ensure_ascii=False)}\n```"
                         for name, d in drafts.items())
     claims = merged.get("claims", [])
@@ -117,11 +127,15 @@ Number of claims to review: {len(claims)}
 {json.dumps(merged, indent=2, ensure_ascii=False)}
 ```
 
+## The roadmap as built from the merge
+Refer to roadmap items by these ids (M1, T1, ...), not by the temporary keys above.
+
+{roadmap_md}
+
 ## The original drafts, for reference
 {shown}
 
-Verdicts: accept, accept_lower_confidence (give the lower "confidence"), contested
-(reasonable doubt remains), reject (should not be recorded).
+{VERDICT_HELP}
 
 {_reply_shape("genesis_review")}"""
 
@@ -201,8 +215,7 @@ claim and every finding update exactly once, by number (1 = first).
 Number of claims to review: {len(claims)}
 Number of finding updates to review: {len(updates)}
 
-Verdicts for claims: accept, accept_lower_confidence (give the lower "confidence"),
-contested (reasonable doubt remains), reject (should not be recorded).
+{VERDICT_HELP}
 For finding updates: agree true/false. A status change only happens if you agree.
 task_complete: was the task's goal really met?
 appeal_check: did any claim look shaped to impress rather than to be true?

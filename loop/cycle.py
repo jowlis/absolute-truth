@@ -150,7 +150,8 @@ class CycleRunner:
         log["roadmap_changes"], log["roadmap_errors"] = result["changes"], result["errors"]
 
         review = self._ask(reviewer, merger, "reviewer", "genesis_review",
-                           prompts.genesis_review(n, drafts, merged, merger.name),
+                           prompts.genesis_review(n, drafts, merged, merger.name,
+                                                  self.roadmap.render_md()),
                            self._review_check(len(merged["claims"]), 0), transcript)
 
         self._record_claims(n, None, merged["claims"], review, merger, reviewer, log)
