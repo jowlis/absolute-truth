@@ -21,12 +21,12 @@ supports_tools = true
 web_search = true                 # Gemini's built-in Google Search grounding
 
 [models.B]
-label = "Kimi"
-lab = "Moonshot AI"               # the lab that made the model (must not be Google)
+label = "Nemotron"
+lab = "NVIDIA"                    # the lab that made the model (must not be Google)
 provider = "openai_compatible"    # any API that speaks OpenAI's chat format
 base_url = "https://integrate.api.nvidia.com/v1"   # NVIDIA's free developer API
-model = "moonshotai/kimi-k3.1-pro"   # Moonshot's flagship, hosted free by NVIDIA
-fallback_models = []              # backups must be from the same lab; Moonshot has no other here
+model = "nvidia/nemotron-3-ultra-550b-a55b"   # NVIDIA's largest model, on NVIDIA's own service
+fallback_models = ["nvidia/nemotron-3.5-super-vl-120b-a12b", "nvidia/nemotron-3.5-lightning-30b-a3b"]
 key_env = "NVIDIA_API_KEY"
 input_price_per_mtok = 0.0
 output_price_per_mtok = 0.0
@@ -38,7 +38,8 @@ max_reply_seconds = 1800          # ...or if one answer takes longer than 30 min
 supports_tools = true
 web_search = false                # no built-in search; uses Wikipedia/arXiv lookups
 
-# Earlier choices, kept for reference:
+# Earlier choices, kept for reference (compare with: python run.py --ping B model1 model2):
+# - Kimi K3.1 Pro (moonshotai/kimi-k3.1-pro): queued for minutes on NVIDIA's free service.
 # - OpenRouter free pool (inclusionai/ling-3.2-flash:free): too often overloaded (429).
 # - Mistral: no free API plan anymore (only pay-as-you-go). Mistral Large 4 is on NVIDIA:
 #   model = "mistralai/mistral-large-4-1t-a52b", label = "Mistral", lab = "Mistral AI".
