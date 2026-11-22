@@ -118,8 +118,10 @@ class Agent:
         """
         limits = self.budget.limits
         waits = limits["retry_wait_seconds"]
-        attempts = limits["retry_attempts"]
         while True:
+            # Few retries while a backup model is still available; all retries on the last one.
+            on_last_model = self.cfg["model"] == self.models[-1]
+            attempts = limits["retry_attempts"] if on_last_model else limits["retries_before_backup"]
             last_error = None
             for attempt in range(attempts + 1):
                 try:
@@ -149,7 +151,7 @@ class Agent:
                 if isinstance(last_error, DailyQuotaReached):
                     raise last_error
                 raise ProviderUnavailable(
-                    f"{self.cfg['label']} kept failing after {attempts} retries on every model "
+                    f"{self.cfg['label']} kept failing on every model "
                     f"({type(last_error).__name__}: {str(last_error)[:200]}). Try again later."
                 ) from last_error
 

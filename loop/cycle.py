@@ -15,6 +15,7 @@ even if it was interrupted.
 
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -297,6 +298,7 @@ class CycleRunner:
 
     def _record_claims(self, n, task_id, claims, review, author, reviewer, log) -> None:
         by_number = {r["claim"]: r for r in (review or {}).get("claim_reviews", [])}
+        recorded = {}   # claim number -> finding id, so later claims can build on earlier ones
         for i, claim in enumerate(claims, start=1):
             r = by_number.get(i)
             verdict = r["verdict"] if r else None
@@ -304,10 +306,19 @@ class CycleRunner:
             if status is None:
                 log["rejected_claims"].append(f"{claim['statement']} (rejected: {r['reason']})")
                 continue
-            builds_on = [str(b) for b in claim["builds_on"] if self.kb.exists(str(b))]
-            dropped = [str(b) for b in claim["builds_on"] if not self.kb.exists(str(b))]
+            builds_on, dropped = [], []
+            for ref in claim["builds_on"]:
+                ref = str(ref).strip()
+                same_report = re.fullmatch(r"(?:claim\s*|C)(\d+)", ref, re.IGNORECASE)
+                if same_report and int(same_report.group(1)) in recorded:
+                    builds_on.append(recorded[int(same_report.group(1))])
+                elif self.kb.exists(ref):
+                    builds_on.append(ref)
+                else:
+                    dropped.append(ref)
             if dropped:
-                log["problems"].append(f"claim {i}: unknown builds_on ids ignored: {dropped}")
+                log["problems"].append(
+                    f"claim {i}: builds_on ignored (unknown, rejected or later claim): {dropped}")
             fid = self.kb.add_finding(
                 cycle=n, task_id=task_id, statement=claim["statement"], type=claim["type"],
                 confidence=verdicts.final_confidence(claim["confidence"], (r or {}).get("confidence")),
@@ -315,6 +326,7 @@ class CycleRunner:
                 status=status, sources=[str(s) for s in claim["sources"]], builds_on=builds_on,
                 created_by=author.name, reviewed_by=reviewer.name if r else None,
                 review_note=r["reason"] if r else "not reviewed")
+            recorded[i] = fid
             log["results"].append(f"{fid} ({status}): {claim['statement']}")
             if verdict == "contested":
                 log["disagreements"].append(f"{fid} contested: {r['reason']}")

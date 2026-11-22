@@ -91,7 +91,8 @@ class MockRunTests(unittest.TestCase):
         with mock.patch.object(agent, "_chat", flaky_chat):
             log = runner.run_cycle()
         self.assertEqual(log["outcome"], "productive")
-        self.assertEqual(sum("retrying" in m for m in messages), 2)
+        self.assertEqual(sum("retrying" in m for m in messages), 1)       # one retry...
+        self.assertEqual(sum("switching to backup" in m for m in messages), 1)  # ...then backup
 
     def test_provider_that_stays_down_ends_the_run_cleanly(self):
         from agents.base import ProviderUnavailable, Transient
@@ -106,7 +107,8 @@ class MockRunTests(unittest.TestCase):
         with mock.patch.object(agent, "_chat", always_down):
             with self.assertRaises(ProviderUnavailable):
                 runner.run_cycle()
-        self.assertEqual(runner.budget.requests, 12)  # 3 models x (first try + 3 retries)
+        # 2 attempts on each model with a backup left, 4 (first try + 3 retries) on the last
+        self.assertEqual(runner.budget.requests, 2 + 2 + 4)
         # No model replied, so the attempt is kept on disk but gets no cycle number.
         self.assertEqual(runner.kb.cycle_logs(), [])
         self.assertTrue(list((d / "runs" / "test").glob("cycle_0001_not_counted")))
@@ -200,6 +202,23 @@ class MockRunTests(unittest.TestCase):
         runner.run_cycle()
         self.assertEqual(runner.kb.cycle_usage(1)["models"].count(agent.models[0]), 1)
 
+    def test_claims_can_build_on_earlier_claims_in_the_same_report(self):
+        d = temp_dir()
+        runner = mock_runner(d)
+        runner.run_cycle()                                       # genesis: F0001
+        log = {"results": [], "rejected_claims": [], "disagreements": [], "problems": []}
+        claim = {"type": "verifiable", "confidence": 0.8, "refutation_condition": "x",
+                 "evidence": "x", "sources": []}
+        claims = [dict(claim, statement="first", builds_on=["F0001"]),
+                  dict(claim, statement="second", builds_on=["claim 1", "C1"]),
+                  dict(claim, statement="third", builds_on=["claim 4", "F9999"])]
+        a, b = runner.agents["A"], runner.agents["B"]
+        runner._record_claims(2, None, claims, None, a, b, log)
+        kb = runner.kb
+        self.assertEqual(kb.finding("F0003")["builds_on"], ["F0002"])
+        self.assertEqual(kb.finding("F0004")["builds_on"], [])
+        self.assertIn("['claim 4', 'F9999']", log["problems"][0])
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()
@@ -217,7 +236,7 @@ class MockRunTests(unittest.TestCase):
         self.assertEqual(log["outcome"], "productive")
         self.assertIn(agent.models[1], log["usage"]["models"])
         self.assertNotIn(main, log["usage"]["models"])
-        self.assertEqual(log["usage"]["failed_attempts"], 4)
+        self.assertEqual(log["usage"]["failed_attempts"], 2)   # first try + 1 retry, then backup
 
     def test_used_up_daily_quota_switches_to_backup(self):
         d = temp_dir()

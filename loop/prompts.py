@@ -189,7 +189,7 @@ Planner's brief: {brief}
 Carry out the task, using tools where they help, then report:
 - claims: each one clear, self-contained statement your work supports. Give type,
   confidence (0 to 1), refutation_condition, evidence, sources, and builds_on (ids of
-  existing findings it relies on).
+  existing findings it relies on, or "claim N" for an earlier claim in this report).
 - finding_updates: if your work shows an existing finding is wrong, propose
   "refuted"; for a finding marked NEEDS REVIEW you re-examined, propose the status it
   deserves now. Give the evidence in the reason. Leave empty if none.

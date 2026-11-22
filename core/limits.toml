@@ -5,4 +5,5 @@ max_api_requests_per_run = 60      # hard cap on API requests in one run
 max_tool_steps_per_turn = 8        # tool calls a worker/reviewer may make per turn
 resource_share_ceiling = 0.20      # max fraction of cycles spent on resource work
 retry_attempts = 3                 # retries after "too many requests", server errors or timeouts
+retries_before_backup = 1          # fewer retries while a backup model is available
 retry_wait_seconds = [15, 45, 90]  # wait before each retry

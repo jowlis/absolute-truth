@@ -50,7 +50,7 @@ _CLAIM_EXAMPLE = """{
       "refutation_condition": "<what would prove this wrong>",
       "evidence": "<how it was established: reasoning steps, calculations, sources>",
       "sources": ["<url or reference>"],
-      "builds_on": ["<id of an existing finding this relies on, e.g. F0003>"]
+      "builds_on": ["<id of an existing finding, e.g. F0003, or 'claim 1' for an earlier claim in this reply>"]
     }"""
 
 EXAMPLES = {
