@@ -34,6 +34,7 @@ class Reply:
     input_tokens: int = 0
     output_tokens: int = 0
     raw: object = None
+    truncated: bool = False     # the answer was cut off at the output length limit
 
 
 class RateLimited(Exception):
@@ -59,6 +60,7 @@ class Agent:
         self.on_usage = on_usage    # callback(agent, purpose, in_tokens, out_tokens, cost)
         self.on_failure = None      # callback(agent, purpose, error) for failed attempts
         self.web_search_off = ""    # reason, once web search has failed for good in this run
+        self.last_truncated = False # whether the last final answer was cut off
         self.say = lambda message: None   # progress messages; the runner sets this
 
     @property
@@ -180,6 +182,7 @@ class Agent:
             messages.append({"role": "assistant", "content": reply.text,
                              "tool_calls": reply.tool_calls, "raw": reply.raw})
             if not reply.tool_calls:
+                self.last_truncated = reply.truncated
                 return reply.text
             for call in reply.tool_calls:
                 steps += 1

@@ -248,6 +248,27 @@ class MockRunTests(unittest.TestCase):
         self.assertIn("How this system works", system)
         self.assertIn("always `conceptual`", system)            # constitution, rule 4
 
+    def test_cut_off_reply_gets_a_clear_retry_message(self):
+        from agents.base import Reply
+        d = temp_dir()
+        runner = mock_runner(d)
+        runner.run_cycle()                                       # genesis
+        agent = runner.agents["B"]                               # cycle 2 planner
+        real_chat, first = agent._chat, iter([True])
+
+        def cut_off(system, messages, tools):
+            if next(first, False):
+                return Reply(text='```json\n{"track": "miss', truncated=True,
+                             input_tokens=10, output_tokens=5)
+            return real_chat(system, messages, tools)
+
+        with mock.patch.object(agent, "_chat", cut_off):
+            log = runner.run_cycle()
+        self.assertEqual(log["outcome"], "productive")
+        transcript = json.loads((d / "runs" / "test" / "cycle_0002" / "transcript.json")
+                                .read_text(encoding="utf-8"))
+        self.assertIn("cut off at the length limit", transcript[0]["messages"][2]["content"])
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()

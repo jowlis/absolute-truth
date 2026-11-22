@@ -402,6 +402,10 @@ class CycleRunner:
                 text = agent.converse(system, messages, toolbox,
                                       self.limits["max_tool_steps_per_turn"], purpose=stage)
                 obj, parse_error = schemas.parse_reply(text)
+                if parse_error and agent.last_truncated:
+                    parse_error = ("your reply was cut off at the length limit before the JSON "
+                                   "was complete; reply again with a shorter answer (fewer or "
+                                   "shorter claims, less text before the JSON)")
                 errors = [parse_error] if parse_error else schemas.check(obj, schemas.SPECS[stage])
                 if not errors and extra_check:
                     errors = extra_check(obj)

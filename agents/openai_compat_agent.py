@@ -48,7 +48,7 @@ class OpenAICompatAgent(Agent):
         try:
             stream = self.client.chat.completions.create(**request)
             with stream:
-                text, calls, usage = self._collect(stream)
+                text, calls, usage, finish = self._collect(stream)
         except openai.RateLimitError as e:
             raise RateLimited(str(e)) from e
         except (openai.InternalServerError, openai.APIConnectionError) as e:  # incl. timeouts
@@ -68,12 +68,12 @@ class OpenAICompatAgent(Agent):
         # Some providers don't report usage when streaming; then estimate it.
         input_tokens = getattr(usage, "prompt_tokens", 0) or estimate_tokens(sent)
         output_tokens = getattr(usage, "completion_tokens", 0) or len(text) // 4 + 1
-        return Reply(text=text, tool_calls=tool_calls,
-                     input_tokens=input_tokens, output_tokens=output_tokens)
+        return Reply(text=text, tool_calls=tool_calls, input_tokens=input_tokens,
+                     output_tokens=output_tokens, truncated=(finish == "length"))
 
-    def _collect(self, stream) -> tuple[str, dict, object]:
-        """Put the streamed pieces back together: text, tool calls and token usage."""
-        parts, calls, usage = [], {}, None
+    def _collect(self, stream) -> tuple[str, dict, object, str | None]:
+        """Put the streamed pieces back together: text, tool calls, usage, finish reason."""
+        parts, calls, usage, finish = [], {}, None, None
         thinking_chars = 0
         started = last_note = time.monotonic()
         limit = self.cfg.get("max_reply_seconds", 1200)
@@ -81,6 +81,7 @@ class OpenAICompatAgent(Agent):
             if chunk.usage:
                 usage = chunk.usage
             for choice in chunk.choices or []:
+                finish = choice.finish_reason or finish
                 delta = choice.delta
                 if delta.content:
                     parts.append(delta.content)
@@ -99,7 +100,7 @@ class OpenAICompatAgent(Agent):
                 self.say(f"{self.cfg['model']} is still working "
                          f"({thinking_chars} characters of thinking, {written} of answer so far)")
                 last_note = now
-        return "".join(parts), calls, usage
+        return "".join(parts), calls, usage, finish
 
     def list_models(self) -> list[str]:
         return sorted(m.id for m in self.client.models.list())

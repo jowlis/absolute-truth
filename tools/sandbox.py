@@ -15,6 +15,7 @@ sandbox is unavailable instead.
 import shutil
 import subprocess
 import uuid
+from pathlib import Path
 
 
 def docker_available() -> bool:
@@ -25,6 +26,25 @@ def docker_available() -> bool:
         return result.returncode == 0
     except (subprocess.TimeoutExpired, OSError):
         return False
+
+
+def ensure_image(cfg: dict, say=print) -> bool:
+    """Make sure the sandbox image exists; build it from sandbox/Dockerfile if not.
+
+    Building needs the internet once (to download Python libraries). The sandbox itself
+    never has network access.
+    """
+    image = cfg["image"]
+    if subprocess.run(["docker", "image", "inspect", image], capture_output=True).returncode == 0:
+        return True
+    dockerfile_dir = Path(__file__).resolve().parent.parent / "sandbox"
+    say(f"Building the sandbox image '{image}' (one time, about 1-3 minutes)...")
+    result = subprocess.run(["docker", "build", "-t", image, str(dockerfile_dir)],
+                            capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if result.returncode != 0:
+        say("Building the sandbox image failed:\n" + result.stderr[-1500:])
+        return False
+    return True
 
 
 def run_python(code: str, cfg: dict) -> str:

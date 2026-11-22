@@ -165,16 +165,39 @@ def parse_reply(text: str) -> tuple[dict | None, str | None]:
     """Find the JSON object in a reply: the last ```json block, else the outermost {...}."""
     blocks = FENCED_JSON.findall(text or "")
     candidates = blocks[::-1]
-    if not candidates and "{" in (text or ""):
+    text = text or ""
+    if not candidates and "{" in text and "}" in text[text.index("{"):]:
         candidates = [text[text.index("{"): text.rindex("}") + 1]]
+    error = "no JSON object found in the reply"
     for candidate in candidates:
-        try:
-            obj = json.loads(candidate)
-        except json.JSONDecodeError:
-            continue
+        obj, problem = _loads(candidate)
         if isinstance(obj, dict):
             return obj, None
-    return None, "no valid JSON object found in the reply"
+        error = problem or "the JSON is not an object"
+    return None, error
+
+
+# A backslash and the character after it, read in pairs as JSON reads them.
+ESCAPE_PAIR = re.compile(r"\\(.)", re.DOTALL)
+VALID_ESCAPES = set('"\\/bfnrtu')
+
+
+def _fix_backslashes(text: str) -> str:
+    """Double every backslash that does not start a valid JSON escape (e.g. LaTeX \\hbar)."""
+    return ESCAPE_PAIR.sub(
+        lambda m: m.group(0) if m.group(1) in VALID_ESCAPES else "\\\\" + m.group(1), text)
+
+
+def _loads(candidate: str):
+    """json.loads, repairing stray backslashes (common in formulas) if needed."""
+    try:
+        return json.loads(candidate), None
+    except json.JSONDecodeError:
+        pass
+    try:
+        return json.loads(_fix_backslashes(candidate)), None
+    except json.JSONDecodeError as e:
+        return None, f"invalid JSON: {e.msg} at line {e.lineno}, column {e.colno}"
 
 
 def check(obj, spec: dict, path: str = "") -> list[str]:

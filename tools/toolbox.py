@@ -12,7 +12,9 @@ RUN_PYTHON = {
     "name": "run_python",
     "description": ("Run Python 3 code in an isolated sandbox with no network and no files, "
                     "and get its printed output. Use it for calculations, simulations and "
-                    "logic checks. Print what you want to see. Standard library only."),
+                    "logic checks. Print what you want to see. Available: the standard "
+                    "library plus numpy, scipy, sympy and mpmath (if one is missing, the "
+                    "error says so)."),
     "parameters": {"type": "object",
                    "properties": {"code": {"type": "string", "description": "Python code"}},
                    "required": ["code"]},

@@ -47,7 +47,8 @@ web_search = false                # no built-in search; uses Wikipedia/arXiv loo
 [sandbox]
 # Python executor: a throwaway Docker container with no network, a read-only
 # filesystem, no mounted files and no environment variables.
-image = "python:3.13-slim"
+image = "absolute-truth-sandbox"   # built from sandbox/Dockerfile (Python + numpy, scipy, sympy, mpmath)
+fallback_image = "python:3.13-slim"  # plain Python, used if the image above cannot be built
 timeout_seconds = 30
 memory = "256m"
 max_output_chars = 4000

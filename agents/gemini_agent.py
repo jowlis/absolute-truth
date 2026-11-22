@@ -47,7 +47,9 @@ class GeminiAgent(Agent):
         calls = [ToolCall(id=p.function_call.id or f"call_{i}", name=p.function_call.name,
                           args=dict(p.function_call.args or {}))
                  for i, p in enumerate(parts) if p.function_call]
-        return Reply(text=text, tool_calls=calls, raw=content, **_usage(response))
+        finish = str(response.candidates[0].finish_reason) if response.candidates else ""
+        return Reply(text=text, tool_calls=calls, raw=content, truncated="MAX_TOKENS" in finish,
+                     **_usage(response))
 
     def _web_search(self, query: str) -> Reply:
         config = types.GenerateContentConfig(

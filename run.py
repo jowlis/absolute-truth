@@ -25,7 +25,7 @@ from core.budget import Budget, BudgetExceeded, DailyQuotaReached
 from knowledge.db import KnowledgeBase
 from knowledge.roadmap import Roadmap
 from loop.cycle import CycleRunner
-from tools.sandbox import docker_available
+from tools.sandbox import docker_available, ensure_image
 
 ROOT = Path(__file__).resolve().parent
 
@@ -118,7 +118,10 @@ def main() -> int:
 
     sandbox_ok = docker_available()
     if not sandbox_ok:
-        print("Warning: Docker is not available, so the Python sandbox is switched off.")
+        print("Warning: Docker is not running, so the Python sandbox is switched off.")
+    elif not ensure_image(config["sandbox"]):
+        config["sandbox"]["image"] = config["sandbox"]["fallback_image"]
+        print("Warning: using plain Python in the sandbox (without numpy, scipy, sympy, mpmath).")
 
     run_id = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S") + ("-mock" if args.mock else "")
     kb = KnowledgeBase(data_dir / "knowledge.db")

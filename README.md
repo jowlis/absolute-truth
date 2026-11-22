@@ -49,7 +49,9 @@ in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
    - `OPENROUTER_API_KEY` is optional (only if you switch model B back to OpenRouter)
 
 3. Install Docker and start it. The Python sandbox needs it. Without Docker the runner
-   still works, but the agents get no code execution.
+   still works, but the agents get no code execution. On the first run, the sandbox
+   image (Python with numpy, scipy, sympy and mpmath, from `sandbox/Dockerfile`) is
+   built automatically; this needs the internet once and takes a few minutes.
 
 4. Check which models your keys can use, and fix `config.toml` if a model id is
    missing. Free model lineups change often.
