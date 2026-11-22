@@ -52,6 +52,8 @@ def main() -> int:
     if args.view == "findings":
         for f in kb.findings():
             flag = "  NEEDS REVIEW" if f["needs_review"] else ""
+            if f.get("superseded_by"):
+                flag += f"  -> replaced by {f['superseded_by']}"
             deps = f"  <- {', '.join(f['builds_on'])}" if f["builds_on"] else ""
             print(f"{f['id']} [{f['status']:<10} {f['type']:<10} conf {f['confidence']:.2f}]"
                   f"{flag} {f['statement']}{deps}")
@@ -61,7 +63,8 @@ def main() -> int:
             print(f"No finding {args.id}")
             return 1
         for key in ("id", "statement", "type", "status", "confidence", "refutation_condition",
-                    "evidence", "sources", "builds_on", "created_by", "reviewed_by", "review_note"):
+                    "evidence", "sources", "builds_on", "superseded_by", "created_by",
+                    "reviewed_by", "review_note"):
             print(f"{key:>21}: {f[key]}")
         print(f"{'needed by':>21}: {kb.dependents(f['id'])}")
         print(f"{'needs review':>21}: {bool(f['needs_review'])}")

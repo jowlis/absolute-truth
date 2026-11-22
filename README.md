@@ -123,11 +123,13 @@ version, with the changes that produced it, is kept in `data/roadmap_versions/`.
   - `conceptual`: conceptual, and accepted;
   - `contested`: the reviewer has doubts;
   - `refuted`: shown wrong;
+  - `superseded`: replaced by a more precise or corrected finding (shown with its
+    replacement);
   - `proposed`: never reviewed (for example, the run stopped);
 - **refutation condition, evidence, sources,** and the earlier findings it builds on.
 
-When a finding is refuted, every finding that depends on it, even indirectly, is
-marked **NEEDS REVIEW**. Rejected claims never become findings; they stay in the
+When a finding is refuted or superseded, every finding that depends on it, even
+indirectly, is marked **NEEDS REVIEW**. Rejected claims never become findings; they stay in the
 cycle log.
 
 **Cycle logs** (`data/runs/<run>/cycle_NNNN/`):

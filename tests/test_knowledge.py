@@ -45,6 +45,41 @@ class RefutationCascadeTests(unittest.TestCase):
                                   "status supported -> contested"])
 
 
+class SupersededTests(unittest.TestCase):
+    def test_superseded_needs_a_replacement_and_flags_dependents(self):
+        kb = KnowledgeBase(temp_dir() / "k.db")
+        old = add(kb)
+        dependent = add(kb, [old])
+        better = add(kb)
+        with self.assertRaises(ValueError):
+            kb.set_status(old, "superseded", "more precise version exists", cycle=2)
+        flagged = kb.set_status(old, "superseded", "more precise", cycle=2, superseded_by=better)
+        self.assertEqual(flagged, [dependent])
+        self.assertEqual(kb.finding(old)["superseded_by"], better)
+        self.assertIn("replaced by", kb.events(old)[-1]["event"])
+        self.assertTrue(kb.finding(add(kb, [old]))["needs_review"])   # building on it later
+
+    def test_old_knowledge_base_is_upgraded_without_losing_data(self):
+        import sqlite3
+        from knowledge.db import SCHEMA
+        path = temp_dir() / "old.db"
+        old_schema = SCHEMA.replace(", 'superseded'", "").replace("    superseded_by TEXT,\n", "")
+        conn = sqlite3.connect(path)
+        conn.executescript(old_schema)
+        conn.execute("INSERT INTO findings (id, cycle, statement, type, confidence, status,"
+                     " created_by, created_at, updated_at) VALUES"
+                     " ('F0001', 1, 'old finding', 'verifiable', 0.9, 'supported', 'a', 't', 't')")
+        conn.commit()
+        conn.close()
+
+        kb = KnowledgeBase(path)
+        self.assertEqual(kb.finding("F0001")["statement"], "old finding")
+        better = add(kb)
+        kb.set_status("F0001", "superseded", "x", cycle=2, superseded_by=better)
+        self.assertEqual(kb.finding("F0001")["status"], "superseded")
+        KnowledgeBase(path)                                    # upgrading twice is harmless
+
+
 class RoadmapTests(unittest.TestCase):
     def test_ops_keys_versions_and_validation(self):
         d = temp_dir()

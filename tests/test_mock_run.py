@@ -219,6 +219,35 @@ class MockRunTests(unittest.TestCase):
         self.assertEqual(kb.finding("F0004")["builds_on"], [])
         self.assertIn("['claim 4', 'F9999']", log["problems"][0])
 
+    def test_finding_can_be_superseded_by_a_claim_in_the_same_report(self):
+        d = temp_dir()
+        runner = mock_runner(d)
+        runner.run_cycle()                                       # genesis: F0001
+        a, b = runner.agents["A"], runner.agents["B"]
+        log = {"results": [], "rejected_claims": [], "disagreements": [], "problems": [],
+               "status_changes": [], "flagged_for_review": []}
+        claim = {"statement": "more precise", "type": "verifiable", "confidence": 0.8,
+                 "refutation_condition": "x", "evidence": "x", "sources": [], "builds_on": []}
+        review = {"claim_reviews": [{"claim": 1, "verdict": "accept", "reason": "ok"}],
+                  "update_reviews": [{"update": 1, "agree": True, "reason": "ok"},
+                                     {"update": 2, "agree": True, "reason": "ok"}]}
+        updates = [{"finding_id": "F0001", "new_status": "superseded", "superseded_by": "claim 1",
+                    "reason": "restated precisely"},
+                   {"finding_id": "F0001", "new_status": "superseded", "superseded_by": "F9999",
+                    "reason": "bad reference"}]
+        runner._record_claims(2, None, [claim], review, a, b, log)
+        runner._record_updates(2, updates, review, log)
+        self.assertEqual(runner.kb.finding("F0001")["superseded_by"], "F0002")
+        self.assertEqual(len(log["status_changes"]), 1)
+        self.assertIn("not applied", log["problems"][0])
+
+    def test_agents_are_told_how_the_system_works(self):
+        from loop import prompts
+        runner = mock_runner(temp_dir())
+        system = prompts.system_prompt(runner.agents["A"], runner.agents["B"], "worker")
+        self.assertIn("How this system works", system)
+        self.assertIn("always `conceptual`", system)            # constitution, rule 4
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()

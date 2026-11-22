@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS findings (
     refutation_condition TEXT,
     evidence TEXT,
     status TEXT NOT NULL CHECK (status IN
-        ('proposed', 'contested', 'supported', 'refuted', 'conceptual')),
+        ('proposed', 'contested', 'supported', 'refuted', 'conceptual', 'superseded')),
+    superseded_by TEXT,
     needs_review INTEGER NOT NULL DEFAULT 0,
     sources TEXT NOT NULL DEFAULT '[]',
     created_by TEXT NOT NULL,
@@ -101,7 +102,31 @@ class KnowledgeBase:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             self.conn = sqlite3.connect(self.path)
             self.conn.executescript(SCHEMA)
+            self._upgrade()
         self.conn.row_factory = sqlite3.Row
+        self.conn.execute("PRAGMA foreign_keys = ON")
+
+    def _upgrade(self) -> None:
+        """Bring a knowledge base made by an older version up to date. Keeps all data.
+
+        Adds the "superseded" status and the superseded_by column. SQLite cannot change a
+        table's rules in place, so the findings table is rebuilt (SQLite's documented way).
+        """
+        sql = self.conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'findings'").fetchone()[0]
+        if "superseded" in sql:
+            return
+        new_table = SCHEMA[SCHEMA.index("CREATE TABLE IF NOT EXISTS findings"):
+                           SCHEMA.index("CREATE TABLE IF NOT EXISTS finding_deps")]
+        new_table = new_table.replace("IF NOT EXISTS findings", "findings_upgraded")
+        old_columns = [r[1] for r in self.conn.execute("PRAGMA table_info(findings)")]
+        columns = ", ".join(old_columns)
+        self.conn.execute("PRAGMA foreign_keys = OFF")
+        with self.conn:
+            self.conn.execute(new_table)
+            self.conn.execute(f"INSERT INTO findings_upgraded ({columns}) SELECT {columns} FROM findings")
+            self.conn.execute("DROP TABLE findings")
+            self.conn.execute("ALTER TABLE findings_upgraded RENAME TO findings")
         self.conn.execute("PRAGMA foreign_keys = ON")
 
     # ---- findings ------------------------------------------------------------
@@ -127,8 +152,8 @@ class KnowledgeBase:
                 "INSERT INTO finding_events (finding_id, cycle, event, reason, at)"
                 " VALUES (?,?,?,?,?)", (fid, cycle, f"created as {status}", review_note, stamp))
         # Building on refuted or flagged work makes the new finding doubtful too.
-        shaky = [d for d in builds_on
-                 if (f := self.finding(d)) and (f["status"] == "refuted" or f["needs_review"])]
+        shaky = [d for d in builds_on if (f := self.finding(d))
+                 and (f["status"] in ("refuted", "superseded") or f["needs_review"])]
         if shaky:
             with self.conn:
                 self.conn.execute("UPDATE findings SET needs_review = 1 WHERE id = ?", (fid,))
@@ -136,7 +161,8 @@ class KnowledgeBase:
                     "INSERT INTO finding_events (finding_id, cycle, event, reason, at)"
                     " VALUES (?,?,?,?,?)",
                     (fid, cycle, "flagged for review",
-                     f"builds on refuted or flagged finding(s) {', '.join(shaky)}", now()))
+                     f"builds on refuted, superseded or flagged finding(s) {', '.join(shaky)}",
+                     now()))
         return fid
 
     def finding(self, fid: str) -> dict | None:
@@ -166,29 +192,40 @@ class KnowledgeBase:
             (fid,))
         return [dict(r) for r in rows]
 
-    def set_status(self, fid: str, new_status: str, reason: str, cycle: int) -> list[str]:
+    def set_status(self, fid: str, new_status: str, reason: str, cycle: int,
+                   superseded_by: str | None = None) -> list[str]:
         """Change a finding's status. Returns the ids flagged for review as a result.
 
         Any status change after review clears the finding's own needs_review flag.
-        If the new status is "refuted", every finding that depends on it, directly or
-        through a chain, is flagged needs_review.
+        If the new status is "refuted" (shown false) or "superseded" (replaced by a more
+        precise or corrected finding, `superseded_by`), every finding that depends on it,
+        directly or through a chain, is flagged needs_review.
         """
         old = self.finding(fid)
         if old is None:
             raise KeyError(fid)
+        if new_status == "superseded" and not (superseded_by and self.exists(superseded_by)):
+            raise ValueError("a superseded finding needs the id of the finding that replaces it")
+        event = f"status {old['status']} -> {new_status}"
+        if superseded_by:
+            event += f" (replaced by {superseded_by})"
         with self.conn:
             self.conn.execute(
-                "UPDATE findings SET status = ?, needs_review = 0, updated_at = ? WHERE id = ?",
-                (new_status, now(), fid))
+                "UPDATE findings SET status = ?, superseded_by = ?, needs_review = 0,"
+                " updated_at = ? WHERE id = ?",
+                (new_status, superseded_by if new_status == "superseded" else None, now(), fid))
             self.conn.execute(
                 "INSERT INTO finding_events (finding_id, cycle, event, reason, at) VALUES (?,?,?,?,?)",
-                (fid, cycle, f"status {old['status']} -> {new_status}", reason, now()))
+                (fid, cycle, event, reason, now()))
         if new_status == "refuted":
-            return self._flag_dependents(fid, cycle)
+            return self._flag_dependents(fid, cycle, f"refuted finding {fid}")
+        if new_status == "superseded":
+            return self._flag_dependents(
+                fid, cycle, f"superseded finding {fid} (check whether to rely on {superseded_by})")
         return []
 
-    def _flag_dependents(self, refuted_id: str, cycle: int) -> list[str]:
-        flagged, queue = [], list(self.dependents(refuted_id))
+    def _flag_dependents(self, changed_id: str, cycle: int, what: str) -> list[str]:
+        flagged, queue = [], list(self.dependents(changed_id))
         while queue:
             fid = queue.pop(0)
             if fid in flagged:
@@ -201,7 +238,7 @@ class KnowledgeBase:
                     "INSERT INTO finding_events (finding_id, cycle, event, reason, at)"
                     " VALUES (?,?,?,?,?)",
                     (fid, cycle, "flagged for review",
-                     f"depends (directly or indirectly) on refuted finding {refuted_id}", now()))
+                     f"depends (directly or indirectly) on {what}", now()))
             queue.extend(self.dependents(fid))
         return flagged
 

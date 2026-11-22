@@ -48,7 +48,27 @@ VERDICT_HELP = """Verdicts for claims:
 - contested: imprecise, overstated, needing to be restated, or open to reasonable doubt.
 - reject: wrong, unsupported or meaningless; it should not be recorded.
 Your verdict must match your criticism: if you say a claim is imprecise or should be
-restated, do not accept it. The statement is recorded exactly as written."""
+restated, do not accept it. The statement is recorded exactly as written.
+A claim with the wrong type must be contested: rules, procedures, definitions,
+recommendations and proposals are "conceptual", never "verifiable"."""
+
+SYSTEM_EXPLAINED = """How this system works (set by the human owner; agents cannot change it):
+- Two models from different labs take turns. In each cycle one plans and later reviews,
+  the other does the work; the roles swap every cycle.
+- A worker's claims become findings only through the reviewer's verdicts, which fixed
+  code turns into statuses: accept or accept_lower_confidence -> "supported" (verifiable)
+  or "conceptual" (conceptual); contested -> "contested"; reject -> not recorded.
+  Unreviewed claims are "proposed". Review can lower confidence, never raise it.
+- Changing an existing finding's status needs the worker's proposal and the reviewer's
+  agreement. "refuted" means shown to be false. "superseded" means replaced by a more
+  precise or corrected finding, named in "superseded_by". In both cases every finding
+  that builds on it, directly or through a chain, is marked NEEDS REVIEW.
+- Every message, tool call and verdict is logged and will be published.
+- How findings are scored, how work is verified, budget limits and the constitution
+  are fixed by the owner. You may study methods and propose better ones, but a proposal
+  does not change how this system works: record it as a conceptual finding, and never
+  describe a rule as being in force unless it is listed here.
+- Resource work only produces proposals for the owner, never findings."""
 
 
 def system_prompt(agent, other, role: str) -> str:
@@ -60,6 +80,8 @@ You are {agent.name}, one of two AI models from different labs working together 
 this mission. The other model is {other.name}.
 
 {ROLE_DESCRIPTIONS[role]}
+
+{SYSTEM_EXPLAINED}
 
 How to reply: think as much as you need, then end your reply with exactly one JSON
 object in a ```json code block, in the shape requested. Do not add other JSON blocks.
@@ -190,9 +212,12 @@ Carry out the task, using tools where they help, then report:
 - claims: each one clear, self-contained statement your work supports. Give type,
   confidence (0 to 1), refutation_condition, evidence, sources, and builds_on (ids of
   existing findings it relies on, or "claim N" for an earlier claim in this report).
-- finding_updates: if your work shows an existing finding is wrong, propose
-  "refuted"; for a finding marked NEEDS REVIEW you re-examined, propose the status it
-  deserves now. Give the evidence in the reason. Leave empty if none.
+- finding_updates: if your work shows an existing finding is false, propose
+  "refuted". If it is not false but one of your claims replaces it with a more precise
+  or corrected statement, propose "superseded" with "superseded_by" (a finding id, or
+  "claim N" for a claim in this report). For a finding marked NEEDS REVIEW that you
+  re-examined, propose the status it deserves now. Give the evidence in the reason.
+  Leave empty if none.
 - task_complete: whether the task's goal was met.
 
 # Knowledge base (cite ids in builds_on)
@@ -288,6 +313,8 @@ def findings_summary(findings: list, max_chars: int) -> str:
     lines = []
     for f in findings:
         flag = " **NEEDS REVIEW**" if f["needs_review"] else ""
+        if f.get("superseded_by"):
+            flag += f" (replaced by {f['superseded_by']})"
         deps = f" (builds on {', '.join(f['builds_on'])})" if f["builds_on"] else ""
         lines.append(f"- {f['id']} [{f['status']}, {f['type']}, confidence {f['confidence']:.2f}]"
                      f"{flag} {f['statement']}{deps}. Refuted if: {f['refutation_condition'] or 'n/a'}")

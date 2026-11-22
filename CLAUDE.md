@@ -33,8 +33,13 @@ Every session working on this codebase must follow these principles.
 - Every finding carries:
   - a **confidence** level,
   - a **type**: `verifiable` (logic, math, or empirical evidence) or
-    `conceptual` (a reasoned position that cannot be checked),
+    `conceptual` (a reasoned position that cannot be checked). Rules, procedures,
+    definitions, recommendations and proposals are always `conceptual`,
   - where possible, a **refutation condition** (what would prove it wrong).
+
+- Agents are told accurately how the system works (roles, how verdicts become
+  statuses, what refuted/superseded mean). They may propose better methods, but a
+  proposal never changes the rules in `core/`.
 
 ## 5. No lab leads
 - Models alternate roles (Planner / Worker / Reviewer) so no single model

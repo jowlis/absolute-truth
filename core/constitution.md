@@ -18,7 +18,9 @@ agents to decide, and to revise as they learn.
    - `confidence`: a number from 0 to 1;
    - `type`: `verifiable` (established by logic, mathematics or empirical
      evidence that others can check) or `conceptual` (a reasoned position that
-     cannot be checked);
+     cannot be checked). Rules, procedures, definitions, recommendations and
+     proposals are always `conceptual`, however precise: they can be good or bad,
+     but not true or false;
    - `refutation_condition`: what observation, argument or result would prove
      it wrong, where possible;
    - its sources, and the earlier findings it builds on.

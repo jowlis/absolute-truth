@@ -17,8 +17,9 @@ CLAIM = {
     "refutation_condition": str, "evidence": str, "sources": list, "builds_on": list,
 }
 FINDING_UPDATE = {
-    "finding_id": str, "new_status": ("enum", "supported", "contested", "refuted", "conceptual"),
-    "reason": str,
+    "finding_id": str,
+    "new_status": ("enum", "supported", "contested", "refuted", "conceptual", "superseded"),
+    "superseded_by?": str, "reason": str,
 }
 CLAIM_REVIEW = {"claim": int, "verdict": ("enum",) + CLAIM_VERDICTS, "confidence?": float,
                 "reason": str}
@@ -110,7 +111,8 @@ EXAMPLES = {
     %s
   ],
   "finding_updates": [
-    {"finding_id": "F0002", "new_status": "refuted", "reason": "<evidence for the change>"}
+    {"finding_id": "F0002", "new_status": "superseded", "superseded_by": "claim 1",
+     "reason": "<why the replacement is more precise or correct>"}
   ],
   "task_complete": true,
   "open_questions": ["<what remains unclear>"],

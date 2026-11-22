@@ -51,6 +51,7 @@ class CycleRunner:
         self.say = say or (lambda message: None)   # progress messages (run.py prints them)
         self.failures: list[str] = []              # failed API attempts in this cycle
         self.last_author = ""                      # model that wrote the last accepted reply
+        self.claim_ids: dict = {}                  # claim number -> finding id, current report
         for agent in agents.values():
             agent.on_usage = self.record_usage
             agent.on_failure = self.record_failure
@@ -299,6 +300,7 @@ class CycleRunner:
     def _record_claims(self, n, task_id, claims, review, author, reviewer, log) -> None:
         by_number = {r["claim"]: r for r in (review or {}).get("claim_reviews", [])}
         recorded = {}   # claim number -> finding id, so later claims can build on earlier ones
+        self.claim_ids = recorded   # also used by _record_updates ("superseded_by": "claim 1")
         for i, claim in enumerate(claims, start=1):
             r = by_number.get(i)
             verdict = r["verdict"] if r else None
@@ -344,9 +346,25 @@ class CycleRunner:
                     f"proposed {fid} -> {u['new_status']} not applied: "
                     f"{r['reason'] if r else 'not reviewed'}")
                 continue
+            replacement = None
+            if u["new_status"] == "superseded":
+                ref = str(u.get("superseded_by") or "").strip()
+                same_report = re.fullmatch(r"(?:claim\s*|C)(\d+)", ref, re.IGNORECASE)
+                if same_report:
+                    replacement = self.claim_ids.get(int(same_report.group(1)))
+                elif self.kb.exists(ref) and ref != fid:
+                    replacement = ref
+                if replacement is None:
+                    log["problems"].append(
+                        f"update {i}: {fid} -> superseded not applied: replacement {ref!r} "
+                        "is not a recorded finding")
+                    continue
             reason = f"{u['reason']} | reviewer: {r['reason']}"
-            flagged = self.kb.set_status(fid, u["new_status"], reason, n)
-            log["status_changes"].append(f"{fid} -> {u['new_status']}: {u['reason']}")
+            flagged = self.kb.set_status(fid, u["new_status"], reason, n, superseded_by=replacement)
+            change = f"{fid} -> {u['new_status']}"
+            if replacement:
+                change += f" (replaced by {replacement})"
+            log["status_changes"].append(f"{change}: {u['reason']}")
             log["flagged_for_review"] += flagged
 
     # ---- asking an agent for JSON --------------------------------------------

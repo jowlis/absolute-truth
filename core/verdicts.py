@@ -5,7 +5,7 @@ This file imports nothing from agent-facing or presentation code.
 """
 
 FINDING_TYPES = ("verifiable", "conceptual")
-FINDING_STATUSES = ("proposed", "contested", "supported", "refuted", "conceptual")
+FINDING_STATUSES = ("proposed", "contested", "supported", "refuted", "conceptual", "superseded")
 CLAIM_VERDICTS = ("accept", "accept_lower_confidence", "contested", "reject")
 PROPOSAL_VERDICTS = ("accept", "reject")
 
