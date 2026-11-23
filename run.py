@@ -73,6 +73,7 @@ def verify(data_dir: Path) -> int:
         print("  -", p)
     db_path = data_dir / "knowledge.db"
     if db_path.exists():
+        KnowledgeBase(db_path)          # applies any pending one-time upgrade first
         kb = KnowledgeBase(db_path, read_only=True)
         db_problems = kb.verify()
         cycles = len(kb.cycle_logs())
