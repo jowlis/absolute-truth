@@ -14,6 +14,8 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
+from core import integrity
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS findings (
     id TEXT PRIMARY KEY,
@@ -56,6 +58,8 @@ CREATE TABLE IF NOT EXISTS cycles (
     planner TEXT, worker TEXT, reviewer TEXT,
     task_id TEXT,
     log_json TEXT NOT NULL,
+    prev_hash TEXT,
+    log_hash TEXT,
     input_tokens INTEGER NOT NULL DEFAULT 0,
     output_tokens INTEGER NOT NULL DEFAULT 0,
     cost_usd REAL NOT NULL DEFAULT 0,
@@ -88,6 +92,41 @@ CREATE TABLE IF NOT EXISTS resource_proposals (
 );
 """
 
+# Rules the database enforces itself, whatever code talks to it (Phase 2, locked core).
+# History is append-only; a recorded finding's content can't be edited; confidence never rises.
+TRIGGERS = {
+    "findings_no_delete":
+        "BEFORE DELETE ON findings BEGIN SELECT RAISE(ABORT, 'findings cannot be deleted'); END",
+    "findings_content_fixed":
+        "BEFORE UPDATE OF id, cycle, task_id, statement, type, refutation_condition, evidence,"
+        " sources, created_by, reviewed_by, review_note, created_at ON findings"
+        " BEGIN SELECT RAISE(ABORT, 'a recorded finding cannot be edited'); END",
+    "findings_confidence_never_rises":
+        "BEFORE UPDATE OF confidence ON findings WHEN NEW.confidence > OLD.confidence"
+        " BEGIN SELECT RAISE(ABORT, 'confidence can never rise'); END",
+    "deps_fixed":
+        "BEFORE UPDATE ON finding_deps BEGIN SELECT RAISE(ABORT, 'dependencies are fixed'); END",
+    "deps_no_delete":
+        "BEFORE DELETE ON finding_deps BEGIN SELECT RAISE(ABORT, 'dependencies are fixed'); END",
+    "events_no_update":
+        "BEFORE UPDATE ON finding_events BEGIN SELECT RAISE(ABORT, 'history is append-only'); END",
+    "events_no_delete":
+        "BEFORE DELETE ON finding_events BEGIN SELECT RAISE(ABORT, 'history is append-only'); END",
+    "cycles_no_delete":
+        "BEFORE DELETE ON cycles BEGIN SELECT RAISE(ABORT, 'cycles cannot be deleted'); END",
+    "cycles_fixed_once_chained":
+        "BEFORE UPDATE ON cycles WHEN OLD.log_hash IS NOT NULL"
+        " BEGIN SELECT RAISE(ABORT, 'a recorded cycle cannot be edited'); END",
+    "api_calls_no_update":
+        "BEFORE UPDATE ON api_calls BEGIN SELECT RAISE(ABORT, 'cost records are fixed'); END",
+    "api_calls_no_delete":
+        "BEFORE DELETE ON api_calls BEGIN SELECT RAISE(ABORT, 'cost records are fixed'); END",
+    "proposals_no_update":
+        "BEFORE UPDATE ON resource_proposals BEGIN SELECT RAISE(ABORT, 'proposals are fixed'); END",
+    "proposals_no_delete":
+        "BEFORE DELETE ON resource_proposals BEGIN SELECT RAISE(ABORT, 'proposals are fixed'); END",
+}
+
 
 def now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -103,14 +142,39 @@ class KnowledgeBase:
             self.conn = sqlite3.connect(self.path)
             self.conn.executescript(SCHEMA)
             self._upgrade()
+            for name, body in TRIGGERS.items():
+                self.conn.execute(f"CREATE TRIGGER IF NOT EXISTS {name} {body}")
+            self.conn.commit()
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
 
     def _upgrade(self) -> None:
-        """Bring a knowledge base made by an older version up to date. Keeps all data.
+        """Bring a knowledge base made by an older version up to date. Keeps all data."""
+        self._upgrade_findings()
+        self._upgrade_cycles()
 
-        Adds the "superseded" status and the superseded_by column. SQLite cannot change a
-        table's rules in place, so the findings table is rebuilt (SQLite's documented way).
+    def _upgrade_cycles(self) -> None:
+        """Add the history chain (Phase 2) and chain the cycles recorded before it."""
+        columns = [r[1] for r in self.conn.execute("PRAGMA table_info(cycles)")]
+        with self.conn:
+            for column in ("prev_hash", "log_hash"):
+                if column not in columns:
+                    self.conn.execute(f"ALTER TABLE cycles ADD COLUMN {column} TEXT")
+            unchained = self.conn.execute(
+                "SELECT number FROM cycles WHERE log_hash IS NULL ORDER BY number").fetchall()
+            for (number,) in unchained:
+                prev = self._last_hash(before=number)
+                log_json = self.conn.execute(
+                    "SELECT log_json FROM cycles WHERE number = ?", (number,)).fetchone()[0]
+                self.conn.execute(
+                    "UPDATE cycles SET prev_hash = ?, log_hash = ? WHERE number = ?",
+                    (prev, integrity.chain_hash(prev, json.loads(log_json)), number))
+
+    def _upgrade_findings(self) -> None:
+        """Add the "superseded" status and the superseded_by column.
+
+        SQLite cannot change a table's rules in place, so the findings table is rebuilt
+        (SQLite's documented way).
         """
         sql = self.conn.execute(
             "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'findings'").fetchone()[0]
@@ -253,17 +317,54 @@ class KnowledgeBase:
     def next_cycle_number(self) -> int:
         return (self.conn.execute("SELECT MAX(number) FROM cycles").fetchone()[0] or 0) + 1
 
-    def record_cycle(self, log: dict, run_id: str) -> None:
+    def record_cycle(self, log: dict, run_id: str) -> str:
+        """Add a cycle to the history chain. Returns its hash."""
+        prev = self._last_hash()
+        log_hash = integrity.chain_hash(prev, log)
         with self.conn:
             self.conn.execute(
-                "INSERT OR REPLACE INTO cycles (number, run_id, track, outcome, planner, worker,"
-                " reviewer, task_id, log_json, input_tokens, output_tokens, cost_usd, started_at,"
-                " ended_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO cycles (number, run_id, track, outcome, planner, worker,"
+                " reviewer, task_id, log_json, prev_hash, log_hash, input_tokens, output_tokens,"
+                " cost_usd, started_at, ended_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (log["cycle"], run_id, log["track"], log["outcome"], log["roles"].get("planner"),
                  log["roles"].get("worker"), log["roles"].get("reviewer"), log.get("task_id"),
-                 json.dumps(log, ensure_ascii=False), log["usage"]["input_tokens"],
-                 log["usage"]["output_tokens"], log["usage"]["cost_usd"], log["started_at"],
-                 log["ended_at"]))
+                 json.dumps(log, ensure_ascii=False), prev, log_hash,
+                 log["usage"]["input_tokens"], log["usage"]["output_tokens"],
+                 log["usage"]["cost_usd"], log["started_at"], log["ended_at"]))
+        return log_hash
+
+    def _last_hash(self, before: int | None = None) -> str:
+        query = "SELECT log_hash FROM cycles WHERE log_hash IS NOT NULL"
+        args: tuple = ()
+        if before is not None:
+            query += " AND number < ?"
+            args = (before,)
+        row = self.conn.execute(query + " ORDER BY number DESC LIMIT 1", args).fetchone()
+        return row[0] if row else integrity.GENESIS_HASH
+
+    def verify(self) -> list[str]:
+        """Check the database's own rules and the history chain. Empty list = all intact."""
+        problems = []
+        present = {r[0] for r in self.conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'trigger'")}
+        problems += [f"database rule missing: {name}" for name in TRIGGERS if name not in present]
+
+        prev = integrity.GENESIS_HASH
+        for number, log_json, prev_hash, log_hash in self.conn.execute(
+                "SELECT number, log_json, prev_hash, log_hash FROM cycles ORDER BY number"):
+            if prev_hash != prev:
+                problems.append(f"history chain broken before cycle {number}")
+            if log_hash != integrity.chain_hash(prev_hash or "", json.loads(log_json)):
+                problems.append(f"cycle {number} was changed after it was recorded")
+            prev = log_hash
+
+        for fid, status, superseded_by in self.conn.execute(
+                "SELECT id, status, superseded_by FROM findings"):
+            if status == "superseded" and not (superseded_by and self.exists(superseded_by)):
+                problems.append(f"{fid} is superseded but names no recorded replacement")
+            if not self.events(fid):
+                problems.append(f"{fid} has no history")
+        return problems
 
     def cycle_logs(self, last: int | None = None) -> list[dict]:
         rows = self.conn.execute("SELECT log_json FROM cycles ORDER BY number").fetchall()

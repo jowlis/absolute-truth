@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from agents.base import ProviderUnavailable, transcript_safe
-from core import verdicts
+from core import integrity, recorder, verdicts
 from core.budget import BudgetExceeded, DailyQuotaReached
 from core.killswitch import StopRequested
 from loop import prompts, schemas
@@ -52,6 +52,7 @@ class CycleRunner:
         self.failures: list[str] = []              # failed API attempts in this cycle
         self.last_author = ""                      # model that wrote the last accepted reply
         self.claim_ids: dict = {}                  # claim number -> finding id, current report
+        self._parties = None                       # (author, reviewer) of the current report
         for agent in agents.values():
             agent.on_usage = self.record_usage
             agent.on_failure = self.record_failure
@@ -87,6 +88,7 @@ class CycleRunner:
             "flagged_for_review": [], "proposals": [], "disagreements": [],
             "roadmap_changes": [], "roadmap_errors": [], "appeal_check": None,
             "next_step": "", "problems": [], "usage": {},
+            "rules": integrity.rules_in_force(),
         }
         transcript = []
         try:
@@ -280,20 +282,11 @@ class CycleRunner:
             prompts.resource_review(n, plan["task_brief"], worker.name, report),
             lambda obj: _numbering_errors(obj["proposal_reviews"], "proposal", count),
             transcript)
-        accepted = 0
-        verdict_by_number = {r["proposal"]: r for r in (review or {}).get("proposal_reviews", [])}
-        for i, p in enumerate(report["proposals"], start=1):
-            r = verdict_by_number.get(i)
-            if r and r["verdict"] == "accept":
-                pid = self.kb.add_resource_proposal(
-                    cycle=n, title=p["title"], proposal=p["proposal"],
-                    expected_benefit=p["expected_benefit"], costs_and_risks=p["costs_and_risks"],
-                    proposed_by=worker.name, reviewed_by=reviewer.name, review_note=r["reason"])
-                log["proposals"].append(f"{pid} accepted: {p['title']}")
-                accepted += 1
-            else:
-                why = r["reason"] if r else "not reviewed"
-                log["proposals"].append(f"rejected: {p['title']} ({why})")
+        out = recorder.record_proposals(self.kb, cycle=n, proposals=report["proposals"],
+                                        review=review, author=_party(worker),
+                                        reviewer=_party(reviewer))
+        accepted = out.pop("accepted")
+        _merge(log, out)
         self._write_proposals_md()
         if review:
             log["disagreements"] += review["disagreements"]
@@ -303,74 +296,21 @@ class CycleRunner:
     # ---- recording -----------------------------------------------------------
 
     def _record_claims(self, n, task_id, claims, review, author, reviewer, log) -> None:
-        by_number = {r["claim"]: r for r in (review or {}).get("claim_reviews", [])}
-        recorded = {}   # claim number -> finding id, so later claims can build on earlier ones
-        self.claim_ids = recorded   # also used by _record_updates ("superseded_by": "claim 1")
-        for i, claim in enumerate(claims, start=1):
-            r = by_number.get(i)
-            verdict = r["verdict"] if r else None
-            status = verdicts.finding_status(claim["type"], verdict)
-            if status is None:
-                log["rejected_claims"].append(f"{claim['statement']} (rejected: {r['reason']})")
-                continue
-            builds_on, dropped = [], []
-            for ref in claim["builds_on"]:
-                ref = str(ref).strip()
-                same_report = re.fullmatch(r"(?:claim\s*|C)(\d+)", ref, re.IGNORECASE)
-                if same_report and int(same_report.group(1)) in recorded:
-                    builds_on.append(recorded[int(same_report.group(1))])
-                elif self.kb.exists(ref):
-                    builds_on.append(ref)
-                else:
-                    dropped.append(ref)
-            if dropped:
-                log["problems"].append(
-                    f"claim {i}: builds_on ignored (unknown, rejected or later claim): {dropped}")
-            fid = self.kb.add_finding(
-                cycle=n, task_id=task_id, statement=claim["statement"], type=claim["type"],
-                confidence=verdicts.final_confidence(claim["confidence"], (r or {}).get("confidence")),
-                refutation_condition=claim["refutation_condition"], evidence=claim["evidence"],
-                status=status, sources=[str(s) for s in claim["sources"]], builds_on=builds_on,
-                created_by=author.name, reviewed_by=reviewer.name if r else None,
-                review_note=r["reason"] if r else "not reviewed")
-            recorded[i] = fid
-            log["results"].append(f"{fid} ({status}): {claim['statement']}")
-            if verdict == "contested":
-                log["disagreements"].append(f"{fid} contested: {r['reason']}")
+        """Hand the claims and the verdicts to the protected recorder (core/recorder.py)."""
+        self._parties = (_party(author), _party(reviewer))
+        out = recorder.record_claims(
+            self.kb, cycle=n, task_id=task_id, claims=claims, review=review,
+            author=self._parties[0], reviewer=self._parties[1],
+            max_claims=self.limits["max_claims_per_report"])
+        self.claim_ids = out.pop("claim_ids")
+        _merge(log, out)
 
     def _record_updates(self, n, updates, review, log) -> None:
-        by_number = {r["update"]: r for r in (review or {}).get("update_reviews", [])}
-        for i, u in enumerate(updates, start=1):
-            r = by_number.get(i)
-            fid = u["finding_id"]
-            if not self.kb.exists(fid):
-                log["problems"].append(f"update {i}: unknown finding {fid}")
-                continue
-            if not verdicts.status_update_allowed(u["new_status"], bool(r and r["agree"])):
-                log["disagreements"].append(
-                    f"proposed {fid} -> {u['new_status']} not applied: "
-                    f"{r['reason'] if r else 'not reviewed'}")
-                continue
-            replacement = None
-            if u["new_status"] == "superseded":
-                ref = str(u.get("superseded_by") or "").strip()
-                same_report = re.fullmatch(r"(?:claim\s*|C)(\d+)", ref, re.IGNORECASE)
-                if same_report:
-                    replacement = self.claim_ids.get(int(same_report.group(1)))
-                elif self.kb.exists(ref) and ref != fid:
-                    replacement = ref
-                if replacement is None:
-                    log["problems"].append(
-                        f"update {i}: {fid} -> superseded not applied: replacement {ref!r} "
-                        "is not a recorded finding")
-                    continue
-            reason = f"{u['reason']} | reviewer: {r['reason']}"
-            flagged = self.kb.set_status(fid, u["new_status"], reason, n, superseded_by=replacement)
-            change = f"{fid} -> {u['new_status']}"
-            if replacement:
-                change += f" (replaced by {replacement})"
-            log["status_changes"].append(f"{change}: {u['reason']}")
-            log["flagged_for_review"] += flagged
+        """Hand proposed status changes to the protected recorder."""
+        out = recorder.record_updates(
+            self.kb, cycle=n, updates=updates, review=review, author=self._parties[0],
+            reviewer=self._parties[1], claim_ids=self.claim_ids)
+        _merge(log, out)
 
     # ---- asking an agent for JSON --------------------------------------------
 
@@ -511,6 +451,17 @@ class CycleRunner:
 
 # ---- helpers -------------------------------------------------------------------
 
+def _party(agent) -> recorder.Party:
+    return recorder.Party(name=agent.name, lab=agent.cfg["lab"])
+
+
+def _merge(log: dict, out: dict) -> None:
+    """Add the recorder's lists (results, problems, ...) to the cycle log."""
+    for key, items in out.items():
+        log.setdefault(key, [])
+        log[key] += items
+
+
 def _numbering_errors(items: list, label: str, expected: int) -> list[str]:
     numbers = [it[label] for it in items]
     wanted = list(range(1, expected + 1))
@@ -543,6 +494,7 @@ def render_log_md(log: dict) -> str:
 - Worker: {log['roles'].get('worker')}
 - Reviewer: {log['roles'].get('reviewer')}
 - Time: {log['started_at']} to {log['ended_at']}
+- Rules: constitution v{log.get('rules', {}).get('constitution_version', '?')}, core fingerprint {log.get('rules', {}).get('core_fingerprint', 'not recorded')}
 - Models that replied: {', '.join(u.get('models', [])) or 'none'}
 - Usage: {u.get('api_calls', 0)} API calls ({u.get('failed_attempts', 0)} failed attempts), {u.get('input_tokens', 0)} input tokens, {u.get('output_tokens', 0)} output tokens, ${u.get('cost_usd', 0):.4f}
 

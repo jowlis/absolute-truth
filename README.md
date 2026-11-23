@@ -6,7 +6,7 @@ tools, check each other's work, and record what holds up as findings. Nobody
 chooses topics for them. The principles are in [CLAUDE.md](CLAUDE.md), and the
 rules the agents follow are in [core/constitution.md](core/constitution.md).
 
-This is Phase 1: the planning-and-doing loop, the roadmap and the knowledge base.
+Phases 1 and 2 are built: the planning-and-doing loop, the roadmap and the knowledge base, and the locked core that guards them.
 
 ## How a cycle works
 
@@ -94,6 +94,43 @@ python -m unittest discover -s tests -t .   # run the tests
   reuses the number, and also reuses the replies already received
   (`data/reply_cache.json`), so finished work isn't thrown away.
 
+## The locked core (Phase 2)
+
+The rules live in `core/`: the constitution, limits, budget guard, kill switch, scoring
+rules (`verdicts.py`) and the recorder (`recorder.py`, the only code that writes findings).
+
+- **Locked.** `core/manifest.json` holds a fingerprint of every core file. `run.py`
+  refuses to run if any of them changed without your approval. To approve a change:
+
+  ```bash
+  python lock_core.py "why the change was made"
+  ```
+
+  It shows what changed, asks you to type `yes`, records the change in
+  `core/CHANGELOG.md` and writes new fingerprints. Then commit `core/`. If the
+  constitution changed, raise its `Version:` line first.
+- **Protected recording.** Whatever the rest of the code does, the recorder only accepts
+  a review from a model of a *different lab*, never lets review raise confidence, skips
+  claims with an invalid type, and records at most `max_claims_per_report` per cycle.
+- **The database guards itself.** Findings and their history can't be deleted, a recorded
+  finding's statement, type and author can't be edited, and confidence can never rise.
+- **History chain.** Each cycle's log is hashed together with the previous cycle's hash.
+  Each log also names the rules it ran under (constitution version and core fingerprint).
+- **Spending caps** in `core/limits.toml`: per run, per day and per month (UTC), kept in
+  `data/spending.json`. Every call is checked first against its worst-case cost.
+- **Check everything:**
+
+  ```bash
+  python run.py --verify
+  ```
+
+  It reports the core fingerprint and constitution version, then checks the database
+  rules and the whole history chain.
+
+An honest limit: on your own computer nothing can be locked against you, since you
+control the machine. The core makes every rule change deliberate and recorded, and
+makes any quiet edit of the rules or of history detectable.
+
 ## Reading the results
 
 Everything is in `data/` (or `data-mock/` for dry runs). These are read-only views:
@@ -148,7 +185,8 @@ cycle log.
 | `run.py` | Starts a run; checks keys, models and the sandbox |
 | `show.py` | Read-only views of the data |
 | `config.toml` | Models, prices, rate limits, sandbox and lookup settings |
-| `core/` | **Protected:** constitution, limits, budget guard, kill switch, scoring rules |
+| `core/` | **Locked:** constitution, limits, budget guard, kill switch, scoring rules, recorder, integrity checks |
+| `lock_core.py` | Your command for approving changes to `core/` |
 | `loop/cycle.py` | One cycle: genesis, or plan → do → review → record |
 | `loop/prompts.py` | Everything the agents are told (no topics, only process) |
 | `loop/schemas.py` | The JSON each role must return, and its checker |

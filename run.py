@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 from agents import make_agents
 from agents.base import ProviderUnavailable
 from core import budget as budget_module
-from core import killswitch
+from core import integrity, killswitch
 from core.budget import Budget, BudgetExceeded, DailyQuotaReached
 from knowledge.db import KnowledgeBase
 from knowledge.roadmap import Roadmap
@@ -63,6 +63,29 @@ def ping(agents: dict, budget, key: str, models: list) -> int:
     return 0
 
 
+def verify(data_dir: Path) -> int:
+    """Check everything that Phase 2 locks, and say plainly what is wrong, if anything."""
+    problems = integrity.check_core()
+    rules = integrity.rules_in_force()
+    print(f"Core: fingerprint {rules['core_fingerprint']}, constitution "
+          f"v{rules['constitution_version']}: " + ("OK" if not problems else "PROBLEMS"))
+    for p in problems:
+        print("  -", p)
+    db_path = data_dir / "knowledge.db"
+    if db_path.exists():
+        kb = KnowledgeBase(db_path, read_only=True)
+        db_problems = kb.verify()
+        cycles = len(kb.cycle_logs())
+        print(f"Knowledge base: {len(kb.findings())} findings, {cycles} cycles in the history "
+              "chain: " + ("OK" if not db_problems else "PROBLEMS"))
+        for p in db_problems:
+            print("  -", p)
+        problems += db_problems
+    else:
+        print("Knowledge base: none yet.")
+    return 1 if problems else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run cycles of the Absolute Truth mission.")
     parser.add_argument("--cycles", type=int, default=1, help="number of cycles to run")
@@ -72,6 +95,8 @@ def main() -> int:
                         help="test how quickly models answer, e.g. --ping B (configured models) "
                              "or --ping B some/model other/model")
     parser.add_argument("--data-dir", help="where to keep data (default: data/ or data-mock/)")
+    parser.add_argument("--verify", action="store_true",
+                        help="check the locked core, the database rules and the history chain")
     args = parser.parse_args()
 
     load_dotenv(ROOT / ".env")
@@ -83,6 +108,17 @@ def main() -> int:
         killswitch.check()
     except killswitch.StopRequested as e:
         print(e)
+        return 1
+
+    if args.verify:
+        return verify(data_dir)
+
+    problems = integrity.check_core()
+    if problems:
+        print("Refusing to run: the protected core (core/) differs from what the owner approved.")
+        for p in problems:
+            print("  -", p)
+        print('If these changes are intended, approve them with:  py lock_core.py "reason"')
         return 1
 
     budget = Budget(limits, data_dir / "daily_usage.json")

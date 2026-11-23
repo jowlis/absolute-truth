@@ -72,8 +72,8 @@ Every session working on this codebase must follow these principles.
   agents can never change it.
 
 ## 8. Build in phases — do not build a later phase until the owner says so
-1. Planning-and-doing loop, roadmap, knowledge base **(current)**
-2. Locked core: constitution file, protected verification, budget cap, kill switch
+1. Planning-and-doing loop, roadmap, knowledge base **(done)**
+2. Locked core: constitution file, protected verification, budget cap, kill switch **(done)**
 3. Static public website showing the roadmap, findings and the path so far
 4. Donations
 5. Human volunteer testing (agents request real-world tests they can't do)
@@ -87,3 +87,12 @@ Every session working on this codebase must follow these principles.
 - Every run has a dollar budget cap; every cycle logs transcripts, tokens and cost.
 - Always keep a mock mode that runs the full loop without calling real APIs.
 - Before writing significant code, show the owner a brief plan and wait for OK.
+- `core/` is locked: `run.py` refuses to run if any core file differs from
+  `core/manifest.json`. Only the owner approves core changes, by running
+  `py lock_core.py "reason"` (it records the change in `core/CHANGELOG.md`). A session
+  that changes `core/` must say so and ask the owner to approve; never write the
+  manifest any other way. If the constitution changes, raise its `Version:` line.
+- Only `core/recorder.py` writes findings, status changes and resource proposals.
+  The database enforces its own rules (append-only history, fixed finding content,
+  confidence never rises) and chains every cycle's log by hash; `run.py --verify`
+  checks all of it.

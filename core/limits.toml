@@ -1,6 +1,8 @@
 # Owner-set limits. Agents can never change these (CLAUDE.md principle 3).
 
 budget_usd_per_run = 2.00          # hard dollar cap for one run of run.py
+budget_usd_per_day = 5.00          # hard dollar cap per day (UTC), across runs
+budget_usd_per_month = 20.00       # hard dollar cap per calendar month (UTC), across runs
 max_api_requests_per_run = 60      # hard cap on API requests in one run
 max_tool_steps_per_turn = 8        # tool calls a worker/reviewer may make per turn
 max_claims_per_report = 8          # claims a worker may record in one cycle (small steps)

@@ -1,5 +1,7 @@
 # Constitution
 
+Version: 2
+
 These rules bind every agent in every role. Agents cannot change them.
 
 ## Mission

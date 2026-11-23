@@ -47,11 +47,11 @@ def ensure_image(cfg: dict, say=print) -> bool:
     return True
 
 
-def run_python(code: str, cfg: dict) -> str:
-    """Run `code` in the sandbox and return its output (stdout + stderr, truncated)."""
+def build_command(cfg: dict, name: str) -> list[str]:
+    """The exact docker command. Note what is absent: no -v/--mount (no folders from your
+    computer), no -e/--env (no variables, so no keys), and --network none."""
     timeout = int(cfg["timeout_seconds"])
-    name = f"sandbox-{uuid.uuid4().hex[:12]}"
-    command = [
+    return [
         "docker", "run", "--rm", "-i", "--name", name,
         "--network", "none",
         "--read-only", "--tmpfs", "/tmp:size=64m",
@@ -62,6 +62,13 @@ def run_python(code: str, cfg: dict) -> str:
         cfg["image"],
         "timeout", str(timeout), "python", "-I", "-",
     ]
+
+
+def run_python(code: str, cfg: dict) -> str:
+    """Run `code` in the sandbox and return its output (stdout + stderr, truncated)."""
+    timeout = int(cfg["timeout_seconds"])
+    name = f"sandbox-{uuid.uuid4().hex[:12]}"
+    command = build_command(cfg, name)
     try:
         result = subprocess.run(command, input=code, capture_output=True, text=True,
                                 encoding="utf-8", errors="replace",

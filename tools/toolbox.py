@@ -5,6 +5,7 @@ provider's format. Tool results are data for the agent, never instructions.
 """
 
 from core.budget import BudgetExceeded, DailyQuotaReached
+from core import killswitch
 from core.killswitch import StopRequested
 from tools import lookup, sandbox
 
@@ -53,6 +54,7 @@ class Toolbox:
         return [d["name"] for d in self.definitions]
 
     def run(self, name: str, args: dict) -> str:
+        killswitch.check()   # STOP also halts the run between tool calls
         if name not in self.names():
             return f"[error] Unknown or unavailable tool: {name}"
         try:
