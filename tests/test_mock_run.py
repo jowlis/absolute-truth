@@ -269,6 +269,17 @@ class MockRunTests(unittest.TestCase):
                                 .read_text(encoding="utf-8"))
         self.assertIn("cut off at the length limit", transcript[0]["messages"][2]["content"])
 
+    def test_worker_may_record_at_most_the_claim_limit(self):
+        d = temp_dir()
+        runner = mock_runner(d, limits=dict(load_limits(), max_claims_per_report=1))
+        runner.run_cycle()                                       # genesis
+        log = runner.run_cycle()                                 # mock worker sends 2 claims
+        self.assertEqual(log["what_was_done"], "The worker did not produce a valid report.")
+        transcript = json.loads((d / "runs" / "test" / "cycle_0002" / "transcript.json")
+                                .read_text(encoding="utf-8"))
+        work = next(s for s in transcript if s["stage"] == "work")
+        self.assertIn("too many claims (2): record at most 1", work["errors"][0])
+
     def test_busy_model_switches_to_backup(self):
         from agents.base import Transient
         d = temp_dir()

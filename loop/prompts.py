@@ -167,7 +167,7 @@ Refer to roadmap items by these ids (M1, T1, ...), not by the temporary keys abo
 # ---- regular cycles ------------------------------------------------------------
 
 def plan(cycle: int, roadmap_md: str, findings: str, recent: str, resources: str,
-         resource_allowed: bool, worker_name: str, worker_tools: list) -> str:
+         resource_allowed: bool, worker_name: str, worker_tools: list, max_claims: int) -> str:
     allowed = ("yes" if resource_allowed else
                "no (the owner's ceiling on resource work would be exceeded)")
     return f"""{_header("plan", cycle)}
@@ -185,6 +185,8 @@ Two tracks:
 Resources are only a means to the mission. Decide the balance and explain it in
 allocation_reasoning. Findings marked NEEDS REVIEW depend on refuted work; consider
 re-examining them. Choose a task the worker can finish in one session with its tools.
+The worker can record at most {max_claims} claims per cycle: size the task to fit, or
+split a large task into several smaller ones.
 
 {ROADMAP_OPS_HELP}
 
@@ -202,7 +204,7 @@ re-examining them. Choose a task the worker can finish in one session with its t
 {_reply_shape("plan")}"""
 
 
-def work(cycle: int, task: dict, brief: str, roadmap_md: str, findings: str) -> str:
+def work(cycle: int, task: dict, brief: str, roadmap_md: str, findings: str, max_claims: int = 8) -> str:
     return f"""{_header("work", cycle)}
 # Your task: [{task['id']}] {task['title']}
 Goal: {task['goal']}
@@ -210,7 +212,9 @@ Why it matters: {task['why']}
 
 Planner's brief: {brief}
 
-Carry out the task, using tools where they help, then report:
+Carry out the task, using tools where they help, then report. Record at most
+{max_claims} claims, the most solid ones; if the task needs more, say in the summary
+what remains, so a later task can continue it.
 - claims: each one clear, self-contained statement your work supports. Give type,
   confidence (0 to 1), refutation_condition, evidence, sources, and builds_on (ids of
   existing findings it relies on, or "claim N" for an earlier claim in this report).

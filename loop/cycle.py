@@ -192,7 +192,8 @@ class CycleRunner:
             planner, worker, "planner", "plan",
             prompts.plan(n, self.roadmap.render_md(), findings_text(),
                          prompts.recent_cycles(self.kb.cycle_logs(last=ctx["recent_cycle_logs"])),
-                         resources_text, resource_allowed, worker.name, worker_tools.names()),
+                         resources_text, resource_allowed, worker.name, worker_tools.names(),
+                         self.limits["max_claims_per_report"]),
             self._plan_check(resource_allowed), transcript)
         if not plan:
             log["what_was_done"] = "The planner did not produce a valid plan."
@@ -221,10 +222,14 @@ class CycleRunner:
 
         # DO
         work_messages: list = []
+        max_claims = self.limits["max_claims_per_report"]
         report = self._ask(worker, planner, "worker", "work",
                            prompts.work(n, task, plan["task_brief"], self.roadmap.render_md(),
-                                        findings_text()),
-                           None, transcript, toolbox=worker_tools, keep_messages=work_messages)
+                                        findings_text(), max_claims),
+                           lambda r: [] if len(r["claims"]) <= max_claims else [
+                               f"too many claims ({len(r['claims'])}): record at most {max_claims}, "
+                               "the most solid ones, and say in the summary what remains"],
+                           transcript, toolbox=worker_tools, keep_messages=work_messages)
         if not report:
             log["what_was_done"] = "The worker did not produce a valid report."
             return
@@ -414,7 +419,8 @@ class CycleRunner:
                         self._store_in_cache(key, text, agent)
                     self.last_author = agent.name
                     return obj
-                self.say(f"{stage}: reply from {agent.cfg['label']} was not usable; asking again")
+                self.say(f"{stage}: reply from {agent.cfg['label']} was not usable "
+                         f"({errors[0][:90]}); asking again")
                 messages.append({"role": "user", "content":
                                  "Your reply could not be used:\n- " + "\n- ".join(errors[:10]) +
                                  "\nReply again with the corrected JSON object in a ```json block."})
