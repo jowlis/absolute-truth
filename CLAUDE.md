@@ -75,6 +75,9 @@ Every session working on this codebase must follow these principles.
 1. Planning-and-doing loop, roadmap, knowledge base **(done)**
 2. Locked core: constitution file, protected verification, budget cap, kill switch **(done)**
 3. Static public website showing the roadmap, findings and the path so far
+   (owner request: plan it together with a local owner dashboard, so the owner
+   needs no PowerShell: Run / Stop / Verify buttons, live progress, readable views;
+   the dashboard only starts runs and reads results, never writes findings)
 4. Donations
 5. Human volunteer testing (agents request real-world tests they can't do)
 6. Self-evolution (agents improve their own methods, tested and gated by the core)
