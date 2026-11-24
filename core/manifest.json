@@ -1,17 +1,17 @@
 {
-  "locked_at": "2026-11-23 06:58 UTC",
-  "reason": "Phase 2: initial lock of the protected core (caps: $2/run, $5/day, $20/month; refuse to run on unapproved changes)",
-  "constitution_version": 2,
-  "fingerprint": "ddda4e2c0d7187cc",
+  "locked_at": "2026-11-24 12:15 UTC",
+  "reason": "Two teams, constitution v3, 50/50 budget split, resource limits",
+  "constitution_version": 3,
+  "fingerprint": "935dd7bb3ef827a9",
   "files": {
-    "CHANGELOG.md": "783ee1f396675df3508262bc0a3f6b771146f71ddb5f4ba4dae0cd36e64c27aa",
     "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "budget.py": "c1a9b3c84a775a9091496903c7ff12471ee2a897d3ccc90c5009dc669c4b0584",
-    "constitution.md": "870a4af9a485ca4e933e9bd8c895b90ef703d80cfb0db8447b7be5c16d60a8e3",
+    "budget.py": "5b64c2a60d5bd259bf0676d5377cec7f5de09d268b58771dd07ce0940a30e1f5",
+    "CHANGELOG.md": "3339051d65f4658195781dd85cd353a9de995581b2f93539b63ee3560c242f2a",
+    "constitution.md": "909b449483b9d0b028cc375fc7b97c6da3692931da8bbc6fa3289645d1ed7305",
     "integrity.py": "cbd8782d0e18083f5ffd00acdf339a003db930095301cffe50b043050f708fcb",
     "killswitch.py": "64d5ce889006f68d4d49e01041ebc72677b3d487c265f3d4e0d0b1265a1afbde",
-    "limits.toml": "68625df2538f9d5efe1287dd4f391da3b75bafce8c0559e77f2d05b907270b62",
-    "recorder.py": "a441cf1910c5e5ea66ed98a416aeab8c1b28a911cf4dbe4ae2b1c01ee9dd87b8",
-    "verdicts.py": "8ea085c00f814ed44c80485c7c4e7d37cacb33336a0ff9cc18a667fd30057149"
+    "limits.toml": "65d9e54b12695afaf343b105b227e265ae24866708ff0c29a4edafe04e1d7db6",
+    "recorder.py": "c48613c78e019d7893d4af983830f8da425421be4fe36c4f1c25fff97972addb",
+    "verdicts.py": "e2635429abc255676099237f322bd321c3e5f717b817f0a5efff1cd53f935e8e"
   }
 }

@@ -24,3 +24,13 @@ Reason: Phase 2: initial lock of the protected core (caps: $2/run, $5/day, $20/m
 - limits.toml
 - recorder.py
 - verdicts.py
+
+## 2026-11-24 12:15 UTC: constitution v3
+
+Reason: Two teams, constitution v3, 50/50 budget split, resource limits
+
+- budget.py
+- constitution.md
+- limits.toml
+- recorder.py
+- verdicts.py
