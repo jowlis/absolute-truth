@@ -89,6 +89,16 @@ Every session working on this codebase must follow these principles.
 5. Human volunteer testing (agents request real-world tests they can't do)
 6. Self-evolution (agents improve their own methods, tested and gated by the core)
 
+## Working with the owner
+- Read `HANDOVER.md` first: the current state, decisions, waiting steps and watch list.
+  Update it whenever something important is decided or changes.
+- The owner is new to the command line and uses Windows, GitHub Desktop, Docker Desktop
+  and the owner dashboard (`Dashboard.bat`). Prefer the dashboard or GitHub's website over
+  PowerShell. Give numbered steps, one command per code block (Windows: `py`, not
+  `python`), say what the output should look like, and ask the owner to paste it back.
+- Plain language, short. Give a recommendation, not a menu; list decisions that need the
+  owner as short numbered questions. Report failures and mistakes honestly.
+
 ## Engineering conventions
 - Python, kept simple and readable: the owner wants to understand every file.
 - Model names, API keys and limits come from config / `.env` — never hard-coded.
