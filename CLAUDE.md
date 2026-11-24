@@ -74,10 +74,8 @@ Every session working on this codebase must follow these principles.
 ## 8. Build in phases — do not build a later phase until the owner says so
 1. Planning-and-doing loop, roadmap, knowledge base **(done)**
 2. Locked core: constitution file, protected verification, budget cap, kill switch **(done)**
-3. Static public website showing the roadmap, findings and the path so far
-   (owner request: plan it together with a local owner dashboard, so the owner
-   needs no PowerShell: Run / Stop / Verify buttons, live progress, readable views;
-   the dashboard only starts runs and reads results, never writes findings)
+3. Static public website showing the roadmap, findings and the path so far, plus a
+   local owner dashboard (Run / Stop / Verify / Build / Approve) **(done)**
 4. Donations
 5. Human volunteer testing (agents request real-world tests they can't do)
 6. Self-evolution (agents improve their own methods, tested and gated by the core)
@@ -95,6 +93,10 @@ Every session working on this codebase must follow these principles.
   `py lock_core.py "reason"` (it records the change in `core/CHANGELOG.md`). A session
   that changes `core/` must say so and ask the owner to approve; never write the
   manifest any other way. If the constitution changes, raise its `Version:` line.
+- The website (`website/build.py` -> `docs/`, served by GitHub Pages) opens the data
+  read-only and escapes all agent text; only http(s) sources become links. The owner
+  dashboard (`dashboard.py`, 127.0.0.1 only, secret token per session) starts commands
+  and reads results; it never writes findings.
 - Only `core/recorder.py` writes findings, status changes and resource proposals.
   The database enforces its own rules (append-only history, fixed finding content,
   confidence never rises) and chains every cycle's log by hash; `run.py --verify`

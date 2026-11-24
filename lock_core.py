@@ -13,6 +13,19 @@ import sys
 from core import integrity
 
 
+def version_problem(problems: list) -> str | None:
+    """If the constitution changed, its 'Version:' line must have been raised."""
+    manifest = integrity.read_manifest()
+    if not manifest or "changed without approval: core/constitution.md" not in problems:
+        return None
+    old_version, new_version = manifest["constitution_version"], integrity.constitution_version()
+    if new_version <= old_version:
+        return (f"The constitution changed, but its 'Version:' line is still {new_version}. "
+                f"Raise it to {old_version + 1} first, so every cycle log shows which "
+                "version it ran under.")
+    return None
+
+
 def main() -> int:
     if len(sys.argv) != 2 or not sys.argv[1].strip():
         print('Usage: py lock_core.py "why the change was made"')
@@ -20,7 +33,6 @@ def main() -> int:
     reason = sys.argv[1].strip()
 
     problems = integrity.check_core()
-    manifest = integrity.read_manifest()
     if not problems:
         print("The core is unchanged since it was last approved. Nothing to lock.")
         return 0
@@ -29,13 +41,9 @@ def main() -> int:
     for p in problems:
         print("  -", p)
 
-    old_version = manifest["constitution_version"] if manifest else 0
-    new_version = integrity.constitution_version()
-    if manifest and "changed without approval: core/constitution.md" in problems \
-            and new_version <= old_version:
-        print(f"\nThe constitution changed, but its 'Version:' line is still {new_version}. "
-              f"Raise it to {old_version + 1} first, so every cycle log shows which "
-              "version it ran under.")
+    problem = version_problem(problems)
+    if problem:
+        print("\n" + problem)
         return 1
 
     answer = input(f'\nApprove these changes with the reason "{reason}"? Type yes: ')

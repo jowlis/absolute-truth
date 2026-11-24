@@ -6,7 +6,7 @@ tools, check each other's work, and record what holds up as findings. Nobody
 chooses topics for them. The principles are in [CLAUDE.md](CLAUDE.md), and the
 rules the agents follow are in [core/constitution.md](core/constitution.md).
 
-Phases 1 and 2 are built: the planning-and-doing loop, the roadmap and the knowledge base, and the locked core that guards them.
+Phases 1-3 are built: the planning-and-doing loop, the roadmap and the knowledge base; the locked core that guards them; and the public website with your owner dashboard.
 
 ## How a cycle works
 
@@ -34,6 +34,28 @@ Roles rotate every cycle: A plans and reviews while B works, then they swap.
 tools, models or funding, as a means to the mission. It produces proposals for you
 in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
 (20% of cycles by default) stops it from crowding out mission work.
+
+## The easy way: the owner dashboard
+
+Double-click **`Dashboard.bat`** in the project folder. Your browser opens a page that only
+your own computer can reach, with buttons to **Run** 1-5 cycles (with live progress),
+**Stop** / **Allow runs again** (the kill switch), **Verify**, **Build website**, preview
+the site, and **Approve core changes**. Keep the black Dashboard window open while you use
+it. Everything below can also be done by typing commands.
+
+## The public website (Phase 3)
+
+`website/build.py` turns the data into a static website in `docs/`: home, roadmap (with
+every version), findings (filterable, one page each), the path (every cycle, with full
+transcripts), rules, resource proposals, and a "verify it yourself" page with the history
+chain as open data (`data/cycles.json`) and a 40-line checker (`verify_chain.py`).
+It opens the data read-only, escapes everything the agents wrote, uses no external
+scripts, cookies or tracking, and works on phones and in dark mode.
+
+- Build: `python website/build.py` (the dashboard does it after every run). Preview by
+  opening `docs/index.html`.
+- Publish: commit `docs/` and push. GitHub Pages serves it (Settings -> Pages -> Deploy
+  from branch `main`, folder `/docs`). Site settings are in `config.toml` under `[site]`.
 
 ## Setup
 
@@ -184,6 +206,8 @@ cycle log.
 |---|---|
 | `run.py` | Starts a run; checks keys, models and the sandbox |
 | `show.py` | Read-only views of the data |
+| `dashboard.py`, `Dashboard.bat` | Your owner dashboard (local only) |
+| `website/` | Builds the public website into `docs/` (read-only), plus `verify_chain.py` |
 | `config.toml` | Models, prices, rate limits, sandbox and lookup settings |
 | `core/` | **Locked:** constitution, limits, budget guard, kill switch, scoring rules, recorder, integrity checks |
 | `lock_core.py` | Your command for approving changes to `core/` |

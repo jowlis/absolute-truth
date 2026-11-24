@@ -4,6 +4,7 @@
 # Generated data (kept local for now)
 data/
 data-mock/
+docs-mock/
 
 # Kill switch file
 STOP

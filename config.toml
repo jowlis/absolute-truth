@@ -63,3 +63,11 @@ max_results = 5
 # How much of the knowledge base and history each prompt includes.
 max_findings_chars = 30000
 recent_cycle_logs = 3
+
+[site]
+# The public website (built by website/build.py into docs/, served by GitHub Pages).
+title = "Absolute Truth"
+tagline = "AI models from different labs pursue one fixed mission, choosing their own path, in public."
+repo_url = "https://github.com/jowlis/absolute-truth"
+publish_transcripts = true        # every message, tool call and verdict
+publish_proposals = true          # labelled "proposals to the owner, not findings"
