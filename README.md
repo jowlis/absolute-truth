@@ -116,6 +116,40 @@ python -m unittest discover -s tests -t .   # run the tests
   reuses the number, and also reuses the replies already received
   (`data/reply_cache.json`), so finished work isn't thrown away.
 
+## Autopilot: cycles on a schedule
+
+`autopilot.py` runs a few cycles every few hours on its own, and asks you only when
+something needs you. Turn it on with **Turn autopilot on** on the dashboard, or:
+
+```bash
+py autopilot.py --install     # Windows Task Scheduler: a tick every few hours
+py autopilot.py --uninstall   # turn it off
+py autopilot.py --status      # what it did lately, and whether it is waiting for you
+py autopilot.py --resume      # carry on after it asked for you
+py autopilot.py --mock        # one tick with pretend models (data-mock/)
+```
+
+Ticks run only while you are signed in to Windows and the computer is awake.
+
+- **Each tick** checks the core and runs `run.py --verify`, then runs `run.py --cycles K`, verifies
+  again and rebuilds the website. K is `cycles_per_tick` in `config.toml` (`[autopilot]`), but
+  never more than what is left today of `autopilot_max_cycles_per_day` in `core/limits.toml`.
+- **Budgets are unchanged.** Every call still passes `core/budget.py`: the dollar caps per run,
+  day and month, and each model's daily quota. A used-up quota or daily cap just waits for a
+  later tick.
+- **History is unchanged.** The autopilot only reads the knowledge base. Runs still record
+  through `core/recorder.py`, and only one run can write at a time (`data/run.lock`).
+- **When it needs you**, it writes `data/NEEDS_OWNER.md`, shows a Windows notification and a
+  banner on the dashboard, and runs nothing until you resume it. That happens when verify finds
+  a problem, the core changed without approval, a model is gone from your key, the monthly cap
+  is reached, a model is unreachable for several ticks in a row, several cycles in a row fail
+  or produce nothing, or a run stops with an unexpected error. New resource proposals only
+  get a notification.
+- **Publishing** stays with you unless you set `publish = true` under `[autopilot]`. Then it
+  commits `docs/` and pushes after each clean verify.
+- Its notes are in `data/autopilot.log`; the output of the last run is in
+  `data/autopilot_last_run.txt`.
+
 ## The locked core (Phase 2)
 
 The rules live in `core/`: the constitution, limits, budget guard, kill switch, scoring

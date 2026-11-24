@@ -64,6 +64,15 @@ max_results = 5
 max_findings_chars = 30000
 recent_cycle_logs = 3
 
+[autopilot]
+# Cycles on a schedule (autopilot.py). The hard daily ceiling is
+# autopilot_max_cycles_per_day in core/limits.toml; budgets still apply to every call.
+every_hours = 3                   # how often Windows Task Scheduler starts a tick
+cycles_per_tick = 2               # cycles to try in one tick
+provider_down_ticks = 3           # ask the owner after this many ticks in a row with a model unreachable
+bad_cycles_in_a_row = 3           # ask the owner after this many failed or unproductive cycles in a row
+publish = false                   # true: after a clean verify, commit docs/ and push (git must be signed in)
+
 [site]
 # The public website (built by website/build.py into docs/, served by GitHub Pages).
 title = "Absolute Truth"

@@ -23,6 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import autopilot
 import lock_core
 from core import integrity, killswitch
 
@@ -79,10 +80,28 @@ class Job:
 JOB = Job()
 
 
+def pilot() -> autopilot.Autopilot:
+    return autopilot.Autopilot(data_dir=ROOT / ("data-mock" if MOCK else "data"), mock=MOCK)
+
+
+def autopilot_state() -> dict:
+    p = pilot()
+    log = p.log_file.read_text(encoding="utf-8").splitlines()[-8:] if p.log_file.exists() else []
+    try:
+        today = p.cycles_today()
+    except Exception:
+        today = None
+    return {"scheduled": autopilot.scheduled(), "every_hours": p.settings["every_hours"],
+            "notice": p.notice_file.read_text(encoding="utf-8") if p.waiting_for_owner() else "",
+            "log": "\n".join(log), "cycles_today": today,
+            "max_per_day": p.limits.get("autopilot_max_cycles_per_day")}
+
+
 def state() -> dict:
     return {"job": JOB.snapshot(), "stopped": killswitch.STOP_FILE.exists(),
             "core_problems": integrity.check_core(), "rules": integrity.rules_in_force(),
-            "site_built": (site_dir() / "index.html").exists(), "mock": MOCK}
+            "site_built": (site_dir() / "index.html").exists(), "mock": MOCK,
+            "autopilot": autopilot_state()}
 
 
 def act(form: dict) -> str:
@@ -107,6 +126,18 @@ def act(form: dict) -> str:
                 else "Something is already running.")
     if action == "build":
         return ("Building..." if JOB.start("Build the website", [with_mock(["website/build.py"])])
+                else "Something is already running.")
+    if action == "autopilot_on":
+        return autopilot.install(int(pilot().settings["every_hours"]))
+    if action == "autopilot_off":
+        return autopilot.uninstall()
+    if action == "autopilot_resume":
+        pilot().resume()
+        return "Resumed: the next tick will run cycles again."
+    if action == "autopilot_tick":
+        if integrity.check_core():
+            return "Not started: the core has unapproved changes (see Approve core changes)."
+        return ("Running one autopilot tick..." if JOB.start("Autopilot tick", [with_mock(["autopilot.py"])])
                 else "Something is already running.")
     if action == "approve":
         problems = integrity.check_core()
@@ -222,6 +253,26 @@ def control_page() -> str:
 <p id="message" class="muted"></p>
 <pre id="output" style="max-height: 420px; overflow: auto">No job yet.</pre>
 
+<h2>Autopilot</h2>
+<div id="notice" class="card" hidden><p class="bad"><strong>The autopilot needs you.</strong>
+It has paused. Read this, sort it out, then press Resume.</p>
+<pre id="notice-text" style="white-space: pre-wrap"></pre>
+<button class="primary" data-action="autopilot_resume">Resume autopilot</button></div>
+<div class="card"><dl class="facts">
+<dt>Schedule</dt><dd id="ap-schedule">…</dd>
+<dt>Cycles today</dt><dd id="ap-today">…</dd>
+</dl>
+<div class="filters">
+<button data-action="autopilot_on">Turn autopilot on</button>
+<button data-action="autopilot_off">Turn autopilot off</button>
+<button data-action="autopilot_tick">Run one tick now</button>
+</div>
+<p class="muted">Runs a few cycles every few hours (settings under <code>[autopilot]</code> in
+config.toml), only while you are signed in to Windows and the computer is awake. All budget caps
+still apply. It pauses and notifies you only when something needs you.</p>
+<pre id="ap-log" style="max-height: 200px; overflow: auto">No autopilot notes yet.</pre>
+</div>
+
 <h2>Publish the website</h2>
 <p>After a run, the website is rebuilt automatically in the <code>docs</code> folder. To publish
 it: in GitHub Desktop, tick the changed files, write a short summary (for example "Cycles 15-17"),
@@ -258,7 +309,14 @@ async function refresh() {{
   const out = $("output"), atBottom = out.scrollTop + out.clientHeight >= out.scrollHeight - 30;
   out.textContent = j.output || "No job yet.";
   if (atBottom) out.scrollTop = out.scrollHeight;
-  for (const b of document.querySelectorAll("button[data-action=run], button[data-action=verify], button[data-action=build]"))
+  const ap = s.autopilot;
+  $("ap-schedule").innerHTML = ap.scheduled === null ? "Windows only (use cron elsewhere)"
+    : ap.scheduled ? '<span class="ok">on</span>, every ' + ap.every_hours + ' hour(s)' : "off";
+  $("ap-today").textContent = (ap.cycles_today ?? "?") + " of " + (ap.max_per_day ?? "?") + " (UTC day)";
+  $("notice").hidden = !ap.notice;
+  $("notice-text").textContent = ap.notice;
+  $("ap-log").textContent = ap.log || "No autopilot notes yet.";
+  for (const b of document.querySelectorAll("button[data-action=run], button[data-action=verify], button[data-action=build], button[data-action=autopilot_tick]"))
     b.disabled = j.running;
 }}
 for (const b of document.querySelectorAll("button[data-action]")) {{

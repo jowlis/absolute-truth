@@ -138,6 +138,8 @@ class DashboardTests(unittest.TestCase):
         self.assertFalse(self.stop_file.exists())
 
     def test_approve_with_nothing_changed_does_nothing(self):
+        if integrity.check_core():     # never approve the owner's pending core change
+            self.skipTest("the core has unapproved changes; run lock_core.py first")
         before = (integrity.CORE_DIR / "manifest.json").read_text(encoding="utf-8")
         _, reply = self.post({"action": "approve", "token": dashboard.TOKEN,
                               "reason": "x", "confirm": "yes"})

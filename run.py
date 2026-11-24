@@ -9,6 +9,7 @@ limits in core/limits.toml.
 """
 
 import argparse
+import json
 import sys
 import time
 import tomllib
@@ -25,6 +26,7 @@ from core.budget import Budget, BudgetExceeded, DailyQuotaReached
 from knowledge.db import KnowledgeBase
 from knowledge.roadmap import Roadmap
 from loop.cycle import CycleRunner
+from loop.runlock import AlreadyRunning, RunLock
 from tools.sandbox import docker_available, ensure_image
 
 ROOT = Path(__file__).resolve().parent
@@ -87,6 +89,14 @@ def verify(data_dir: Path) -> int:
     return 1 if problems else 0
 
 
+def write_summary(path, status: str, message: str = "", **extra) -> None:
+    """Write what happened as JSON, for the autopilot (--summary). Does nothing without a path."""
+    if path:
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        Path(path).write_text(json.dumps({"status": status, "message": message, **extra},
+                                         indent=2), encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run cycles of the Absolute Truth mission.")
     parser.add_argument("--cycles", type=int, default=1, help="number of cycles to run")
@@ -98,6 +108,8 @@ def main() -> int:
     parser.add_argument("--data-dir", help="where to keep data (default: data/ or data-mock/)")
     parser.add_argument("--verify", action="store_true",
                         help="check the locked core, the database rules and the history chain")
+    parser.add_argument("--summary", metavar="FILE",
+                        help="also write the outcome of a run as JSON to FILE (used by autopilot.py)")
     args = parser.parse_args()
 
     load_dotenv(ROOT / ".env")
@@ -109,6 +121,7 @@ def main() -> int:
         killswitch.check()
     except killswitch.StopRequested as e:
         print(e)
+        write_summary(args.summary, "stopped", str(e))
         return 1
 
     if args.verify:
@@ -120,6 +133,7 @@ def main() -> int:
         for p in problems:
             print("  -", p)
         print('If these changes are intended, approve them with:  py lock_core.py "reason"')
+        write_summary(args.summary, "core_changed", "; ".join(problems))
         return 1
 
     budget = Budget(limits, data_dir / "daily_usage.json")
@@ -144,8 +158,10 @@ def main() -> int:
         for key, agent in agents.items():
             available = agent.list_models()
             if agent.cfg["model"] not in available:
-                print(f"Model {key}: {agent.cfg['model']!r} is not available to your key. "
-                      f"Run 'python run.py --list-models' and fix config.toml.")
+                message = (f"Model {key}: {agent.cfg['model']!r} is not available to your key. "
+                           f"Run 'python run.py --list-models' and fix config.toml.")
+                print(message)
+                write_summary(args.summary, "model_missing", message)
                 return 1
             missing = [m for m in agent.models[1:] if m not in available]
             if missing:
@@ -153,6 +169,17 @@ def main() -> int:
                       f"they will be skipped.")
                 agent.models = [m for m in agent.models if m not in missing]
 
+    try:
+        with RunLock(data_dir / "run.lock"):
+            return run_cycles(args, config, limits, data_dir, budget, agents)
+    except AlreadyRunning as e:
+        print(e)
+        write_summary(args.summary, "already_running", str(e))
+        return 1
+
+
+def run_cycles(args, config, limits, data_dir, budget, agents) -> int:
+    """Run up to args.cycles cycles. Only one process at a time gets here (see RunLock)."""
     sandbox_ok = docker_available()
     if not sandbox_ok:
         print("Warning: Docker is not running, so the Python sandbox is switched off.")
@@ -169,13 +196,22 @@ def main() -> int:
     print(f"Run {run_id}: up to {args.cycles} cycle(s); data in {data_dir}")
     for key, agent in agents.items():
         print(f"  model {key}: {agent.name}")
+    cycles, halted = [], None
     for _ in range(args.cycles):
         try:
             log = runner.run_cycle()
         except (killswitch.StopRequested, BudgetExceeded, DailyQuotaReached,
                 ProviderUnavailable) as e:
             print(f"Run halted: {e}")
+            halted = {"kind": type(e).__name__, "message": str(e)}
             break
+        except Exception as e:
+            write_summary(args.summary, "crashed", f"{type(e).__name__}: {e}", cycles=cycles,
+                          spent_usd=budget.spent_usd)
+            raise
+        accepted = sum(" accepted: " in p for p in log["proposals"])
+        cycles.append({"cycle": log["cycle"], "track": log["track"], "outcome": log["outcome"],
+                       "findings": len(log["results"]), "proposals": accepted})
         u = log["usage"]
         if u["failed_attempts"]:
             print(f"    ({u['failed_attempts']} failed attempt(s); see the cycle log)")
@@ -187,6 +223,9 @@ def main() -> int:
 
     print(f"Done. Spent ${budget.spent_usd:.4f} of ${limits['budget_usd_per_run']:.2f}; "
           f"{budget.requests} API requests. See: python show.py --help")
+    write_summary(args.summary, "halted" if halted else "done",
+                  halted["message"] if halted else "", halted=halted, cycles=cycles,
+                  spent_usd=budget.spent_usd)
     return 0
 
 
