@@ -90,6 +90,17 @@ CREATE TABLE IF NOT EXISTS resource_proposals (
     review_note TEXT,
     at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS public_updates (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    cites TEXT NOT NULL DEFAULT '[]',
+    written_by TEXT NOT NULL,
+    reviewed_by TEXT NOT NULL,
+    checked_by TEXT NOT NULL,
+    check_note TEXT,
+    at TEXT NOT NULL
+);
 """
 
 # Rules the database enforces itself, whatever code talks to it (Phase 2, locked core).
@@ -125,6 +136,10 @@ TRIGGERS = {
         "BEFORE UPDATE ON resource_proposals BEGIN SELECT RAISE(ABORT, 'proposals are fixed'); END",
     "proposals_no_delete":
         "BEFORE DELETE ON resource_proposals BEGIN SELECT RAISE(ABORT, 'proposals are fixed'); END",
+    "updates_no_update":
+        "BEFORE UPDATE ON public_updates BEGIN SELECT RAISE(ABORT, 'published updates are fixed'); END",
+    "updates_no_delete":
+        "BEFORE DELETE ON public_updates BEGIN SELECT RAISE(ABORT, 'published updates are fixed'); END",
 }
 
 
@@ -416,6 +431,20 @@ class KnowledgeBase:
                 (pid, cycle, title, proposal, expected_benefit, costs_and_risks, proposed_by,
                  reviewed_by, review_note, now()))
         return pid
+
+    def add_public_update(self, *, title: str, body: str, cites: list, written_by: str,
+                          reviewed_by: str, checked_by: str, check_note: str) -> str:
+        count = self.conn.execute("SELECT COUNT(*) FROM public_updates").fetchone()[0]
+        uid = f"U{count + 1:04d}"
+        with self.conn:
+            self.conn.execute("INSERT INTO public_updates VALUES (?,?,?,?,?,?,?,?,?)",
+                              (uid, title, body, json.dumps(cites), written_by, reviewed_by,
+                               checked_by, check_note, now()))
+        return uid
+
+    def public_updates(self) -> list[dict]:
+        rows = self.conn.execute("SELECT * FROM public_updates ORDER BY id").fetchall()
+        return [dict(r, cites=json.loads(r["cites"])) for r in rows]
 
     def resource_proposals(self) -> list[dict]:
         rows = self.conn.execute("SELECT * FROM resource_proposals ORDER BY id").fetchall()

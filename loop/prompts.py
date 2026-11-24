@@ -68,7 +68,9 @@ SYSTEM_EXPLAINED = """How this system works (set by the human owner; agents cann
   are fixed by the owner. You may study methods and propose better ones, but a proposal
   does not change how this system works: record it as a conceptual finding, and never
   describe a rule as being in force unless it is listed here.
-- Resource work only produces proposals for the owner, never findings."""
+- A separate resource team works on the project's resources (audience, presentation,
+  funding). You never see its work, and it can never change findings. Your only job is
+  the mission."""
 
 
 def system_prompt(agent, other, role: str) -> str:
@@ -166,24 +168,14 @@ Refer to roadmap items by these ids (M1, T1, ...), not by the temporary keys abo
 
 # ---- regular cycles ------------------------------------------------------------
 
-def plan(cycle: int, roadmap_md: str, findings: str, recent: str, resources: str,
-         resource_allowed: bool, worker_name: str, worker_tools: list, max_claims: int) -> str:
-    allowed = ("yes" if resource_allowed else
-               "no (the owner's ceiling on resource work would be exceeded)")
+def plan(cycle: int, roadmap_md: str, findings: str, recent: str, worker_name: str,
+         worker_tools: list, max_claims: int) -> str:
     return f"""{_header("plan", cycle)}
-Choose what this cycle does. The worker will be {worker_name}, with these tools:
-{", ".join(worker_tools) or "none"}.
+Choose what this cycle does: pick one task from the roadmap (or add one) for the
+worker, {worker_name}, who has these tools: {", ".join(worker_tools) or "none"}.
+Set task_id to an existing task id, or to the key of a task you add in roadmap_ops.
 
-Two tracks:
-- "mission": pick one task from the roadmap (or add one) for the worker. Set
-  task_id to an existing task id, or to the key of a task you add in roadmap_ops.
-- "resource": spend this cycle examining how to get resources (tools, models,
-  compute, funding, human help) that would advance the mission faster or better.
-  Resource work only produces proposals for the human owner, never findings.
-  Leave task_id empty. Resource track allowed now: {allowed}
-
-Resources are only a means to the mission. Decide the balance and explain it in
-allocation_reasoning. Findings marked NEEDS REVIEW depend on refuted work; consider
+Findings marked NEEDS REVIEW depend on refuted or superseded work; consider
 re-examining them. Choose a task the worker can finish in one session with its tools.
 The worker can record at most {max_claims} claims per cycle: size the task to fit, or
 split a large task into several smaller ones.
@@ -197,9 +189,6 @@ split a large task into several smaller ones.
 
 # Recent cycles
 {recent}
-
-# Resources
-{resources}
 
 {_reply_shape("plan")}"""
 
@@ -269,50 +258,6 @@ Planner's brief: {brief}
 {_reply_shape("review")}"""
 
 
-def resource_work(cycle: int, brief: str, resources: str, proposals: str, findings: str) -> str:
-    return f"""{_header("resource_work", cycle)}
-This cycle examines resources: what tools, models, compute, funding or human help
-would advance the mission faster or better, and how they could be obtained.
-
-Planner's brief: {brief}
-
-Rules: proposals go to the human owner, who decides. You cannot act on them. They
-must be legal and honest, and must serve the mission. Never propose shaping findings
-to attract visitors or donors. Give at most three concrete proposals.
-
-# Current resources
-{resources}
-
-# Earlier proposals
-{proposals}
-
-# Knowledge base (what the mission has produced so far)
-{findings}
-
-{_reply_shape("resource_work")}"""
-
-
-def resource_review(cycle: int, brief: str, worker_name: str, report: dict) -> str:
-    proposals = report.get("proposals", [])
-    return f"""{_header("resource_review", cycle)}
-{worker_name} examined resources for the mission and made proposals for the human
-owner. Review each proposal exactly once, by number (1 = first). Accept only
-proposals that are legal, honest, realistic, and clearly serve the mission.
-
-Number of proposals to review: {len(proposals)}
-
-Planner's brief: {brief}
-
-# Report
-```json
-{json.dumps(report, indent=2, ensure_ascii=False)}
-```
-
-{_reply_shape("resource_review")}"""
-
-
-# ---- context builders --------------------------------------------------------
-
 def findings_summary(findings: list, max_chars: int) -> str:
     if not findings:
         return "(no findings yet)"
@@ -353,27 +298,3 @@ def recent_cycles(logs: list) -> str:
             f"Disagreements: {'; '.join(log.get('disagreements', [])) or 'none'}\n"
             f"Next step suggested: {log.get('next_step') or '-'}")
     return "\n\n".join(parts)
-
-
-def resource_status(models: dict, budget, resource_cycles: int, total_cycles: int,
-                    ceiling: float) -> str:
-    lines = ["Models in use:"]
-    for key, cfg in models.items():
-        price = ("free tier" if cfg["input_price_per_mtok"] == 0 and cfg["output_price_per_mtok"] == 0
-                 else f"${cfg['input_price_per_mtok']}/${cfg['output_price_per_mtok']} per million tokens in/out")
-        lines.append(f"- {key}: {cfg['label']} ({cfg['lab']}, {cfg['model']}), {price}, "
-                     f"limit {cfg['requests_per_day']} requests/day")
-    lines.append(f"This run: ${budget.spent_usd:.4f} spent of ${budget.limits['budget_usd_per_run']:.2f}; "
-                 f"{budget.requests} of {budget.limits['max_api_requests_per_run']} requests used.")
-    share = (resource_cycles / total_cycles) if total_cycles else 0.0
-    lines.append(f"Cycles so far: {total_cycles}, of which resource work: {resource_cycles} "
-                 f"({share:.0%}). Owner's ceiling on resource work: {ceiling:.0%} of cycles.")
-    lines.append("Funding: no donations exist yet (planned for a later phase).")
-    return "\n".join(lines)
-
-
-def proposals_summary(proposals: list) -> str:
-    if not proposals:
-        return "(none yet)"
-    return "\n".join(f"- {p['id']} (cycle {p['cycle']}): {p['title']}. {p['proposal']}"
-                     for p in proposals)

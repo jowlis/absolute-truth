@@ -9,6 +9,7 @@ limits in core/limits.toml.
 """
 
 import argparse
+import os
 import sys
 import time
 import tomllib
@@ -17,7 +18,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from agents import make_agents
+from agents import make_agents, team
 from agents.base import ProviderUnavailable
 from core import budget as budget_module
 from core import integrity, killswitch
@@ -25,6 +26,7 @@ from core.budget import Budget, BudgetExceeded, DailyQuotaReached
 from knowledge.db import KnowledgeBase
 from knowledge.roadmap import Roadmap
 from loop.cycle import CycleRunner
+from loop.resource_cycle import ResourceRunner
 from tools.sandbox import docker_available, ensure_image
 
 ROOT = Path(__file__).resolve().parent
@@ -95,7 +97,11 @@ def main() -> int:
     parser.add_argument("--ping", nargs="+", metavar="A|B [MODEL]",
                         help="test how quickly models answer, e.g. --ping B (configured models) "
                              "or --ping B some/model other/model")
+    parser.add_argument("--team", choices=["truth", "resource"], default="truth",
+                        help="which team runs: truth (default) or resource")
     parser.add_argument("--data-dir", help="where to keep data (default: data/ or data-mock/)")
+    parser.add_argument("--private-dir", help="the resource team's private folder "
+                                              "(default: private/ or private-mock/)")
     parser.add_argument("--verify", action="store_true",
                         help="check the locked core, the database rules and the history chain")
     args = parser.parse_args()
@@ -104,6 +110,8 @@ def main() -> int:
     config = tomllib.loads((ROOT / "config.toml").read_text(encoding="utf-8"))
     limits = budget_module.load_limits()
     data_dir = Path(args.data_dir) if args.data_dir else ROOT / ("data-mock" if args.mock else "data")
+    private_dir = (Path(args.private_dir) if args.private_dir else
+                   ROOT / (config["private"]["dir"] + ("-mock" if args.mock else "")))
 
     try:
         killswitch.check()
@@ -122,7 +130,16 @@ def main() -> int:
         print('If these changes are intended, approve them with:  py lock_core.py "reason"')
         return 1
 
-    budget = Budget(limits, data_dir / "daily_usage.json")
+    in_cloud = os.environ.get("GITHUB_ACTIONS") == "true"
+    if (config.get("cloud", {}).get("runs_in_cloud") and not in_cloud and not args.mock
+            and not (args.list_models or args.ping)):
+        print("Runs happen in the cloud (GitHub Actions), so there is only ever one history.\n"
+              "To start a run now: on GitHub, open Actions, choose a team, click 'Run workflow'.\n"
+              "To run on this computer instead, set runs_in_cloud = false in config.toml.")
+        return 1
+
+    # Request counts and spending are resource status: they live in the private folder.
+    budget = Budget(limits, private_dir / "daily_usage.json", team=args.team)
     agents = make_agents(config, budget, mock=args.mock)
 
     if args.list_models:
@@ -140,8 +157,11 @@ def main() -> int:
     if args.ping:
         return ping(agents, budget, args.ping[0], args.ping[1:])
 
+    truth_agents = team(agents, config, "truth")
+    running = truth_agents if args.team == "truth" else {**team(agents, config, "resource"),
+                                                         **truth_agents}   # truth team checks updates
     if not args.mock:
-        for key, agent in agents.items():
+        for key, agent in running.items():
             available = agent.list_models()
             if agent.cfg["model"] not in available:
                 print(f"Model {key}: {agent.cfg['model']!r} is not available to your key. "
@@ -162,12 +182,28 @@ def main() -> int:
 
     run_id = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S") + ("-mock" if args.mock else "")
     kb = KnowledgeBase(data_dir / "knowledge.db")
-    runner = CycleRunner(config=config, limits=limits, agents=agents, kb=kb,
-                         roadmap=Roadmap(data_dir), budget=budget, run_id=run_id,
-                         data_dir=data_dir, sandbox_ok=sandbox_ok, say=say)
+    if args.team == "truth":
+        runner = CycleRunner(config=config, limits=limits, agents=truth_agents, kb=kb,
+                             roadmap=Roadmap(data_dir), budget=budget, run_id=run_id,
+                             data_dir=data_dir, sandbox_ok=sandbox_ok, say=say)
+    else:
+        private_kb = KnowledgeBase(private_dir / "resources.db")
+        today = datetime.now(timezone.utc).date().isoformat()
+        done_today = sum(1 for log in private_kb.cycle_logs() if log["started_at"][:10] == today)
+        allowed = limits["resource_cycles_per_day"] - done_today
+        if allowed <= 0:
+            print(f"The resource team has already had its {limits['resource_cycles_per_day']} "
+                  "cycle(s) today.")
+            return 0
+        args.cycles = min(args.cycles, allowed)
+        runner = ResourceRunner(config=config, limits=limits, agents=team(agents, config, "resource"),
+                                kb=private_kb, public_kb=kb, public_data_dir=data_dir,
+                                checkers=truth_agents, truth_agents=truth_agents, budget=budget,
+                                run_id=run_id, data_dir=private_dir, sandbox_ok=False, say=say)
 
-    print(f"Run {run_id}: up to {args.cycles} cycle(s); data in {data_dir}")
-    for key, agent in agents.items():
+    where = data_dir if args.team == "truth" else private_dir
+    print(f"Run {run_id}: {args.team} team, up to {args.cycles} cycle(s); data in {where}")
+    for key, agent in runner.agents.items():
         print(f"  model {key}: {agent.name}")
     for _ in range(args.cycles):
         try:
@@ -179,8 +215,11 @@ def main() -> int:
         u = log["usage"]
         if u["failed_attempts"]:
             print(f"    ({u['failed_attempts']} failed attempt(s); see the cycle log)")
-        print(f"  cycle {log['cycle']}: {log['track']}, {log['outcome']}, "
-              f"{len(log['results'])} new finding(s), {u['api_calls']} calls, ${u['cost_usd']:.4f}")
+        made = (f"{len(log['results'])} new finding(s)" if args.team == "truth" else
+                f"{sum(' accepted: ' in p for p in log['proposals'])} proposal(s), "
+                f"{len(log.get('published_updates', []))} published update(s)")
+        print(f"  cycle {log['cycle']}: {log['track']}, {log['outcome']}, {made}, "
+              f"{u['api_calls']} calls, ${u['cost_usd']:.4f}")
         problems = [p for p in log["problems"] if not p.startswith("failed attempt")]
         if problems:
             print("    problems:", "; ".join(problems))

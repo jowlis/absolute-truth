@@ -2,14 +2,15 @@
 
 It returns obviously generic placeholder content in exactly the JSON shapes the real
 models must use, so the whole loop (roadmap, findings, review, refutation cascade,
-resource track, logs) can be tested without spending tokens.
+resource team, logs) can be tested without spending tokens.
 
 Scripted behaviour, so tests can check every path:
-  cycle 2: the reviewer rejects claim 2
-  cycle 3: the reviewer contests claim 2
-  cycle 4: the worker proposes refuting F0002; the reviewer agrees (dependents get flagged)
-  cycle 5: the planner chooses the resource track (if the core allows it)
-  every work turn: one run_python tool call first, if the tool is available
+  truth cycle 2: the reviewer rejects claim 2
+  truth cycle 3: the reviewer contests claim 2
+  truth cycle 4: the worker proposes refuting F0002; the reviewer agrees (dependents flagged)
+  every truth work turn: one run_python tool call first, if the tool is available
+  resource cycles: two proposals (one accepted) and one public update citing the first
+  finding; the reviewer accepts it and the accuracy checker approves it
 """
 
 import json
@@ -79,13 +80,7 @@ class MockAgent(Agent):
                 "next_step": "Placeholder next step (mock)"}
 
     def _plan(self, cycle, prompt):
-        resource_ok = "Resource track allowed now: yes" in prompt
-        if cycle % 5 == 0 and resource_ok:
-            return {"track": "resource", "allocation_reasoning": "Placeholder: time to look at resources (mock)",
-                    "roadmap_ops": [], "task_id": "", "task_brief": "Placeholder resource question (mock)",
-                    "why_this_task": "Placeholder"}
-        return {"track": "mission", "allocation_reasoning": "Placeholder: mission work first (mock)",
-                "roadmap_ops": [{"op": "add", "kind": "task", "parent": "M1", "key": "next",
+        return {"roadmap_ops": [{"op": "add", "kind": "task", "parent": "M1", "key": "next",
                                  "title": f"Placeholder task from cycle {cycle} (mock)",
                                  "goal": "Placeholder goal", "why": "Placeholder reason"}],
                 "task_id": "next", "task_brief": "Placeholder brief (mock)",
@@ -126,18 +121,32 @@ class MockAgent(Agent):
                 "appeal_check": "Placeholder: nothing looks shaped to impress (mock)",
                 "disagreements": [], "next_step": "Placeholder next step (mock)"}
 
+    def _resource_plan(self, cycle, prompt):
+        return {"task_brief": f"Placeholder resource brief {cycle} (mock)",
+                "why_this_task": "Placeholder (mock)"}
+
     def _resource_work(self, cycle, prompt):
+        section = re.search(r"# The truth team's findings\n(.*)", prompt, re.DOTALL)
+        ids = re.findall(r"\bF\d{4}\b", section.group(1) if section else "")
+        updates = ([{"title": f"Placeholder update {cycle} (mock)",
+                     "body": "Placeholder article body (mock)", "cites": [ids[0]]}] if ids else [])
         return {"summary": "Placeholder resource summary (mock)",
                 "proposals": [{"title": f"Placeholder proposal {i} (mock)",
                                "proposal": "Placeholder", "expected_benefit": "Placeholder",
                                "costs_and_risks": "Placeholder"} for i in (1, 2)],
+                "public_updates": updates,
                 "suggested_next_step": "Placeholder next step (mock)"}
 
     def _resource_review(self, cycle, prompt):
         return {"proposal_reviews": [
                     {"proposal": 1, "verdict": "accept", "reason": "Placeholder (mock)"},
                     {"proposal": 2, "verdict": "reject", "reason": "Placeholder (mock)"}],
+                "update_reviews": [{"update": i, "verdict": "accept", "reason": "Placeholder (mock)"}
+                                   for i in range(1, _count(prompt, "public updates") + 1)],
                 "disagreements": [], "next_step": "Placeholder next step (mock)"}
+
+    def _accuracy_check(self, cycle, prompt):
+        return {"verdict": "approve", "problems": [], "reason": "Placeholder: matches (mock)"}
 
 
 def _count(prompt: str, what: str) -> int:

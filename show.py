@@ -6,7 +6,7 @@
   python show.py path                 every cycle, one line each
   python show.py cycle 4              the full log of one cycle
   python show.py versions             how the roadmap changed, version by version
-  python show.py proposals            resource proposals for the owner
+  python show.py proposals            resource proposals (from the private folder)
   python show.py costs                tokens and cost per cycle
 
 Add --mock to read the dry-run data (data-mock/) instead of data/.
@@ -85,8 +85,9 @@ def main() -> int:
         from loop.cycle import render_log_md
         print(render_log_md(logs[0]))
     elif args.view == "proposals":
-        path = data / "resource_proposals.md"
-        print(path.read_text(encoding="utf-8") if path.exists() else "No resource proposals yet.")
+        path = ROOT / ("private-mock" if args.mock else "private") / "proposals.md"
+        print(path.read_text(encoding="utf-8") if path.exists() else
+              "No resource proposals here. They are in the private repository (proposals.md).")
     elif args.view == "costs":
         print(f"{'cycle':>5} {'calls':>5} {'input':>9} {'output':>9} {'cost $':>9}")
         for log in kb.cycle_logs():

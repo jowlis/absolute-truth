@@ -1,0 +1,83 @@
+# The resource team's daily run. Its work goes to the PRIVATE repository; only updates that
+# pass the truth team's accuracy check are added to the public data and website.
+# New proposals open an issue in the private repository, so GitHub emails the owner.
+name: Resource team
+
+on:
+  schedule:
+    - cron: "30 15 * * *"     # 15:30 UTC = 17:30 in UTC+2
+  workflow_dispatch:
+
+concurrency:
+  group: agents
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PRIVATE_REPO: jowlis/absolute-truth-private
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kill switch
+        id: kill
+        run: |
+          if [ -f STOP ]; then echo "STOP file present: no run today."; echo "stop=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Private folder
+        if: steps.kill.outputs.stop != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRIVATE_REPO }}
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: private
+
+      - uses: actions/setup-python@v5
+        if: steps.kill.outputs.stop != 'true'
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install
+        if: steps.kill.outputs.stop != 'true'
+        run: pip install -r requirements.txt
+
+      - name: Run the resource team
+        if: steps.kill.outputs.stop != 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: python run.py --team resource --cycles 1
+
+      - name: Owner inbox
+        if: always() && steps.kill.outputs.stop != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+        run: |
+          if [ -f private/latest_inbox.md ]; then
+            gh issue create --repo "$PRIVATE_REPO" --title "Owner inbox $(date -u +%Y-%m-%d)" --body-file private/latest_inbox.md
+            rm private/latest_inbox.md
+          fi
+
+      - name: Build the website
+        if: always() && steps.kill.outputs.stop != 'true'
+        run: python website/build.py
+
+      - name: Save results
+        if: always() && steps.kill.outputs.stop != 'true'
+        run: |
+          git config --global user.name "absolute-truth-bot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs
+          git commit -m "Resource team: public updates $(date -u +%Y-%m-%d)" || echo "nothing new"
+          git pull --rebase origin main && git push origin HEAD:main
+          cd private
+          git add -A
+          git commit -m "Resource team run $(date -u +%Y-%m-%d)" || echo "nothing new"
+          git pull --rebase && git push

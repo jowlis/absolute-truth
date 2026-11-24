@@ -1,8 +1,14 @@
 # Secrets
 .env
 
-# Generated data (kept local for now)
-data/
+# Data: data/ is public and committed (the cloud runs continue from it), except resource
+# status from older versions. The resource team's work lives in a separate PRIVATE repository,
+# cloned into private/.
+data/daily_usage.json
+data/spending.json
+data/resource_proposals.md
+private/
+private-mock/
 data-mock/
 docs-mock/
 

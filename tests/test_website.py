@@ -35,11 +35,12 @@ class WebsiteTests(unittest.TestCase):
     def test_site_has_every_page_and_open_data(self):
         _, out = built_site()
         for name in ("index.html", "roadmap.html", "findings.html", "path.html", "rules.html",
-                     "proposals.html", "verify.html", "style.css", "verify_chain.py",
+                     "updates.html", "verify.html", "style.css", "verify_chain.py",
                      "findings/F0001.html", "cycles/0001.html", "cycles/0001-transcript.html",
                      "data/cycles.json", "data/findings.json", ".nojekyll"):
             self.assertTrue((out / name).exists(), name)
-        self.assertIn("Version: 2", (out / "rules.html").read_text(encoding="utf-8"))
+        self.assertIn("Version: 3", (out / "rules.html").read_text(encoding="utf-8"))
+        self.assertFalse((out / "proposals.html").exists())   # proposals are private
 
     def test_building_never_changes_the_data(self):
         data = temp_dir()
@@ -137,12 +138,28 @@ class DashboardTests(unittest.TestCase):
         self.post({"action": "allow", "token": dashboard.TOKEN})
         self.assertFalse(self.stop_file.exists())
 
+    # These tests must never touch the real core: approval is replaced by stand-ins.
     def test_approve_with_nothing_changed_does_nothing(self):
-        before = (integrity.CORE_DIR / "manifest.json").read_text(encoding="utf-8")
-        _, reply = self.post({"action": "approve", "token": dashboard.TOKEN,
-                              "reason": "x", "confirm": "yes"})
+        with mock.patch.object(dashboard.integrity, "check_core", return_value=[]), \
+                mock.patch.object(dashboard.integrity, "lock") as lock:
+            _, reply = self.post({"action": "approve", "token": dashboard.TOKEN,
+                                  "reason": "x", "confirm": "yes"})
         self.assertIn("Nothing to approve", reply["message"])
-        self.assertEqual(before, (integrity.CORE_DIR / "manifest.json").read_text(encoding="utf-8"))
+        lock.assert_not_called()
+
+    def test_approve_needs_a_reason_and_yes(self):
+        changed = ["changed without approval: core/limits.toml"]
+        with mock.patch.object(dashboard.integrity, "check_core", return_value=changed), \
+                mock.patch.object(dashboard.lock_core, "version_problem", return_value=None), \
+                mock.patch.object(dashboard.integrity, "lock", return_value="abc") as lock:
+            _, reply = self.post({"action": "approve", "token": dashboard.TOKEN,
+                                  "reason": "raise a cap", "confirm": "no"})
+            self.assertIn("Not approved", reply["message"])
+            lock.assert_not_called()
+            _, reply = self.post({"action": "approve", "token": dashboard.TOKEN,
+                                  "reason": "raise a cap", "confirm": "yes"})
+            lock.assert_called_once_with("raise a cap")
+        self.assertIn("Approved", reply["message"])
 
     def test_site_files_only_from_the_site_folder(self):
         with mock.patch.object(dashboard, "site_dir", return_value=temp_dir()):

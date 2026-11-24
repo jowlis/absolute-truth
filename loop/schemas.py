@@ -10,7 +10,7 @@ Spec mini-language (kept deliberately tiny):
 import json
 import re
 
-from core.verdicts import CLAIM_VERDICTS, PROPOSAL_VERDICTS
+from core.verdicts import ACCURACY_VERDICTS, CLAIM_VERDICTS, PROPOSAL_VERDICTS
 
 CLAIM = {
     "statement": str, "type": ("enum", "verifiable", "conceptual"), "confidence": float,
@@ -32,15 +32,19 @@ GENESIS_DRAFT = {"interpretation": str, "knowable": list, "unknowable": list, "m
 GENESIS_MERGE = dict(GENESIS_DRAFT, disagreements=list)
 GENESIS_REVIEW = {"claim_reviews": [CLAIM_REVIEW], "roadmap_concerns": list,
                   "disagreements": list, "next_step": str}
-PLAN = {"track": ("enum", "mission", "resource"), "allocation_reasoning": str,
-        "roadmap_ops": list, "task_id?": str, "task_brief": str, "why_this_task": str}
+PLAN = {"roadmap_ops": list, "task_id": str, "task_brief": str, "why_this_task": str}
 WORK = {"summary": str, "claims": [CLAIM], "finding_updates": [FINDING_UPDATE],
         "task_complete": bool, "open_questions": list, "suggested_next_step": str}
 REVIEW = {"claim_reviews": [CLAIM_REVIEW], "update_reviews": [UPDATE_REVIEW],
           "task_complete": bool, "appeal_check": str, "disagreements": list, "next_step": str}
-RESOURCE_WORK = {"summary": str, "proposals": [PROPOSAL], "suggested_next_step": str}
-RESOURCE_REVIEW = {"proposal_reviews": [PROPOSAL_REVIEW], "disagreements": list,
-                   "next_step": str}
+PUBLIC_UPDATE = {"title": str, "body": str, "cites": list}
+UPDATE_VERDICT = {"update": int, "verdict": ("enum", "accept", "reject"), "reason": str}
+RESOURCE_PLAN = {"task_brief": str, "why_this_task": str}
+RESOURCE_WORK = {"summary": str, "proposals": [PROPOSAL], "public_updates": [PUBLIC_UPDATE],
+                 "suggested_next_step": str}
+RESOURCE_REVIEW = {"proposal_reviews": [PROPOSAL_REVIEW], "update_reviews": [UPDATE_VERDICT],
+                   "disagreements": list, "next_step": str}
+ACCURACY_CHECK = {"verdict": ("enum",) + ACCURACY_VERDICTS, "problems": list, "reason": str}
 
 # ---- examples shown to the agents (tests check they match the specs) ----------
 
@@ -94,8 +98,6 @@ EXAMPLES = {
   "next_step": "<what the first planner should consider>"
 }""",
     "plan": """{
-  "track": "mission",
-  "allocation_reasoning": "<why mission work (or resource work) is the better use of this cycle>",
   "roadmap_ops": [
     {"op": "add", "kind": "task", "parent": "M1", "key": "new1",
      "title": "<small concrete task>", "goal": "<what done looks like>", "why": "<why it matters>"},
@@ -131,6 +133,10 @@ EXAMPLES = {
   "disagreements": ["<points where you disagree with the worker>"],
   "next_step": "<what should happen next>"
 }""",
+    "resource_plan": """{
+  "task_brief": "<what the worker should do this cycle, concretely>",
+  "why_this_task": "<why this is the best use of the resource team's cycle now>"
+}""",
     "resource_work": """{
   "summary": "<what you examined and how>",
   "proposals": [
@@ -138,21 +144,34 @@ EXAMPLES = {
      "expected_benefit": "<how this advances the mission>",
      "costs_and_risks": "<money, time, legal or reputational risks>"}
   ],
+  "public_updates": [
+    {"title": "<headline>", "body": "<plain-language article about the truth team's work>",
+     "cites": ["<finding ids the article relies on, e.g. F0012>"]}
+  ],
   "suggested_next_step": "<...>"
 }""",
     "resource_review": """{
   "proposal_reviews": [
     {"proposal": 1, "verdict": "accept", "reason": "<why>"}
   ],
+  "update_reviews": [
+    {"update": 1, "verdict": "accept", "reason": "<why>"}
+  ],
   "disagreements": ["<...>"],
   "next_step": "<...>"
+}""",
+    "accuracy_check": """{
+  "verdict": "approve",
+  "problems": ["<each statement that the findings do not support, or that overstates them>"],
+  "reason": "<summary of your judgement>"
 }""",
 }
 
 SPECS = {
     "genesis_draft": GENESIS_DRAFT, "genesis_merge": GENESIS_MERGE,
     "genesis_review": GENESIS_REVIEW, "plan": PLAN, "work": WORK, "review": REVIEW,
-    "resource_work": RESOURCE_WORK, "resource_review": RESOURCE_REVIEW,
+    "resource_plan": RESOURCE_PLAN, "resource_work": RESOURCE_WORK,
+    "resource_review": RESOURCE_REVIEW, "accuracy_check": ACCURACY_CHECK,
 }
 
 

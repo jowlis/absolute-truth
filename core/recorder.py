@@ -1,4 +1,4 @@
-"""The only code that writes findings, status changes and resource proposals.
+"""The only code that writes findings, status changes, resource proposals and public updates.
 
 Protected (CLAUDE.md principle 3). The loop hands over what the worker reported and what
 the reviewer decided; this file applies the owner's rules, whatever the loop does:
@@ -154,4 +154,39 @@ def record_proposals(kb, *, cycle: int, proposals: list, review: dict | None, au
         else:
             out["proposals"].append(
                 f"rejected: {p.get('title')} ({r.get('reason') if r else 'not reviewed'})")
+    return out
+
+
+def record_public_update(kb, *, update: dict, review: dict | None, check: dict | None,
+                         author: Party, reviewer: Party, checker: Party) -> dict:
+    """Publish a resource-team update only if all of these hold (constitution rule 11):
+    - the resource-team reviewer (another lab) accepted it,
+    - a truth-team model from another lab than the author checked it against the findings
+      and approved it,
+    - it cites at least one recorded finding (unknown citations are dropped).
+    `kb` is the PUBLIC knowledge base; nothing else in it is touched.
+    """
+    out = {"published": [], "problems": []}
+    title = str(update.get("title", "")).strip()
+    if not (review and review.get("verdict") == "accept"):
+        out["problems"].append(f"update '{title}' not published: the reviewer did not accept it")
+        return out
+    if not _independent(author, reviewer):
+        out["problems"].append(f"update '{title}' not published: reviewer from the author's lab")
+        return out
+    if not _independent(author, checker):
+        out["problems"].append(f"update '{title}' not published: checker from the author's lab")
+        return out
+    if not (check and check.get("verdict") == "approve"):
+        reason = check.get("reason") if check else "no accuracy check"
+        out["problems"].append(f"update '{title}' not published: accuracy check said no ({reason})")
+        return out
+    cites = [str(c).strip() for c in update.get("cites") or [] if kb.exists(str(c).strip())]
+    if not cites:
+        out["problems"].append(f"update '{title}' not published: it cites no recorded finding")
+        return out
+    uid = kb.add_public_update(title=title, body=str(update.get("body", "")), cites=cites,
+                               written_by=author.name, reviewed_by=reviewer.name,
+                               checked_by=checker.name, check_note=str(check.get("reason", "")))
+    out["published"].append(f"{uid}: {title}")
     return out

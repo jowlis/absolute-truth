@@ -28,6 +28,10 @@ class GeminiAgent(Agent):
             retry_options=types.HttpRetryOptions(attempts=1)))
 
     def _chat(self, system: str, messages: list, tools: list) -> Reply:
+        if self.cfg.get("system_in_prompt"):     # e.g. open models without system instructions
+            messages = [dict(messages[0], content=f"{system}\n\n---\n\n{messages[0]['content']}")] \
+                + messages[1:]
+            system = None
         config = types.GenerateContentConfig(
             system_instruction=system,
             max_output_tokens=self.cfg["max_output_tokens"],

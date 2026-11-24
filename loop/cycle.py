@@ -4,7 +4,7 @@ Cycle 1 (genesis): both models draft what "Absolute Truth" might mean and a firs
 roadmap; the planner merges the drafts; the other model reviews the merge.
 
 Every later cycle:
-  PLAN    the planner reviews roadmap + knowledge base and picks a task (or resource work)
+  PLAN    the planner reviews roadmap + knowledge base and picks a task
   DO      the worker carries it out with tools
   REVIEW  the other model checks the work
   RECORD  core/verdicts.py decides what becomes a finding, and with what status
@@ -80,7 +80,7 @@ class CycleRunner:
         roles = roles_for(n, tuple(self.agents))
         log = {
             "cycle": n, "run_id": self.run_id, "started_at": now(), "ended_at": None,
-            "track": "genesis" if not self.roadmap.exists() else "mission",
+            "track": self._initial_track(),
             "outcome": "unproductive",
             "roles": {r: self.agents[k].name for r, k in roles.items()},
             "task_id": None, "task": None, "allocation_reasoning": None,
@@ -92,13 +92,7 @@ class CycleRunner:
         }
         transcript = []
         try:
-            if log["track"] == "genesis":
-                log["roles"] = {"planner": self.agents[roles["planner"]].name,
-                                "worker": "both models (drafts)",
-                                "reviewer": self.agents[roles["worker"]].name}
-                self._genesis(n, roles, log, transcript)
-            else:
-                self._regular(n, roles, log, transcript)
+            self._body(n, roles, log, transcript)
         except HALTING as e:
             log["outcome"] = "interrupted"
             log["problems"].append(f"interrupted: {e}")
@@ -108,7 +102,8 @@ class CycleRunner:
             log["problems"].append(f"error: {type(e).__name__}: {e}")
             raise
         finally:
-            self.roadmap.commit(n)
+            if self.roadmap is not None:
+                self.roadmap.commit(n)
             log["ended_at"] = now()
             log["usage"] = self.kb.cycle_usage(n)
             log["usage"]["failed_attempts"] = len(self.failures)
@@ -117,12 +112,27 @@ class CycleRunner:
             # number in the path: the next attempt reuses the number, and the replies
             # already received (see _ask).
             recorded = (log["results"] or log["status_changes"] or log["proposals"]
-                        or log["roadmap_changes"])
+                        or log["roadmap_changes"] or log.get("published_updates"))
             log["counted"] = bool(recorded) or log["outcome"] not in ("interrupted", "failed")
             if log["outcome"] != "interrupted":
                 self._cache_path().unlink(missing_ok=True)
             self._save(log, transcript)
         return log
+
+    def _system_prompt(self, agent, other, role: str) -> str:
+        return prompts.system_prompt(agent, other, role)
+
+    def _initial_track(self) -> str:
+        return "genesis" if not self.roadmap.exists() else "mission"
+
+    def _body(self, n: int, roles: dict, log: dict, transcript: list) -> None:
+        if log["track"] == "genesis":
+            log["roles"] = {"planner": self.agents[roles["planner"]].name,
+                            "worker": "both models (drafts)",
+                            "reviewer": self.agents[roles["worker"]].name}
+            self._genesis(n, roles, log, transcript)
+        else:
+            self._regular(n, roles, log, transcript)
 
     # ---- genesis -------------------------------------------------------------
 
@@ -181,12 +191,6 @@ class CycleRunner:
         reviewer = self.agents[roles["reviewer"]]
         ctx = self.config["context"]
         findings_text = lambda: prompts.findings_summary(self.kb.findings(), ctx["max_findings_chars"])
-        resource_cycles, total_cycles = self.kb.track_counts()
-        resource_allowed = verdicts.resource_track_allowed(
-            resource_cycles, total_cycles, self.limits["resource_share_ceiling"])
-        resources_text = prompts.resource_status(
-            {k: a.cfg for k, a in self.agents.items()}, self.budget, resource_cycles,
-            total_cycles, self.limits["resource_share_ceiling"])
         worker_tools = Toolbox(worker, self.config, self.sandbox_ok)
 
         # PLAN
@@ -194,21 +198,14 @@ class CycleRunner:
             planner, worker, "planner", "plan",
             prompts.plan(n, self.roadmap.render_md(), findings_text(),
                          prompts.recent_cycles(self.kb.cycle_logs(last=ctx["recent_cycle_logs"])),
-                         resources_text, resource_allowed, worker.name, worker_tools.names(),
-                         self.limits["max_claims_per_report"]),
-            self._plan_check(resource_allowed), transcript)
+                         worker.name, worker_tools.names(), self.limits["max_claims_per_report"]),
+            self._plan_check(), transcript)
         if not plan:
             log["what_was_done"] = "The planner did not produce a valid plan."
             return
-        log["allocation_reasoning"] = plan["allocation_reasoning"]
-        log["track"] = plan["track"]
         result = self.roadmap.apply(plan["roadmap_ops"], n, planner.cfg["label"])
         log["roadmap_changes"] += result["changes"]
         log["roadmap_errors"] += result["errors"]
-
-        if plan["track"] == "resource":
-            self._resource_cycle(n, plan, planner, worker, reviewer, resources_text, log, transcript)
-            return
 
         task_id = self.roadmap.resolve(plan.get("task_id") or "", result["keys"])
         task = self.roadmap.node(task_id) if task_id else None
@@ -262,37 +259,6 @@ class CycleRunner:
         log["outcome"] = "productive" if verdicts.is_productive(
             len(log["results"]), len(log["status_changes"]), 0) else "unproductive"
 
-    def _resource_cycle(self, n, plan, planner, worker, reviewer, resources_text, log,
-                        transcript) -> None:
-        log["task"] = f"Resource work: {plan['task_brief']}"
-        report = self._ask(
-            worker, planner, "worker", "resource_work",
-            prompts.resource_work(n, plan["task_brief"], resources_text,
-                                  prompts.proposals_summary(self.kb.resource_proposals()),
-                                  prompts.findings_summary(self.kb.findings(),
-                                                           self.config["context"]["max_findings_chars"])),
-            None, transcript, toolbox=Toolbox(worker, self.config, self.sandbox_ok))
-        if not report:
-            log["what_was_done"] = "The worker did not produce valid resource proposals."
-            return
-        log["what_was_done"] = report["summary"]
-        count = len(report["proposals"])
-        review = self._ask(
-            reviewer, worker, "reviewer", "resource_review",
-            prompts.resource_review(n, plan["task_brief"], worker.name, report),
-            lambda obj: _numbering_errors(obj["proposal_reviews"], "proposal", count),
-            transcript)
-        out = recorder.record_proposals(self.kb, cycle=n, proposals=report["proposals"],
-                                        review=review, author=_party(worker),
-                                        reviewer=_party(reviewer))
-        accepted = out.pop("accepted")
-        _merge(log, out)
-        self._write_proposals_md()
-        if review:
-            log["disagreements"] += review["disagreements"]
-        log["next_step"] = (review or {}).get("next_step") or report["suggested_next_step"]
-        log["outcome"] = "productive" if verdicts.is_productive(0, 0, accepted) else "unproductive"
-
     # ---- recording -----------------------------------------------------------
 
     def _record_claims(self, n, task_id, claims, review, author, reviewer, log) -> None:
@@ -317,7 +283,7 @@ class CycleRunner:
     def _ask(self, agent, other, role, stage, prompt, extra_check, transcript, toolbox=None,
              keep_messages=None) -> dict | None:
         """Ask for a JSON reply; if it is invalid, explain the problems and ask once more."""
-        system = prompts.system_prompt(agent, other, role)
+        system = self._system_prompt(agent, other, role)
 
         # Reuse a valid reply received for exactly this request before an interruption.
         # (Only for turns without tools; those cannot be replayed from one reply.)
@@ -370,11 +336,8 @@ class CycleRunner:
                                "system": system, "messages": transcript_safe(messages),
                                "valid": not errors, "errors": errors})
 
-    def _plan_check(self, resource_allowed: bool):
+    def _plan_check(self):
         def check(plan: dict) -> list[str]:
-            if plan["track"] == "resource":
-                return [] if resource_allowed else [
-                    "the resource track is not allowed now (owner's ceiling); choose a mission task"]
             ref = plan.get("task_id") or ""
             node = self.roadmap.node(ref)
             if node is not None:
@@ -435,18 +398,6 @@ class CycleRunner:
         self._cache_path().write_text(json.dumps(
             {"cycle": self.current_cycle, "replies": replies}, indent=2, ensure_ascii=False),
             encoding="utf-8")
-
-    def _write_proposals_md(self) -> None:
-        lines = ["# Resource proposals for the owner", "",
-                 "Ideas from the agents for getting resources that would advance the mission.",
-                 "Agents cannot act on these; the owner decides.", ""]
-        for p in self.kb.resource_proposals():
-            lines += [f"## {p['id']}: {p['title']} (cycle {p['cycle']})", "", p["proposal"], "",
-                      f"- Expected benefit: {p['expected_benefit']}",
-                      f"- Costs and risks: {p['costs_and_risks']}",
-                      f"- Proposed by {p['proposed_by']}; accepted by {p['reviewed_by']}: "
-                      f"{p['review_note']}", ""]
-        (self.data_dir / "resource_proposals.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 # ---- helpers -------------------------------------------------------------------
@@ -518,6 +469,9 @@ def render_log_md(log: dict) -> str:
 
 **Resource proposals:**
 {bullets(log['proposals'])}
+
+**Published updates:**
+{bullets(log.get('published_updates', []))}
 
 **Disagreements:**
 {bullets(log['disagreements'])}

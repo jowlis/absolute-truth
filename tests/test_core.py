@@ -28,10 +28,6 @@ class VerdictTests(unittest.TestCase):
         self.assertFalse(verdicts.status_update_allowed("refuted", False))
         self.assertFalse(verdicts.status_update_allowed("proposed", True))
 
-    def test_resource_ceiling(self):
-        self.assertFalse(verdicts.resource_track_allowed(0, 1, 0.2))   # 1 of 2 = 50%
-        self.assertTrue(verdicts.resource_track_allowed(0, 4, 0.2))    # 1 of 5 = 20%
-        self.assertFalse(verdicts.resource_track_allowed(1, 5, 0.2))   # 2 of 6 = 33%
 
 
 class BudgetTests(unittest.TestCase):

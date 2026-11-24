@@ -56,22 +56,31 @@ Every session working on this codebase must follow these principles.
 - Funds exist only to reach the mission faster or better: more tokens, better
   models, better tools, and later paying human contributors for experiments
   and verification. Not for profit.
-- Agents decide how to split effort between **mission work** and **resource
-  work** (thinking about tools, models, funding), and refine that split over
-  time with stated reasons. A hard ceiling on the resource share lives in
-  `core/` and is set by the owner only.
-- Resource work is a separate track:
-  - Resource proposals never enter the knowledge base or the research roadmap.
-  - Agents cannot act on them (no posting, emailing or spending). The owner
-    decides; executing fundraising is Phase 4.
-  - Truth comes first. Findings must never be shaped to be more appealing to
-    visitors or donors, and reviewers check for this. Attractiveness belongs
-    to presentation, which can never change findings (principle 6).
+- **Two teams** (constitution rules 9-12). The **truth team** (the two strongest
+  available models, different labs) works only on the mission; everything it does is
+  public, and its prompts contain no resource information. The **resource team** (two
+  other models, different labs) works on audience, presentation, funding ideas and how
+  resources are divided, and may recommend budget splits; only the owner changes limits.
+  - Its work is **private to the owner** (separate private repository: proposals,
+    transcripts, spending, owner inbox and `owner_notes.md`).
+  - It can publish only **public updates**, each accepted by its reviewer AND checked
+    against the cited findings by a truth-team model from another lab (`core/recorder.py`).
+  - It cannot post, email, contact anyone or spend money; the owner decides. Executing
+    fundraising is Phase 4.
+  - Truth comes first: nothing it does can change findings (principle 6).
+- Budget: $20 per month (the owner's contribution), split by `resource_team_budget_share`
+  in `core/limits.toml` (currently 50/50), plus per-run and per-day caps.
 - Founder compensation: the founder receives 1% of funds raised. This is
   disclosed publicly wherever donations are requested, fixed in `core/`, and
   agents can never change it.
 
-## 8. Build in phases — do not build a later phase until the owner says so
+## 8. Runs happen in the cloud
+- GitHub Actions run the truth team daily (08:30 UTC, 3 cycles) and the resource team
+  daily (15:30 UTC, 1 cycle). `config.toml` `[cloud] runs_in_cloud = true` makes local
+  real runs refuse, so there is only one history. Keys are GitHub Secrets.
+- Pause: a `STOP` file in the repository, or disable the workflows.
+
+## 9. Build in phases — do not build a later phase until the owner says so
 1. Planning-and-doing loop, roadmap, knowledge base **(done)**
 2. Locked core: constitution file, protected verification, budget cap, kill switch **(done)**
 3. Static public website showing the roadmap, findings and the path so far, plus a

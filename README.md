@@ -6,7 +6,7 @@ tools, check each other's work, and record what holds up as findings. Nobody
 chooses topics for them. The principles are in [CLAUDE.md](CLAUDE.md), and the
 rules the agents follow are in [core/constitution.md](core/constitution.md).
 
-Phases 1-3 are built: the planning-and-doing loop, the roadmap and the knowledge base; the locked core that guards them; and the public website with your owner dashboard.
+Phases 1-3 are built: the planning-and-doing loop, the roadmap and the knowledge base; the locked core that guards them; and the public website with your owner dashboard. Two teams (truth and resource) run daily in the cloud.
 
 ## How a cycle works
 
@@ -34,6 +34,40 @@ Roles rotate every cycle: A plans and reviews while B works, then they swap.
 tools, models or funding, as a means to the mission. It produces proposals for you
 in `data/resource_proposals.md`, never findings. A ceiling in `core/limits.toml`
 (20% of cycles by default) stops it from crowding out mission work.
+
+## Two teams
+
+- **Truth team** (models A and B in `config.toml`): works only on the mission, as described
+  below. Everything it does is public. Its prompts contain no resource information.
+- **Resource team** (models C and D): works on the project's resources: audience,
+  presentation, funding ideas, and how the budget should be divided. Each cycle: plan,
+  work, review, then an accuracy check of any article by a truth-team model from another
+  lab. Accepted proposals and the transcripts go to the **private** folder (`private/`,
+  a separate private GitHub repository): `proposals.md`, `inbox.md`, `owner_notes.md`
+  (your notes to the team, read every cycle). Articles that pass every check appear on the
+  website under **Updates**.
+- Budget: `$20` a month, split between the teams by `resource_team_budget_share` in
+  `core/limits.toml` (50/50), plus per-run and per-day caps.
+
+```bash
+python run.py --mock --team resource      # a dry-run resource cycle (after some truth cycles)
+```
+
+## Running in the cloud
+
+Real runs happen on GitHub Actions (`.github/workflows/`): the truth team every day at
+08:30 UTC (3 cycles), the resource team at 15:30 UTC (1 cycle). Results are committed back:
+public data and the website to this repository, private work to the private one. New
+proposals open an issue in the private repository, so GitHub emails you.
+
+- Start a run now: GitHub -> Actions -> choose a team -> Run workflow.
+- Pause everything: add a file named `STOP` to the repository on GitHub, or disable the
+  workflows (Actions -> the workflow -> ... -> Disable).
+- Secrets (Settings -> Secrets and variables -> Actions): `GEMINI_API_KEY`,
+  `NVIDIA_API_KEY`, and `PRIVATE_REPO_TOKEN` (a fine-grained token with Contents and Issues
+  read/write on the private repository only).
+- `config.toml` `[cloud] runs_in_cloud = true` makes local real runs refuse, so there is
+  only one history. Mock runs always work locally.
 
 ## The easy way: the owner dashboard
 

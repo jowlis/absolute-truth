@@ -96,7 +96,7 @@ def markdown(text: str) -> str:
 
 NAV = [("index", "Home", "index.html"), ("roadmap", "Roadmap", "roadmap.html"),
        ("findings", "Findings", "findings.html"), ("path", "The path", "path.html"),
-       ("rules", "Rules", "rules.html"), ("proposals", "Proposals", "proposals.html"),
+       ("updates", "Updates", "updates.html"), ("rules", "Rules", "rules.html"),
        ("verify", "Verify", "verify.html")]
 
 
@@ -136,7 +136,7 @@ constitution v{esc(rules["constitution_version"])} · core fingerprint
 
 # ---- pages ---------------------------------------------------------------------
 
-def home(site: dict, roadmap: dict, findings: list, logs: list) -> str:
+def home(site: dict, roadmap: dict, findings: list, logs: list, updates: list) -> str:
     f = roadmap.get("foundations", {})
     counts = {}
     for item in findings:
@@ -157,6 +157,13 @@ def home(site: dict, roadmap: dict, findings: list, logs: list) -> str:
 <p class="muted small">Next step suggested: {esc(log.get("next_step") or "-")}</p>
 </div>"""
 
+    if updates:
+        u = updates[-1]
+        latest += f"""<h2>Latest update</h2>
+<div class="card"><strong><a href="updates.html#{esc(u["id"])}">{esc(u["title"])}</a></strong>
+<p class="muted small">{esc(u["at"][:10])} · written by the resource team, checked for accuracy
+by the truth team</p></div>"""
+
     return layout(site, "Home", f"""
 <h1>The mission: Absolute Truth</h1>
 <p>AI models from different labs pursue one fixed mission. Nobody chooses their topics:
@@ -176,8 +183,14 @@ and check each other's work. Everything they do is published here.</p>
 
 <h2>How it works</h2>
 <ul>
-<li>Two models from different labs take turns: in each cycle one plans and later reviews,
-the other does the work. The roles swap every cycle, so no lab leads.</li>
+<li>The <strong>truth team</strong>, two models from different labs, works only on the
+mission. In each cycle one plans and later reviews, the other does the work. The roles swap
+every cycle, so no lab leads. Everything it does is published here.</li>
+<li>A separate <strong>resource team</strong>, two other models from different labs, works on
+the project's resources: audience, presentation and funding ideas. It can read the truth
+team's public work but can never change findings, and the truth team never sees its work. Its articles appear under
+<a href="updates.html">Updates</a> only after a truth-team model has checked them against the
+findings. Its other work is private to the project's owner.</li>
 <li>A claim becomes a finding only after review by the other lab's model. Review can lower
 confidence, never raise it. Rejected claims are never recorded as findings.</li>
 <li>Every finding states its type (<em>verifiable</em> by logic, maths or evidence, or
@@ -368,7 +381,6 @@ ${u.get("cost_usd", 0):.4f}</dd>
 <h2>Rejected claims</h2>{bullets(log.get("rejected_claims"))}
 <h2>Status changes</h2>{bullets(log.get("status_changes"))}
 <h2>Flagged for review</h2>{bullets(log.get("flagged_for_review"))}
-<h2>Resource proposals</h2>{bullets(log.get("proposals"))}
 <h2>Disagreements</h2>{bullets(log.get("disagreements"))}
 <h2>Roadmap changes</h2>{bullets((log.get("roadmap_changes") or []) +
                                   [f"(skipped) {e}" for e in log.get("roadmap_errors") or []])}
@@ -430,23 +442,26 @@ core file differs from what the owner approved.</p>
 """, "rules")
 
 
-def proposals_page(site: dict, proposals: list) -> str:
-    items = "".join(f"""<div class="card">
-<h3>{esc(p["id"])}: {esc(p["title"])}</h3>
-<p class="muted small">{cycle_link(p["cycle"], "")} · proposed by {esc(p["proposed_by"])} ·
-accepted by {esc(p["reviewed_by"])}</p>
-<div class="text">{esc(p["proposal"])}</div>
-<dl class="facts small"><dt>Expected benefit</dt><dd class="text">{esc(p["expected_benefit"])}</dd>
-<dt>Costs and risks</dt><dd class="text">{esc(p["costs_and_risks"])}</dd>
-<dt>Review note</dt><dd class="text">{esc(p["review_note"])}</dd></dl>
-</div>""" for p in proposals)
-    return layout(site, "Proposals", f"""
-<h1>Resource proposals</h1>
-<p><strong>Proposals to the owner, not findings.</strong> In a limited share of cycles the
-agents may think about tools, models and funding that would advance the mission. They can
-only propose; the owner decides. These proposals never enter the knowledge base.</p>
-{items or '<p class="muted">No proposals yet.</p>'}
-""", "proposals")
+def updates_page(site: dict, updates: list) -> str:
+    items = []
+    for u in reversed(updates):
+        cites = ", ".join(finding_link(c, "") for c in u["cites"])
+        items.append(f"""<div class="card" id="{esc(u["id"])}">
+<h2>{esc(u["title"])}</h2>
+<p class="muted small">{esc(u["at"][:10])} · {esc(u["id"])} · based on {cites}</p>
+<div class="text">{esc(u["body"])}</div>
+<p class="muted small">Written by {esc(u["written_by"])}, reviewed by {esc(u["reviewed_by"])}
+(resource team). Checked for accuracy against the findings by {esc(u["checked_by"])}
+(truth team): {esc(u["check_note"])}</p>
+</div>""")
+    return layout(site, "Updates", f"""
+<h1>Updates</h1>
+<p>Plain-language articles about the truth team's work, written by the resource team. Each
+one is published only after a truth-team model from another lab has checked every
+statement against the findings it cites. The findings themselves are the authority: follow
+the links.</p>
+{"".join(items) or '<p class="muted">No updates yet.</p>'}
+""", "updates")
 
 
 def verify_page(site: dict, chain: list) -> str:

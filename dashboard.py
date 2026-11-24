@@ -23,13 +23,24 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import tomllib
+
 import lock_core
 from core import integrity, killswitch
 
 ROOT = Path(__file__).resolve().parent
+_CONFIG = tomllib.loads((ROOT / "config.toml").read_text(encoding="utf-8"))
+REPO_URL = _CONFIG.get("site", {}).get("repo_url", "https://github.com")
+PRIVATE_REPO = _CONFIG.get("private", {}).get("repo", "")
 HOST, PORT = "127.0.0.1", 8765
 TOKEN = secrets.token_urlsafe(24)
 MOCK = False                       # set by --mock: use data-mock/ and docs-mock/
+
+
+def runs_in_cloud() -> bool:
+    """True when real runs happen on GitHub (see [cloud] in config.toml); mock runs are local."""
+    config = tomllib.loads((ROOT / "config.toml").read_text(encoding="utf-8"))
+    return bool(config.get("cloud", {}).get("runs_in_cloud")) and not MOCK
 
 
 def site_dir() -> Path:
@@ -82,18 +93,22 @@ JOB = Job()
 def state() -> dict:
     return {"job": JOB.snapshot(), "stopped": killswitch.STOP_FILE.exists(),
             "core_problems": integrity.check_core(), "rules": integrity.rules_in_force(),
-            "site_built": (site_dir() / "index.html").exists(), "mock": MOCK}
+            "site_built": (site_dir() / "index.html").exists(), "mock": MOCK,
+            "cloud": runs_in_cloud()}
 
 
 def act(form: dict) -> str:
     """Carry out one button press. Returns a message for the page."""
     action = form.get("action", "")
     if action == "run":
+        if runs_in_cloud():
+            return "Runs happen in the cloud: start one on GitHub (Actions, Run workflow)."
         if integrity.check_core():
             return "Not started: the core has unapproved changes (see Approve core changes)."
         cycles = max(1, min(5, int(form.get("cycles", "1") or 1)))
-        started = JOB.start(f"Running {cycles} cycle(s), then building the website",
-                            [with_mock(["run.py", "--cycles", str(cycles)]),
+        team = "resource" if form.get("team") == "resource" else "truth"
+        started = JOB.start(f"Running {cycles} {team} cycle(s), then building the website",
+                            [with_mock(["run.py", "--team", team, "--cycles", str(cycles)]),
                              with_mock(["website/build.py"])])
         return "Started." if started else "Something is already running."
     if action == "stop":
@@ -185,6 +200,11 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, json.dumps({"message": message}).encode("utf-8"), "application/json")
 
 
+def esc(text: str) -> str:
+    import html
+    return html.escape(str(text), quote=True)
+
+
 def control_page() -> str:
     mock_note = ('<p class="badge contested">MOCK MODE: pretend models, data-mock/</p>'
                  if MOCK else "")
@@ -199,7 +219,8 @@ def control_page() -> str:
 <nav><a href="/site/index.html" target="_blank">Open the website preview</a>
 <a href="/site/path.html" target="_blank">The path</a>
 <a href="/site/findings.html" target="_blank">Findings</a>
-<a href="/site/proposals.html" target="_blank">Proposals</a></nav></header>
+<a href="/site/updates.html" target="_blank">Updates</a>
+<a href="https://github.com/{esc(PRIVATE_REPO)}" target="_blank">Private: proposals and inbox</a></nav></header>
 <main>
 {mock_note}
 <h2>Status</h2>
@@ -210,7 +231,15 @@ def control_page() -> str:
 </dl></div>
 
 <h2>Run</h2>
-<div class="filters">
+<p id="cloud-note" class="card" hidden>Runs happen automatically in the cloud every day.
+To start one now: open <a href="{esc(REPO_URL)}/actions" target="_blank">GitHub Actions</a>,
+choose <em>Truth team</em> or <em>Resource team</em>, then <em>Run workflow</em>. To pause
+everything: add a file named <code>STOP</code> to the repository on GitHub (Add file, Create
+new file), or disable the workflows there. Use GitHub Desktop's Pull to bring the latest
+data to this computer.</p>
+<div class="filters" id="run-controls">
+<label>Team <select id="team"><option value="truth">truth team</option>
+<option value="resource">resource team</option></select></label>
 <label>Cycles <select id="cycles"><option>1</option><option>2</option><option selected>3</option>
 <option>4</option><option>5</option></select></label>
 <button class="primary" data-action="run">Run</button>
@@ -260,11 +289,15 @@ async function refresh() {{
   if (atBottom) out.scrollTop = out.scrollHeight;
   for (const b of document.querySelectorAll("button[data-action=run], button[data-action=verify], button[data-action=build]"))
     b.disabled = j.running;
+  $("cloud-note").hidden = !s.cloud;
+  for (const el of document.querySelectorAll("#run-controls select, button[data-action=run]"))
+    el.disabled = el.disabled || s.cloud;
 }}
 for (const b of document.querySelectorAll("button[data-action]")) {{
   b.onclick = async () => {{
     const body = new URLSearchParams({{token: TOKEN, action: b.dataset.action,
-      cycles: $("cycles").value, reason: $("reason").value, confirm: $("confirm").value}});
+      cycles: $("cycles").value, team: $("team").value, reason: $("reason").value,
+      confirm: $("confirm").value}});
     const r = await fetch("/action", {{method: "POST", body}});
     $("message").textContent = (await r.json()).message;
     refresh();

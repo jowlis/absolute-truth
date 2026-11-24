@@ -3,6 +3,11 @@
 #
 # Prices are USD per million tokens. Free-tier models cost 0.
 # Check that the model ids exist with:  python run.py --list-models
+# and that they answer with:             python run.py --ping C   (any model key)
+
+[teams]
+truth = ["A", "B"]       # the two strongest available models, from different labs
+resource = ["C", "D"]    # the resource team: two models from different labs
 
 [models.A]
 label = "Gemini"                  # short name used in logs
@@ -44,6 +49,50 @@ web_search = false                # no built-in search; uses Wikipedia/arXiv loo
 # - Mistral: no free API plan anymore (only pay-as-you-go). Mistral Large 4 is on NVIDIA:
 #   model = "mistralai/mistral-large-4-1t-a52b", label = "Mistral", lab = "Mistral AI".
 
+[models.C]
+label = "Mistral"
+lab = "Mistral AI"
+provider = "openai_compatible"
+base_url = "https://integrate.api.nvidia.com/v1"   # NVIDIA's free developer API
+model = "mistralai/mistral-large-4-1t-a52b"
+key_env = "NVIDIA_API_KEY"
+input_price_per_mtok = 0.0
+output_price_per_mtok = 0.0
+max_output_tokens = 16384
+requests_per_minute = 20
+requests_per_day = 100
+timeout_seconds = 300
+max_reply_seconds = 1800
+supports_tools = true
+web_search = false
+
+[models.D]
+label = "Gemma"
+lab = "Google"
+provider = "gemini"
+model = "gemma-4-31b-it"          # Google's open model; its free quota is separate from Gemini Flash
+key_env = "GEMINI_API_KEY"
+input_price_per_mtok = 0.0
+output_price_per_mtok = 0.0
+max_output_tokens = 8192
+requests_per_minute = 10
+requests_per_day = 100
+timeout_seconds = 300
+supports_tools = false            # resource work needs no tools; keeps it simple and safe
+system_in_prompt = true           # some open models don't accept separate system instructions
+web_search = false
+
+[private]
+# The resource team's work is private to the owner (constitution rule 12). Locally this is a
+# folder; in the cloud it is a clone of the private repository below.
+dir = "private"
+repo = "jowlis/absolute-truth-private"
+
+[cloud]
+# When true, real runs happen only in the cloud (GitHub Actions); local runs are refused so
+# there are never two diverging histories. Mock runs always work locally.
+runs_in_cloud = true
+
 [sandbox]
 # Python executor: a throwaway Docker container with no network, a read-only
 # filesystem, no mounted files and no environment variables.
@@ -70,4 +119,3 @@ title = "Absolute Truth"
 tagline = "AI models from different labs pursue one fixed mission, choosing their own path, in public."
 repo_url = "https://github.com/jowlis/absolute-truth"
 publish_transcripts = true        # every message, tool call and verdict
-publish_proposals = true          # labelled "proposals to the owner, not findings"

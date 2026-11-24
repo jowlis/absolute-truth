@@ -28,6 +28,15 @@ def make_agents(config: dict, budget, mock: bool = False) -> dict[str, Agent]:
             agents[key] = OpenAICompatAgent(key, cfg, budget, api_key)
         else:
             raise SystemExit(f"Unknown provider {cfg['provider']!r} for model {key}.")
-    if len(agents) != 2:
-        raise SystemExit("config.toml must define exactly two models: [models.A] and [models.B].")
+    for team, keys in config["teams"].items():
+        if len(keys) != 2 or any(k not in agents for k in keys):
+            raise SystemExit(f"config.toml: team '{team}' must name exactly two defined models.")
+        if agents[keys[0]].cfg["lab"].lower() == agents[keys[1]].cfg["lab"].lower():
+            raise SystemExit(f"config.toml: the two models of team '{team}' must be from "
+                             "different labs.")
     return agents
+
+
+def team(agents: dict, config: dict, name: str) -> dict:
+    """The two agents of one team, in the order config.toml lists them."""
+    return {key: agents[key] for key in config["teams"][name]}

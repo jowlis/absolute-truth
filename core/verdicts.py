@@ -8,6 +8,7 @@ FINDING_TYPES = ("verifiable", "conceptual")
 FINDING_STATUSES = ("proposed", "contested", "supported", "refuted", "conceptual", "superseded")
 CLAIM_VERDICTS = ("accept", "accept_lower_confidence", "contested", "reject")
 PROPOSAL_VERDICTS = ("accept", "reject")
+ACCURACY_VERDICTS = ("approve", "reject")
 
 
 def finding_status(claim_type: str, verdict: str | None) -> str | None:
@@ -45,11 +46,6 @@ def status_update_allowed(new_status: str, reviewer_agrees: bool) -> bool:
     "proposed" is excluded: it only describes work that was never reviewed.
     """
     return reviewer_agrees and new_status in FINDING_STATUSES and new_status != "proposed"
-
-
-def resource_track_allowed(resource_cycles: int, total_cycles: int, ceiling: float) -> bool:
-    """Would one more resource cycle keep the resource share at or under the ceiling?"""
-    return (resource_cycles + 1) / (total_cycles + 1) <= ceiling + 1e-9
 
 
 def is_productive(new_findings: int, status_changes: int, accepted_proposals: int,

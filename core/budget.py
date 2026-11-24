@@ -3,8 +3,9 @@
 It enforces, in this order:
   1. the kill switch (STOP file),
   2. the per-run request cap,
-  3. the dollar caps per run, per day and per month (using the worst case: full input +
-     max output tokens); spending per day and month is kept in data/spending.json,
+  3. the dollar caps per run, per day and per month, and each team's share of the monthly
+     budget (using the worst case: full input + max output tokens). Spending is kept in
+     spending.json next to the daily usage file (in the private folder: it is resource status),
   4. each model's daily request limit (free tiers), persisted across runs,
   5. spacing between calls to respect each model's requests-per-minute.
 """
@@ -42,8 +43,9 @@ def cost_usd(model_cfg: dict, input_tokens: int, output_tokens: int) -> float:
 
 
 class Budget:
-    def __init__(self, limits: dict, daily_usage_file: Path):
+    def __init__(self, limits: dict, daily_usage_file: Path, team: str = "truth"):
         self.limits = limits
+        self.team = team            # "truth" or "resource": each has its share of the month
         self.daily_usage_file = daily_usage_file
         self.spending_file = Path(daily_usage_file).parent / "spending.json"
         self.spending_file.parent.mkdir(parents=True, exist_ok=True)
@@ -63,10 +65,13 @@ class Budget:
         worst_case = cost_usd(model_cfg, estimated_input_tokens, model_cfg["max_output_tokens"])
         day, month = _today(), _today()[:7]
         ledger = self._ledger()
+        team_cap = self.limits["budget_usd_per_month"] * self.team_share()
+        team_spent = ledger["team_months"].get(month, {}).get(self.team, 0.0)
         for label, spent, cap in (
                 ("run", self.spent_usd, self.limits["budget_usd_per_run"]),
                 ("day", ledger["days"].get(day, 0.0), self.limits["budget_usd_per_day"]),
-                ("month", ledger["months"].get(month, 0.0), self.limits["budget_usd_per_month"])):
+                ("month", ledger["months"].get(month, 0.0), self.limits["budget_usd_per_month"]),
+                (f"month for the {self.team} team", team_spent, team_cap)):
             if spent + worst_case > cap:
                 raise BudgetExceeded(
                     f"Next call could cost up to ${worst_case:.4f}; spent ${spent:.4f} of the "
@@ -99,15 +104,22 @@ class Budget:
             day, month = _today(), _today()[:7]
             ledger["days"][day] = ledger["days"].get(day, 0.0) + cost
             ledger["months"][month] = ledger["months"].get(month, 0.0) + cost
+            teams = ledger["team_months"].setdefault(month, {})
+            teams[self.team] = teams.get(self.team, 0.0) + cost
             self.spending_file.write_text(json.dumps(ledger, indent=2), encoding="utf-8")
         return cost
 
     # ---- spending per day and month (UTC) ------------------------------------
 
+    def team_share(self) -> float:
+        share = float(self.limits["resource_team_budget_share"])
+        return share if self.team == "resource" else 1.0 - share
+
     def _ledger(self) -> dict:
+        ledger = {"days": {}, "months": {}, "team_months": {}}
         if self.spending_file.exists():
-            return json.loads(self.spending_file.read_text(encoding="utf-8"))
-        return {"days": {}, "months": {}}
+            ledger.update(json.loads(self.spending_file.read_text(encoding="utf-8")))
+        return ledger
 
     # ---- daily request counts (UTC day) --------------------------------------
 

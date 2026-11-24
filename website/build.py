@@ -80,7 +80,9 @@ def build(data_dir: Path, out_dir: Path, config: dict) -> dict:
     shutil.copy(ROOT / "website" / "style.css", out_dir / "style.css")
     shutil.copy(ROOT / "website" / "verify_chain.py", out_dir / "verify_chain.py")
 
-    _write(out_dir / "index.html", pages.home(site, roadmap, findings, logs))
+    updates = kb.public_updates()
+    _write(out_dir / "index.html", pages.home(site, roadmap, findings, logs, updates))
+    _write(out_dir / "updates.html", pages.updates_page(site, updates))
     _write(out_dir / "roadmap.html", pages.roadmap_page(site, roadmap, versions))
     _write(out_dir / "findings.html", pages.findings_page(site, findings))
     _write(out_dir / "path.html", pages.path_page(site, logs))
@@ -113,8 +115,6 @@ def build(data_dir: Path, out_dir: Path, config: dict) -> dict:
         site, (core / "constitution.md").read_text(encoding="utf-8"),
         (core / "CHANGELOG.md").read_text(encoding="utf-8"),
         (core / "limits.toml").read_text(encoding="utf-8")))
-    proposals = kb.resource_proposals() if settings.get("publish_proposals", True) else []
-    _write(out_dir / "proposals.html", pages.proposals_page(site, proposals))
 
     _write(out_dir / "data" / "cycles.json", json.dumps(chain, indent=1, ensure_ascii=False))
     _write(out_dir / "data" / "findings.json", json.dumps(findings_data, indent=1, ensure_ascii=False))

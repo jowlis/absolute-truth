@@ -21,8 +21,10 @@ MODEL = {"model": "m", "input_price_per_mtok": 1000.0, "output_price_per_mtok": 
 
 class LockedCoreTests(unittest.TestCase):
     def copy_core(self) -> Path:
+        """A locked copy of the core (the real one may have changes awaiting approval)."""
         d = temp_dir() / "core"
         shutil.copytree(ROOT / "core", d, ignore=shutil.ignore_patterns("__pycache__"))
+        integrity.lock("test baseline", d)
         return d
 
     def test_the_real_core_is_exactly_as_approved(self):
@@ -58,7 +60,7 @@ class LockedCoreTests(unittest.TestCase):
     def test_every_cycle_log_names_the_rules_it_ran_under(self):
         log = mock_runner(temp_dir()).run_cycle()
         self.assertEqual(log["rules"], integrity.rules_in_force())
-        self.assertEqual(log["rules"]["constitution_version"], 2)
+        self.assertEqual(log["rules"]["constitution_version"], 3)
 
 
 class DatabaseRuleTests(unittest.TestCase):

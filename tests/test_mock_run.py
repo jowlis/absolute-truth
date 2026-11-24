@@ -16,7 +16,7 @@ class MockRunTests(unittest.TestCase):
         logs = [runner.run_cycle() for _ in range(6)]
 
         self.assertEqual([l["track"] for l in logs],
-                         ["genesis", "mission", "mission", "mission", "resource", "mission"])
+                         ["genesis", "mission", "mission", "mission", "mission", "mission"])
         self.assertTrue(all(l["outcome"] == "productive" for l in logs))
 
         # Roles rotate: planner alternates, and the worker is never its own reviewer.
@@ -34,13 +34,11 @@ class MockRunTests(unittest.TestCase):
         self.assertTrue({"F0003", "F0004", "F0005", "F0006"} <= flagged)
         self.assertTrue(all(f["confidence"] <= 0.7 for f in kb.findings()))
 
-        # Resource work produced a proposal, but no findings.
-        self.assertEqual(len(kb.resource_proposals()), 1)
-        self.assertEqual(logs[4]["results"], [])
-        self.assertTrue((d / "resource_proposals.md").exists())
+        # The truth team never does resource work.
+        self.assertEqual(kb.resource_proposals(), [])
 
         # One roadmap version per cycle that changed it, readable files, full logs.
-        self.assertEqual(len(list((d / "roadmap_versions").glob("v*.json"))), 5)
+        self.assertEqual(len(list((d / "roadmap_versions").glob("v*.json"))), 6)
         self.assertIn("# Roadmap", (d / "roadmap.md").read_text(encoding="utf-8"))
         for n in range(1, 7):
             cycle_dir = d / "runs" / "test" / f"cycle_{n:04d}"

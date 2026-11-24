@@ -1,0 +1,77 @@
+# The truth team's daily run. Results go to the public repository (data/ and the website in docs/);
+# request counts and spending go to the private repository (resource status).
+# Pause everything: add a file named STOP to this repository, or disable this workflow.
+name: Truth team
+
+on:
+  schedule:
+    - cron: "30 8 * * *"      # 08:30 UTC = 10:30 in UTC+2, just after Gemini's free quota resets
+  workflow_dispatch:
+    inputs:
+      cycles:
+        description: "Number of cycles"
+        default: "3"
+
+concurrency:
+  group: agents               # never two runs at once (truth and resource share data)
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PRIVATE_REPO: jowlis/absolute-truth-private
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kill switch
+        id: kill
+        run: |
+          if [ -f STOP ]; then echo "STOP file present: no run today."; echo "stop=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Private folder
+        if: steps.kill.outputs.stop != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRIVATE_REPO }}
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: private
+
+      - uses: actions/setup-python@v5
+        if: steps.kill.outputs.stop != 'true'
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install
+        if: steps.kill.outputs.stop != 'true'
+        run: pip install -r requirements.txt
+
+      - name: Run the truth team
+        if: steps.kill.outputs.stop != 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: python run.py --team truth --cycles "${{ inputs.cycles || '3' }}"
+
+      - name: Build the website
+        if: always() && steps.kill.outputs.stop != 'true'
+        run: python website/build.py
+
+      - name: Save results
+        if: always() && steps.kill.outputs.stop != 'true'
+        run: |
+          git config --global user.name "absolute-truth-bot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs
+          git commit -m "Truth team run $(date -u +%Y-%m-%d)" || echo "nothing new"
+          git pull --rebase origin main && git push origin HEAD:main
+          cd private
+          git add -A
+          git commit -m "Truth team run $(date -u +%Y-%m-%d)" || echo "nothing new"
+          git pull --rebase && git push
