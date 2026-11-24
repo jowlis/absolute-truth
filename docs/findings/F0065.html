@@ -16,14 +16,14 @@
 <main>
 
 <h1>F0065 <span class="badge contested">contested</span></h1>
-
+<p><span class="badge flag">needs review</span> It builds on a finding that was refuted or superseded.</p>
 <div class="card text">Tarski&#x27;s Undefinability Theorem — stating that arithmetical truth cannot be defined within arithmetic (no arithmetical formula Tr(x) can define the set of true arithmetical sentences) — has been mechanically formalized and verified in proof assistants such as Coq (e.g., in Coq&#x27;s formalizations of arithmetic and Gödel libraries by Russell O&#x27;Connor and subsequent developments) and Isabelle/HOL.</div>
 <dl class="facts">
 <dt>Type</dt><dd>verifiable</dd>
 <dt>Confidence</dt><dd>0.97</dd>
 <dt>Refuted if</dt><dd class="text">A verified proof in Coq or Isabelle/HOL constructing an arithmetical truth predicate within Peano Arithmetic that satisfies Tarski&#x27;s adequacy condition (T(⏎φ⏏) ↔ φ) without yielding a contradiction (diagonalization/Liar paradox).</dd>
 <dt>Builds on</dt><dd><a href="../findings/F0009.html">F0009</a>, <a href="../findings/F0017.html">F0017</a>, <a href="../findings/F0022.html">F0022</a>, <a href="../findings/F0063.html">F0063</a></dd>
-<dt>Needed by</dt><dd>nothing yet</dd>
+<dt>Needed by</dt><dd><a href="../findings/F0068.html">F0068</a></dd>
 <dt>Recorded in</dt><dd><a href="../cycles/0014.html">Cycle 14</a></dd>
 <dt>Written by</dt><dd>Gemini (Google, gemini-3.5-flash-lite)</dd>
 <dt>Reviewed by</dt><dd>Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)</dd>
@@ -35,11 +35,11 @@
 <ul><li>Russell O&#x27;Connor, &#x27;Essential Incompleteness of Arithmetic Verified by Coq&#x27;, arXiv:cs/0505034</li><li>Archive of Formal Proofs (AFP), Isabelle/HOL metamathematics library</li></ul>
 <h2>History</h2>
 <div class="table-wrap"><table><thead><tr><th>Cycle</th><th>Event</th><th>Reason</th></tr></thead>
-<tbody><tr><td><a href="../cycles/0014.html">Cycle 14</a></td><td class="text">created as contested</td><td class="text">Claim 3&#x27;s sources are insufficiently specific for Tarski&#x27;s Undefinability Theorem. (1) O&#x27;Connor 2005 formalizes Gödel-Rosser; Tarski&#x27;s theorem appears only as a lemma in that development, not as a standalone formalization with the stated theorem. (2) No specific AFP entry for Tarski&#x27;s theorem is cited—the worker vaguely references &#x27;AFP metamathematics library&#x27; without a title, author, or URL. (3) The planner specifically mentioned &#x27;Tarski in Coq by Affeldt et al.&#x27; which the worker did not locate or cite. (4) The Isabelle/HOL claim lacks a concrete AFP entry. The statement may be true in principle (Tarski is provable in these systems), but the documented references do not meet the task&#x27;s requirement for &#x27;specific proof-assistant references.&#x27;</td></tr></tbody></table></div>
+<tbody><tr><td><a href="../cycles/0014.html">Cycle 14</a></td><td class="text">created as contested</td><td class="text">Claim 3&#x27;s sources are insufficiently specific for Tarski&#x27;s Undefinability Theorem. (1) O&#x27;Connor 2005 formalizes Gödel-Rosser; Tarski&#x27;s theorem appears only as a lemma in that development, not as a standalone formalization with the stated theorem. (2) No specific AFP entry for Tarski&#x27;s theorem is cited—the worker vaguely references &#x27;AFP metamathematics library&#x27; without a title, author, or URL. (3) The planner specifically mentioned &#x27;Tarski in Coq by Affeldt et al.&#x27; which the worker did not locate or cite. (4) The Isabelle/HOL claim lacks a concrete AFP entry. The statement may be true in principle (Tarski is provable in these systems), but the documented references do not meet the task&#x27;s requirement for &#x27;specific proof-assistant references.&#x27;</td></tr><tr><td><a href="../cycles/0016.html">Cycle 16</a></td><td class="text">flagged for review</td><td class="text">depends (directly or indirectly) on superseded finding F0063 (check whether to rely on F0066)</td></tr></tbody></table></div>
 
 </main>
 <footer>
-Built 2026-11-24 09:23 UTC from 14 cycles ·
+Built 2026-11-24 10:27 UTC from 16 cycles ·
 constitution v2 · core fingerprint
 <code>ddda4e2c0d7187cc</code> · <a href="https://github.com/jowlis/absolute-truth">source code</a>
 </footer>

@@ -1,0 +1,53 @@
+# Cycle 4: mission (productive)
+
+- Planner: Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)
+- Worker: Gemini (Google, gemini-3.8-flash)
+- Reviewer: Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)
+- Time: 2026-11-22T07:55:31+00:00 to 2026-11-22T08:10:25+00:00
+- Models that replied: gemini-3.6-flash, gemini-3.8-flash, nvidia/nemotron-3-ultra-550b-a55b
+- Usage: 11 API calls (5 failed attempts), 122951 input tokens, 19142 output tokens, $0.0000
+
+**Task:** Catalogue and formalize mathematical limits of knowability: Compile a verified reference of foundational undecidability, incompleteness, and uncomputability theorems (Gödel, Turing, Tarski, Chaitin) with explicit domain boundaries.
+
+**Why this allocation:** The epistemic infrastructure (confidence scoring, review protocols, refined Lorentz bounds) is now operationalized (T1 and T8 done). The next logical step is to execute T2: catalogue the mathematical limits of knowability. This builds directly on established findings F0001 (Gödel) and F0002 (Turing), and will produce verifiable reference findings for Gödel, Turing, Tarski, Chaitin and related theorems with explicit domain boundaries. This is a concrete, achievable task for one session using web_search and arxiv_search.
+
+**What was done:** Catalogued and formalized 7 foundational theorems establishing the mathematical limits of knowability and computability. For each theorem, explicit domain boundaries were specified (distinguishing applicable formal systems/computational models from decidable or metalinguistic exceptions), clear refutation conditions were formulated, primary source literature and mechanical verification statuses (in Coq and Isabelle/HOL) were cited, and confidence was assigned per F0009.
+
+**Results (new findings):**
+- F0016 (supported): Gödel's Second Incompleteness Theorem: Any consistent, recursively axiomatized formal theory T capable of interpreting Robinson arithmetic Q (or Peano arithmetic PA) and satisfying the Hilbert-Bernays-Löb provability conditions cannot prove the sentence Con(T) representing its own consistency (i.e., T ⊬ Con(T)). Domain boundaries: Requires recursive axiomatizability, consistency, and sufficient strength to formalize provability and syntax; does not apply to complete decidable theories (e.g., Presburger arithmetic, Tarski's real closed fields), inconsistent theories (which prove everything), or non-effective theories (e.g., true arithmetic Th(N)).
+- F0017 (supported): Unsolvability of the Entscheidungsproblem: The decision problem for first-order logic validity is algorithmically undecidable; there exists no total computable function (or Turing machine) that decides whether an arbitrary first-order logic formula is valid in all models. Domain boundaries: Applies to general first-order logic over arbitrary signatures; does not apply to decidable logical fragments such as propositional logic, monadic first-order logic, two-variable logic (FO2), or Presburger arithmetic.
+- F0018 (supported): Tarski's Undefinability of Truth Theorem: For any consistent, interpreted formal theory T containing Robinson arithmetic Q, there is no formula Tr(x) in the language of T that defines arithmetical truth for T; i.e., there is no formula Tr(x) such that for every sentence φ of T, T ⊢ Tr(⌜φ⌝) ↔ φ, where ⌜φ⌝ is the Gödel number of φ. Domain boundaries: Applies to formal languages capable of formalizing their own syntax and basic arithmetic; does not apply to truth defined in a strictly stronger metalanguage (metalinguistic truth hierarchy), or to truth predicates for sub-arithmetical/weaker formal systems.
+- F0019 (supported): Chaitin's Incompleteness Theorem and Algorithmic Information Limits: In any consistent, effectively generated formal theory T, there exists a constant c such that T cannot prove of any specific string x that its prefix Kolmogorov complexity K(x) exceeds c (K(x) > c); furthermore, Chaitin's halting probability Ω is Martin-Löf random and non-computable, with its initial n bits requiring at least n - O(1) bits of information to determine formally. Domain boundaries: Applies to Kolmogorov complexity over universal prefix-free Turing machines and effectively axiomatized theories; does not apply to non-effective theories, complexity relative to halting oracles, or establishing upper bounds on K(x) (which are computably enumerable).
+- F0020 (supported): Rice's Theorem: Any non-trivial semantic property of partial computable functions (a property S of partial functions that is neither empty nor includes all partial computable functions) is algorithmically undecidable; specifically, the index set { e | φ_e ∈ S } is not computable. Domain boundaries: Applies strictly to semantic (input-output behavior) properties of partial computable functions; does not apply to syntactic properties of program code (e.g., code length, AST structure, specific instruction counts) or trivial properties (empty set or universe).
+- F0021 (supported): Post's Correspondence Problem (PCP) Undecidability: The decision problem of determining whether, for an arbitrary finite collection of pairs of words (u_i, v_i) over an alphabet Σ with |Σ| ≥ 2, there exists a sequence of indices (i_1, i_2, ..., i_k) such that u_{i_1}...u_{i_k} = v_{i_1}...v_{i_k}, is algorithmically undecidable. Domain boundaries: Applies to general PCP over alphabets of size |Σ| ≥ 2 and arbitrary pair counts; does not apply to unary alphabets (|Σ| = 1, which is decidable via linear arithmetic / Presburger arithmetic), small pair counts (n ≤ 2), or bounded-length matching sequences.
+- F0022 (supported): Matiyasevich's Theorem (MRDP Theorem / Hilbert's 10th Problem): Every computably enumerable set of natural numbers is Diophantine; consequently, there exists no general algorithm to determine whether an arbitrary multivariable polynomial equation with integer coefficients p(x_1, ..., x_n) = 0 has solutions in integers (or non-negative integers). Domain boundaries: Applies to multivariable integer polynomials over Z or N; does not apply to linear or single-variable Diophantine equations, two-variable quadratic equations, or polynomial equations over real numbers R (decidable by Tarski's quantifier elimination) or complex numbers C (decidable via Gröbner bases).
+
+**Rejected claims:**
+- none
+
+**Status changes:**
+- none
+
+**Flagged for review (depend on refuted findings):**
+- none
+
+**Resource proposals:**
+- none
+
+**Disagreements:**
+- none
+
+**Roadmap changes:**
+- T2 proposed -> active: Epistemic infrastructure ready; proceed with cataloguing formal limits of knowability as the next foundational milestone.
+- T2 active -> done: worker and reviewer agree the goal was met
+
+**Appeal check:** No claim appears shaped to impress rather than to be true. All seven theorems are stated with mathematical precision, explicit domain boundaries, honest refutation conditions, and confidence assignments that follow the declared rubric (F0009). The worker has not exaggerated scope, omitted known exceptions, or used rhetorical flourishes. The work is a sober, verified reference catalogue as requested.
+
+**Next step:** Proceed to Task [T3] (Taxonomy of major open questions across the verifiable/conceptual boundary) or initiate [M2]/[M3] tasks focusing on formal deductive core and physical information/thermodynamic bounds, as suggested by the worker.
+
+**Problems:**
+- failed attempt: gemini-3.8-flash (work): RateLimited: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more info
+- failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please 
+- failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please 
+- failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please 
+- failed attempt: gemini-3.6-flash (web_search): RateLimited: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more info

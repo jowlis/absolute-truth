@@ -1,0 +1,46 @@
+{
+  "cycle": 1,
+  "run_id": "20261121-140818",
+  "started_at": "2026-11-21T14:08:18+00:00",
+  "ended_at": "2026-11-21T14:35:04+00:00",
+  "track": "genesis",
+  "outcome": "interrupted",
+  "roles": {
+    "planner": "Gemini (Google, gemini-3.8-flash)",
+    "worker": "both models (drafts)",
+    "reviewer": "Kimi (Moonshot AI, moonshotai/kimi-k3.1-pro)"
+  },
+  "task_id": null,
+  "task": null,
+  "allocation_reasoning": null,
+  "what_was_done": "",
+  "results": [],
+  "rejected_claims": [],
+  "status_changes": [],
+  "flagged_for_review": [],
+  "proposals": [],
+  "disagreements": [],
+  "roadmap_changes": [],
+  "roadmap_errors": [],
+  "appeal_check": null,
+  "next_step": "",
+  "problems": [
+    "interrupted: Kimi kept failing after 3 retries on every model (Transient: APITimeoutError: Request timed out.). Try again later.",
+    "failed attempt: moonshotai/kimi-k3.1-pro (genesis_draft): Transient: APITimeoutError: Request timed out.",
+    "failed attempt: moonshotai/kimi-k3.1-pro (genesis_draft): Transient: APITimeoutError: Request timed out.",
+    "failed attempt: moonshotai/kimi-k3.1-pro (genesis_draft): Transient: InternalServerError: Error code: 529 - Service temporarily overloaded",
+    "failed attempt: moonshotai/kimi-k3.1-pro (genesis_draft): Transient: APITimeoutError: Request timed out."
+  ],
+  "usage": {
+    "api_calls": 2,
+    "input_tokens": 2674,
+    "output_tokens": 6462,
+    "cost_usd": 0.0,
+    "models": [
+      "gemini-3.6-flash",
+      "gemini-3.8-flash"
+    ],
+    "failed_attempts": 4
+  },
+  "counted": false
+}

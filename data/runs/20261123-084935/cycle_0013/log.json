@@ -1,0 +1,60 @@
+{
+  "cycle": 13,
+  "run_id": "20261123-084935",
+  "started_at": "2026-11-23T08:58:42+00:00",
+  "ended_at": "2026-11-23T09:03:42+00:00",
+  "track": "mission",
+  "outcome": "productive",
+  "roles": {
+    "planner": "Gemini (Google, gemini-3.8-flash)",
+    "worker": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+    "reviewer": "Gemini (Google, gemini-3.8-flash)"
+  },
+  "task_id": "T11",
+  "task": "Taxonomy of major open questions: Computation, Complexity, and Foundations: Deliver a second batch of 8-10 foundational questions in computation, complexity theory, and formal epistemology (e.g., P vs NP, Quantum supremacy verification, Church-Turing thesis limits, Computational irreducibility, Foundations of probability/Bayesianism), classified into verifiable-now, verifiable-in-principle, or purely-conceptual with confidence, type, refutation_condition, and builds_on.",
+  "allocation_reasoning": "Continuing mission work is the priority as we have active milestones (M3 Physical Invariants and Information Bounds) and can expand our taxonomy of major open questions from physics to computation and complexity theory, building directly on the successful completion of T3 (batch 1 physics taxonomy). Resource track is available (0% used vs 20% ceiling), but mission progress is smooth and resource limits are not currently impeding our work.",
+  "what_was_done": "Delivered 8 foundational open questions in computation, complexity theory, and formal epistemology (CMP-001 through CMP-008), classified using the taxonomy methodology established in F0047-F0054. Each claim provides: precise question statement, classification (verifiable-now, verifiable-in-principle, or purely-conceptual), confidence score applying dependency-scaling rules per F0027, explicit operational refutation conditions, and justified builds_on citations from existing supported findings (F0017, F0019, F0020, F0022, F0032, F0035, F0036, F0027, F0047-F0054). Used arXiv searches to verify theoretical foundations: P vs NP (Millennium problem), quantum supremacy (Google 2019, Bouland et al. 2018, Movassagh 2019), physical Church-Turing thesis (Gandy 1980, Arrighi & Dowek 2011), computational irreducibility (Wolfram 2002, Conway 1972), Cox's theorem (Cox 1946/1961), BQP vs PH (Aaronson 2010 oracle separation), one-way functions (Impagliazzo's five worlds), and logical omniscience (Hintikka 1962).",
+  "results": [
+    "F0055 (supported): CMP-001: The question 'Does P = NP?' (i.e., can every problem whose solution can be verified in polynomial time also be solved in polynomial time by a deterministic Turing machine?) is classified as 'verifiable-in-principle' (type: verifiable). While no polynomial-time algorithm for NP-complete problems has been found and the problem is one of the seven Millennium Prize Problems, a proof of P = NP (by exhibiting a polynomial-time algorithm for an NP-complete problem like 3-SAT) or P ≠ NP (by proving a superpolynomial lower bound) would constitute verification. The question is not verifiable-now because no proof exists in either direction, and it is not purely-conceptual because it has a definite mathematical answer within standard complexity theory.",
+    "F0056 (supported): CMP-002: The question 'Can quantum computational supremacy be conclusively verified for random circuit sampling (RCS) on noisy intermediate-scale quantum (NISQ) devices?' is classified as 'verifiable-now' (type: verifiable). Google's 2019 Sycamore experiment (53 qubits, 20 cycles) demonstrated RCS with cross-entropy benchmarking fidelity ~0.2%, and theoretical work (Bouland et al. 2018; Movassagh 2019) established average-case #P-hardness of estimating output probabilities. Ongoing verification efforts include improved classical spoofing algorithms, better fidelity estimation, and larger circuit demonstrations. The question is empirically testable now with existing and near-term quantum hardware.",
+    "F0057 (supported): CMP-003: The question 'Is the physical Church-Turing thesis (PCTT) true — i.e., can every physically realizable computational process be simulated by a Turing machine with at most polynomial overhead?' is classified as 'verifiable-in-principle' (type: verifiable). Gandy's theorem (1980) showed PCTT follows from postulates of homogeneity, bounded density, and bounded velocity of information. Arrighi and Dowek (2011) provided a quantum version. The thesis could be falsified by discovering a physical process (e.g., closed timelike curves, hypercomputation in general relativity spacetimes, or quantum gravity effects) that computes non-recursive functions or achieves superpolynomial speedups beyond BQP. It is not verifiable-now because no such process has been experimentally realized, and not purely-conceptual because it makes empirical claims about physical law.",
+    "F0058 (supported): CMP-004: The question 'Is computational irreducibility a fundamental feature of physical law — i.e., do there exist natural systems whose future behavior cannot be predicted by any computational shortcut (simulation faster than running the system itself)?' is classified as 'verifiable-in-principle' (type: verifiable). Wolfram (2002) conjectured that many simple programs (e.g., Rule 110 cellular automaton, which is Turing-complete per Cook 2004) exhibit computational irreducibility. This is connected to undecidability results (Conway 1972 on Collatz-type problems; Moore 1990 on particle systems). The question could be verified by proving computational irreducibility for a specific physical model or falsified by discovering general predictive shortcuts (e.g., closed-form solutions, efficient simulation algorithms) for systems currently believed irreducible. It is not purely-conceptual because it makes claims about the computational complexity of physical prediction.",
+    "F0059 (conceptual): CMP-005: The question 'Does Cox's theorem uniquely justify Bayesian probability as the only consistent extension of Boolean logic to degrees of belief, given its postulates (divisibility, comparability, associativity of conjunction, and continuity)?' is classified as 'purely-conceptual' (type: conceptual). Cox's theorem (1946, 1961) derives the sum and product rules of probability from postulates about plausible reasoning. However, the theorem's assumptions (particularly differentiability/continuity and the functional equation form) have been debated (Paris 1994; Van Horn 2003). Alternative foundations (de Finetti's Dutch book, Savage's axioms, Jaynes' desirata) exist. The question is purely-conceptual because it concerns the interpretation and justification of a mathematical framework — there is no empirical test that could distinguish 'Bayesian probability as uniquely justified' from 'Bayesian probability as one coherent framework among others' when all yield identical numerical calculations.",
+    "F0060 (supported): CMP-006: The question 'Is BQP (bounded-error quantum polynomial time) contained in the polynomial hierarchy (PH)?' is classified as 'verifiable-in-principle' (type: verifiable). Aaronson (2010) gave an oracle separation showing BQP ⊄ PH relative to an oracle, but the unrelativized question remains open. If BQP ⊄ PH, then quantum computers provide a computational advantage that cannot be captured by any level of the polynomial hierarchy. A proof either way would resolve a major open problem in quantum complexity theory. The question is not verifiable-now (no proof exists) and not purely-conceptual (it has a definite answer in complexity theory).",
+    "F0061 (supported): CMP-007: The question 'Do one-way functions exist (i.e., functions easy to compute but hard to invert on average)?' is classified as 'verifiable-in-principle' (type: verifiable). The existence of one-way functions is equivalent to P ≠ NP (Impagliazzo 1995 'five worlds': Algorithmica, Heuristica, Pessiland, Minicrypt, Cryptomania). If one-way functions exist, then secure cryptography (pseudorandom generators, digital signatures, private-key encryption) is possible. The question could be resolved by: (a) proving P ≠ NP and constructing explicit one-way functions, or (b) proving P = NP (which would imply no one-way functions exist). It is not verifiable-now and not purely-conceptual — it is a concrete mathematical question with major practical implications.",
+    "F0062 (conceptual): CMP-008: The question 'Can the problem of logical omniscience in Bayesian epistemology be resolved — i.e., can a normative theory of rational belief simultaneously satisfy: (1) logical consistency (beliefs closed under logical consequence), (2) probabilistic coherence (Kolmogorov axioms), and (3) computational feasibility (bounded reasoning resources)?' is classified as 'purely-conceptual' (type: conceptual). The problem (Hintikka 1962; Garber 1983; Hacking 1967) is that standard Bayesian agents are logically omniscient (assign probability 1 to all tautologies, 0 to contradictions, and respect logical entailment), which is computationally impossible for bounded agents. Proposed solutions (Garber-style, Hacking-style, logical induction, computational Bayesianism) involve modifying the normative framework. The question is purely-conceptual because it asks which normative ideal we should adopt for bounded reasoners — there is no empirical fact of the matter about 'the correct normative theory' independent of the choice of normative criteria."
+  ],
+  "rejected_claims": [],
+  "status_changes": [],
+  "flagged_for_review": [],
+  "proposals": [],
+  "disagreements": [],
+  "roadmap_changes": [
+    "added task T11 under M1: Taxonomy of major open questions: Computation, Complexity, and Foundations",
+    "T11 proposed -> active: chosen by the planner: Task T3 delivered the first batch of physics taxonomy (F0047-F0054). Expanding the taxonomy into computation and complexity theory is the natural next step in Milestone 1's epistemic infrastructure and boundary mapping before deeper dives into physical invariants.",
+    "T11 active -> done: worker and reviewer agree the goal was met"
+  ],
+  "roadmap_errors": [],
+  "appeal_check": "No claims appeared shaped to impress; all were rigorously formulated with appropriate operational refutation conditions, proper classifications, and justified dependency citations.",
+  "next_step": "Proceed to the next task in the roadmap, such as extending the taxonomy to formal systems and logic (Gödel incompleteness boundaries, reverse mathematics, proof complexity) or utilizing this epistemic infrastructure for further Milestone tasks.",
+  "problems": [
+    "failed attempt: gemini-3.8-flash (plan): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.8-flash (plan): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please "
+  ],
+  "usage": {
+    "api_calls": 13,
+    "input_tokens": 541696,
+    "output_tokens": 11643,
+    "cost_usd": 0.0,
+    "models": [
+      "gemini-3.5-flash-lite",
+      "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "failed_attempts": 2
+  },
+  "rules": {
+    "core_fingerprint": "ddda4e2c0d7187cc",
+    "constitution_version": 2
+  },
+  "counted": true
+}

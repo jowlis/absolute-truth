@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "cycle": 1,
+  "mission": "Absolute Truth",
+  "foundations": {
+    "interpretation": "Absolute Truth is operationalized as propositions and structural invariants that hold unconditionally across all observers, coordinate frames, languages, and contexts—truths that would hold in any coherent reality or possible universe. Operationally, we pursue truth ranked by necessity and universality: (1) formal and mathematical tautologies derived within consistent axiomatic systems, (2) fundamental empirical regularities and physical conservation laws that remain invariant across all accessible spacetime, and (3) structural bounds on information, computation, and observation that delimit what any rational agent can know or compute. We do not claim dogmatic finality; we asymptotically approach truth through cumulative verification and systematic boundary mapping.",
+    "knowable": [
+      "Deductive theorems of mathematics and formal logic derivable from specified axiomatic systems, because their proof-validity is algorithmically checkable and observer-independent.",
+      "Empirical regularities and invariant physical relations bounded by explicit measurement precision and domain constraints (e.g., conservation laws, relativistic invariants, Standard Model predictions in tested regimes), surviving rigorous falsification attempts.",
+      "Structural and computational bounds on information processing (e.g., Gödel's incompleteness, Turing's undecidability, Heisenberg's uncertainty relation, Landauer's principle), which are themselves demonstrable theorems or experimentally validated physical laws.",
+      "Probabilistic coherence and rational belief updating (e.g., Cox's theorem, Bayesian inference), establishing normative mathematical rules for reasoning under incomplete information."
+    ],
+    "unknowable": [
+      "Global omniscience regarding the total microstate of the physical universe, bounded by relativistic event horizons, quantum measurement limits, and finite thermodynamic/computational capacity (e.g., Bremermann's limit).",
+      "Absolute semantic completeness within sufficiently expressive formal systems, as established by Gödel's First Incompleteness Theorem and Tarski's undefinability theorem.",
+      "General solutions to undecidable decision problems (e.g., the universal Halting Problem) across all instances for Turing-complete systems.",
+      "Metaphysical conjectures that are inherently unfalsifiable and make no formal or empirical predictions (e.g., unfalsifiable simulation conjectures, solipsism, why there is something rather than nothing).",
+      "Counterfactual trajectories of unique singular historical cosmogenic events without reproducible experimental access."
+    ],
+    "method": "Iterative triangulation from secure formal and empirical foundations outward: (1) Epistemic Taxonomy: Explicitly partition claims into verifiable (empirical or formal propositions with concrete refutation conditions) and conceptual (interpretive, epistemological, or definitional positions). (2) Formal Rigor: Specify hypotheses with precise operational definitions, domain boundaries, and explicit refutation criteria. (3) Independent Cross-Lab Review: Subject every claim to adversarial critique from an independent lab model, where review may challenge assumptions and lower confidence, but never raise it. (4) Cumulative Dependency Mapping: Build complex claims on top of previously verified findings (`builds_on`), propagating refutations downward if an underlying dependency fails."
+  },
+  "nodes": [
+    {
+      "id": "M1",
+      "kind": "milestone",
+      "parent": "ROOT",
+      "title": "Epistemic Infrastructure and Formal Limits",
+      "goal": "Establish calibration standards, review procedures, and mathematical limits of knowability to govern all subsequent truth claims.",
+      "why": "Provides the verification criteria and formal bounds required to prevent chasing undecidable problems and ensure rigorous confidence scoring.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Provides the verification criteria and formal bounds required to prevent chasing undecidable problems and ensure rigorous confidence scoring."
+        }
+      ]
+    },
+    {
+      "id": "T1",
+      "kind": "task",
+      "parent": "M1",
+      "title": "Operationalize confidence scoring and review protocols",
+      "goal": "Formulate concrete criteria for assigning confidence intervals [0.0, 1.0] to verifiable vs conceptual claims and define cross-lab review challenge rubrics.",
+      "why": "Guarantees cross-lab consistency and enforces Constitution Rules 3, 4, and 6.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Guarantees cross-lab consistency and enforces Constitution Rules 3, 4, and 6."
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "kind": "task",
+      "parent": "M1",
+      "title": "Catalogue and formalize mathematical limits of knowability",
+      "goal": "Compile a verified reference of foundational undecidability, incompleteness, and uncomputability theorems (Gödel, Turing, Tarski, Chaitin) with explicit domain boundaries.",
+      "why": "Prevents wasted cognitive and computational resources attempting to prove or decide unresolvable propositions.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Prevents wasted cognitive and computational resources attempting to prove or decide unresolvable propositions."
+        }
+      ]
+    },
+    {
+      "id": "T3",
+      "kind": "task",
+      "parent": "M1",
+      "title": "Taxonomy of major open questions across the verifiable/conceptual boundary",
+      "goal": "Classify 25-40 foundational questions in physics, computation, and ontology into verifiable-now, verifiable-in-principle, or purely conceptual.",
+      "why": "Clarifies where empirical verification is possible and channels focus toward fruitful inquiry.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Clarifies where empirical verification is possible and channels focus toward fruitful inquiry."
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "kind": "milestone",
+      "parent": "ROOT",
+      "title": "Deductive and Mathematical Core",
+      "goal": "Establish a base of machine-checkable mathematical tautologies and logical theorems to serve as immutable anchor points.",
+      "why": "Anchors the knowledge base in proof-checked deductive certainty that holds across all possible universes.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Anchors the knowledge base in proof-checked deductive certainty that holds across all possible universes."
+        }
+      ]
+    },
+    {
+      "id": "T4",
+      "kind": "task",
+      "parent": "M2",
+      "title": "Formalize core theorems of Peano Arithmetic and Presburger Arithmetic",
+      "goal": "Document essential arithmetic invariants (commutativity, associativity, induction) with formal proof-assistant references (Lean 4/Coq) as bedrock findings.",
+      "why": "Demonstrates formal verification workflows and supplies indisputable dependencies for subsequent formal work.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Demonstrates formal verification workflows and supplies indisputable dependencies for subsequent formal work."
+        }
+      ]
+    },
+    {
+      "id": "M3",
+      "kind": "milestone",
+      "parent": "ROOT",
+      "title": "Physical Invariants and Information Bounds",
+      "goal": "Catalogue empirical conservation laws, spacetime invariants, and physical information constraints across the accessible universe.",
+      "why": "Grounds the mission in empirical reality by verifying the stability of natural laws and physical constraints on rational observers.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Grounds the mission in empirical reality by verifying the stability of natural laws and physical constraints on rational observers."
+        }
+      ]
+    },
+    {
+      "id": "T5",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Catalogue fundamental constants and verify bounds on Lorentz invariance",
+      "goal": "Review current observational and experimental bounds on the constancy of fundamental constants (alpha, G, c) and Lorentz symmetry tests across high energy and cosmological baselines.",
+      "why": "Establishes the empirical baseline of physical invariances under which our universe operates.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Establishes the empirical baseline of physical invariances under which our universe operates."
+        }
+      ]
+    },
+    {
+      "id": "T6",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Formulate information-theoretic and thermodynamic bounds on physical systems",
+      "goal": "Document Landauer's principle, the Bekenstein bound, and Bremermann's limit as hard physical constraints on computation and information storage.",
+      "why": "Defines what physical agents can compute, observe, and store in physical reality.",
+      "status": "proposed",
+      "history": [
+        {
+          "cycle": 1,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Defines what physical agents can compute, observe, and store in physical reality."
+        }
+      ]
+    }
+  ],
+  "changes_in_this_version": {
+    "cycle": 1,
+    "changes": [
+      "Gemini: added milestone M1 under ROOT: Epistemic Infrastructure and Formal Limits",
+      "Gemini: added task T1 under M1: Operationalize confidence scoring and review protocols",
+      "Gemini: added task T2 under M1: Catalogue and formalize mathematical limits of knowability",
+      "Gemini: added task T3 under M1: Taxonomy of major open questions across the verifiable/conceptual boundary",
+      "Gemini: added milestone M2 under ROOT: Deductive and Mathematical Core",
+      "Gemini: added task T4 under M2: Formalize core theorems of Peano Arithmetic and Presburger Arithmetic",
+      "Gemini: added milestone M3 under ROOT: Physical Invariants and Information Bounds",
+      "Gemini: added task T5 under M3: Catalogue fundamental constants and verify bounds on Lorentz invariance",
+      "Gemini: added task T6 under M3: Formulate information-theoretic and thermodynamic bounds on physical systems",
+      "Gemini: foundation 'interpretation' set: genesis: merged from both models' drafts",
+      "Gemini: foundation 'knowable' set: genesis: merged from both models' drafts",
+      "Gemini: foundation 'unknowable' set: genesis: merged from both models' drafts",
+      "Gemini: foundation 'method' set: genesis: merged from both models' drafts"
+    ]
+  }
+}

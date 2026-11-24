@@ -1,0 +1,66 @@
+# Cycle 1: genesis (productive)
+
+- Planner: Gemini (Google, gemini-3.8-flash)
+- Worker: both models (drafts)
+- Reviewer: Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)
+- Time: 2026-11-21T15:01:21+00:00 to 2026-11-21T15:10:55+00:00
+- Models that replied: gemini-3.6-flash, gemini-3.8-flash, nvidia/nemotron-3-ultra-550b-a55b
+- Usage: 6 API calls (0 failed attempts), 23615 input tokens, 21597 output tokens, $0.0000
+
+**Task:** Genesis: interpret the mission and draft the first roadmap
+
+**Why this allocation:** -
+
+**What was done:** 2 independent draft(s) of what 'Absolute Truth' might mean and a first roadmap; merged by Gemini (Google, gemini-3.8-flash); reviewed by Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b).
+
+**Results (new findings):**
+- F0001 (supported): In any consistent, effective formal system capable of expressing elementary arithmetic, there exist true statements of arithmetic that cannot be proved within the system (Gödel's First Incompleteness Theorem).
+- F0002 (supported): There is no general algorithm that can decide, for all possible program-input pairs, whether an arbitrary program will halt or execute indefinitely (Turing's Halting Problem).
+- F0003 (supported): In standard Peano Arithmetic, addition is commutative: ∀a∀b (a + b = b + a).
+- F0004 (supported): Lorentz invariance holds empirically in the photon and electron sectors to at least the 10^-19 precision level relative to the Planck scale.
+- F0005 (conceptual): The Church-Turing thesis (every intuitively effectively calculable function is computable by a Turing machine) is a conceptual thesis rather than a deductive theorem, because 'effective calculability' is an informal intuitive concept.
+- F0006 (conceptual): Epistemic inquiry by bounded rational agents into empirical reality must assign probabilistic credences rather than absolute certainty (0 or 1), due to inductive underdetermination and finite sampling.
+
+**Rejected claims:**
+- none
+
+**Status changes:**
+- none
+
+**Flagged for review (depend on refuted findings):**
+- none
+
+**Resource proposals:**
+- none
+
+**Disagreements:**
+- External store infrastructure vs in-harness tracking: Nemotron proposed building a file-based finding store and software schema engine. Resolved: Because the harness already manages persistent finding and roadmap data structures, we refocused infrastructure work on formalizing scoring rubrics, review criteria, and schema requirements within the existing framework rather than building redundant external database tooling.
+- Definitional conventions vs empirical invariance: Nemotron included the speed of light c as an exact finding (c = 299,792,458 m/s by SI definition). Gemini emphasized empirical tests of physical constancy. Resolved: While c is fixed by SI unit convention, human unit choices are definitional tautologies rather than deep truths of nature. We resolved this by prioritizing empirical invariance tests (such as observational bounds on Lorentz invariance and cosmological constancy of dimensionless constants like alpha) as substantive truth claims.
+- Generalized cogito / 'computation is occurring': Nemotron proposed that the existence of computation right now is a verifiable claim with confidence 1.0, but noted that its refutation condition is self-undermining. Resolved: In accordance with Rule 4 (verifiable claims require refutation conditions that others can check), a self-undermining proposition whose negation cannot be observed cannot serve as a verifiable empirical claim. We set aside this solipsistic/cogito formulation to prioritize claims with clear empirical or formal refutation criteria.
+- Claim 4's formulation 'Lorentz invariance holds empirically in the photon and electron sectors to at least the 10^-19 precision level relative to the Planck scale' is imprecise. The Fermi-LAT bound on linear dispersion is at ~1.2×Planck mass (i.e., no violation at the Planck scale), not a 10^-19 fractional precision. Optical cavity tests constrain Lorentz-violating parameters at the 10^-18–10^-19 level, but these are dimensionless parameter bounds, not 'precision relative to the Planck scale.' The claim should be restated with specific parameter bounds (e.g., SME coefficients) and the confidence adjusted accordingly.
+- The interpretation states that Absolute Truth includes 'truths that would hold in any coherent reality or possible universe.' This modal claim (across all possible universes) goes beyond what the verifiable findings can support (they are valid in this universe or in specified formal systems). The interpretation should be weakened to 'truths that hold across all observers and contexts within our universe, and across all models of the specified formal systems.'
+- roadmap concern: The roadmap includes tasks for confidence calibration (t_confidence_calibration) and formal limits (t_formal_limits), but lacks an explicit task for implementing the cross-lab review protocol mandated by the method and Constitution Rule 6. The protocol should be codified as a task under m_epistemic_foundations.
+- roadmap concern: Claim 4's empirical bounds are cited as a dependency for future work (e.g., t_spacetime_invariants), but the claim's precision characterization needs refinement before being used as a firm foundation. A dedicated verification subtask should be added.
+- roadmap concern: The roadmap does not include a task for establishing the 'independent cross-lab review' mechanism itself (e.g., a review template, challenge rubrics, recording format). This is a prerequisite for all subsequent claim acceptance.
+
+**Roadmap changes:**
+- added milestone M1 under ROOT: Epistemic Infrastructure and Formal Limits
+- added task T1 under M1: Operationalize confidence scoring and review protocols
+- added task T2 under M1: Catalogue and formalize mathematical limits of knowability
+- added task T3 under M1: Taxonomy of major open questions across the verifiable/conceptual boundary
+- added milestone M2 under ROOT: Deductive and Mathematical Core
+- added task T4 under M2: Formalize core theorems of Peano Arithmetic and Presburger Arithmetic
+- added milestone M3 under ROOT: Physical Invariants and Information Bounds
+- added task T5 under M3: Catalogue fundamental constants and verify bounds on Lorentz invariance
+- added task T6 under M3: Formulate information-theoretic and thermodynamic bounds on physical systems
+- foundation 'interpretation' set: genesis: merged from both models' drafts
+- foundation 'knowable' set: genesis: merged from both models' drafts
+- foundation 'unknowable' set: genesis: merged from both models' drafts
+- foundation 'method' set: genesis: merged from both models' drafts
+
+**Appeal check:** -
+
+**Next step:** The first planner should: (1) add a task 't_review_protocol' under m_epistemic_foundations to codify the cross-lab review process; (2) prioritize t_confidence_calibration and t_formal_limits as scheduled; (3) schedule a focused review of Claim 4's empirical bounds with concrete numbers from the literature (SME coefficients, Fermi-LAT, cavity experiments) before it is used as a dependency; (4) revise the interpretation to avoid modal claims about 'any possible universe' that exceed the mission's verifiable scope.
+
+**Problems:**
+- none

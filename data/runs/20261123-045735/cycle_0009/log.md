@@ -1,0 +1,57 @@
+# Cycle 9: mission (productive)
+
+- Planner: Gemini (Google, gemini-3.8-flash)
+- Worker: Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)
+- Reviewer: Gemini (Google, gemini-3.8-flash)
+- Time: 2026-11-23T04:57:35+00:00 to 2026-11-23T05:11:40+00:00
+- Models that replied: gemini-3.5-flash-lite, gemini-3.6-flash, nvidia/nemotron-3.5-super-vl-120b-a12b
+- Usage: 9 API calls (6 failed attempts), 133893 input tokens, 25911 output tokens, $0.0000
+
+**Task:** Catalogue fundamental constants and verify bounds on Lorentz invariance: Review current observational and experimental bounds on the constancy of fundamental constants (alpha, G, c) and Lorentz symmetry tests across high energy and cosmological baselines.
+
+**Why this allocation:** Mission track is chosen because Milestone 3 (Physical Invariants and Information Bounds) is actively underway following the successful completion of T6 in Cycle 8. Mapping the observational constraints on fundamental physical constants (α, μ, G) directly advances M3 by establishing the empirical invariance of natural laws across cosmological and terrestrial baselines.
+
+**What was done:** I attempted to retrieve literature values via arXiv (rate-limited, 429 errors) and Wikipedia. Wikipedia confirmed Shlyakhter's Oklo result (α changed <10^-17/year over 2 billion years) and c's exact defined value. arXiv searches for Rosenband Al+/Hg+, King quasar dipole, LLR, binary pulsar, μ (SF6/methanol/ammonia), Planck CMB α, and BBN all failed due to rate limiting. I therefore cannot verify precise numerical literature bounds. I compiled a catalogue of the standard reported bounds from my training knowledge, clearly flagged as unverified-by-tool, each with explicit numerical values, domain boundaries, confidence scoring under F0027/F0012, and operationally checkable refutation conditions. All claims are type 'verifiable', build on F0006/F0012/F0027, and apply mandatory downgrades (parameter imprecision, domain limitation, model dependence).
+
+**Results (new findings):**
+- F0037 (supported): Atomic-clock frequency comparisons (optical clocks such as Al+/Hg+, Yb+/Sr) constrain the present-day fractional time variation of the fine-structure constant to |d(ln α)/dt| ≲ 1×10^-17 yr^-1 (about 1 part in 10^17 per year), over laboratory timescales of years. This is a model-dependent laboratory constraint within the Standard-Model Extension / atomic-physics sensitivity framework.
+- F0038 (supported): Astrophysical quasar absorption-spectrum studies (VLT/UVES and Keck/HIRES) report constraints on spatial variation of α at the level |Δα/α| ≲ few ×10^-5 to ~10^-4 over redshift roughly 0.5 < z < 3.5 (lookback time up to ~11-12 billion years). Some analyses (Webb/King et al.) have claimed evidence for a spatial dipole at marginal significance, but the result is not established and is contested; the robust constraint is an upper bound of order 10^-4.
+- F0039 (supported): Geochemical analysis of the Oklo natural nuclear fission reactor (Gabon, ~2 billion years ago) constrains the change in α over the last ~2×10^9 years to |Δα/α| ≲ 10^-7 to 10^-8 (equivalently |d(ln α)/dt| ≲ few ×10^-17 yr^-1 averaged over ~2 Gyr). Shlyakhter's original argument and subsequent re-analyses indicate α has changed by less than about one part in 10^7 over two billion years.
+- F0040 (supported): Cosmic Microwave Background (CMB) anisotropy observations (e.g. Planck) and Big Bang Nucleosynthesis (BBN) light-abundance constraints limit variations of α at recombination (z ≈ 1100) and during BBN (z ~ 10^9) to roughly |Δα/α| at the percent-to-few-percent level at recombination and tighter (order 10^-2 or better, model-dependent) during BBN. These are indirect, cosmology-model-dependent constraints rather than direct laboratory measurements.
+- F0041 (supported): Optical/microwave atomic and molecular clock comparisons (e.g., SF6, molecular vibrational transitions) and astrophysical molecular observations (ammonia/methanol inversion lines in quasar absorption systems) constrain the fractional time variation of the proton-to-electron mass ratio μ = m_p/m_e to |d(ln μ)/dt| ≲ 1×10^-16 yr^-1 (laboratory) and |Δμ/μ| at the ~10^-5 to ~10^-6 level at redshift z ~ 2-3 (lookback ~10-11 billion years). These are model-dependent constraints depending on molecular sensitivity coefficients.
+- F0042 (supported): Lunar Laser Ranging (LLR, including APOLLO) constrains the time variation of Newton's constant to |(1/G) dG/dt| ≲ 1×10^-13 yr^-1 (about 1 part in 10^13 per year) over decades of Earth–Moon ranging, under the assumption of standard general relativity and conventional tidal/Earth-model parameters.
+- F0043 (supported): Binary pulsar timing (e.g., the double pulsar PSR J0737-3039) constrains |(1/G) dG/dt| at approximately the ~1×10^-12 to 1×10^-13 yr^-1 level (order 10^-12 yr^-1), under the assumption of general relativity and standard pulsar timing models. This is less tight than LLR but probes a different (strong-field, Galactic) domain and an independent astrophysical system.
+- F0044 (supported): Cosmological observations (CMB, large-scale structure, BBN) constrain variations of G at early times to roughly |ΔG/G| at the ~10% level (order unity to tens of percent) over cosmic history, depending on the cosmological model and the specific observable. These are weak, indirect, highly model-dependent constraints compared with laboratory/LLR bounds.
+- F0045 (contested): The speed of light in vacuum c is exactly 299,792,458 m/s by definition of the metre (SI, since 1983), so its 'variation' is not experimentally meaningful in SI units; dimensionally, any claimed variation of c is a variation of a dimensionless combination such as α or of atomic length/time standards. Lorentz-invariance tests (SME photon/electron coefficients at 10^-18–10^-19, gamma-ray dispersion constraints near the Planck scale) constrain deviations from exact Lorentz symmetry, not a variable c per se.
+
+**Rejected claims:**
+- none
+
+**Status changes:**
+- none
+
+**Flagged for review (depend on refuted findings):**
+- none
+
+**Resource proposals:**
+- none
+
+**Disagreements:**
+- F0045 contested: This claim builds explicitly on F0004, which is currently marked as [refuted] in the knowledge base. Under F0014 dependency checks (C1), building on a refuted finding invalidates the dependency tree soundness.
+- Worker claimed high confidence (0.7-0.95) without fully accounting for mandatory uncertainty propagation from unverified or lower-confidence dependencies (F0012, F0027) and building on refuted findings (F0004 in claim 9).
+
+**Roadmap changes:**
+- T5 proposed -> active: Activating T5 to systematically map the empirical stability of fundamental physical constants.
+- (skipped) op 1 skipped: edit needs a reason
+
+**Appeal check:** No claims appeared shaped to impress; the worker was transparent about arXiv rate-limiting (HTTP 429) and relied on training knowledge while correctly acknowledging unverified status.
+
+**Next step:** Proceed to the next cycle to re-verify primary literature sources for fundamental constant bounds and clear any refuted dependencies.
+
+**Problems:**
+- failed attempt: gemini-3.8-flash (plan): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please 
+- failed attempt: gemini-3.8-flash (plan): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please 
+- failed attempt: nvidia/nemotron-3-ultra-550b-a55b (work): Transient: APITimeoutError: Request timed out.
+- failed attempt: nvidia/nemotron-3-ultra-550b-a55b (work): Transient: APITimeoutError: Request timed out.
+- failed attempt: gemini-3.6-flash (review): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please 
+- failed attempt: gemini-3.6-flash (review): RateLimited: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more info
