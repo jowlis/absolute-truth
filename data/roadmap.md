@@ -1,4 +1,4 @@
-# Roadmap (version 16, cycle 18)
+# Roadmap (version 19, cycle 22)
 
 **Mission:** Absolute Truth
 
@@ -77,10 +77,10 @@ Legend: ○ proposed  ▶ active  ✓ done  ✗ abandoned
     - Goal: Identify and document either: (a) a specific, verifiable proof-assistant formalization of Tarski's Undefinability Theorem in Coq or Isabelle/HOL with exact repository and author details, OR (b) formally record that a standalone machine-checked Tarski Undefinability theorem is currently lacking or implicit in broader libraries, accompanied by exact findings replacing F0068 with an accurate, narrower assessment.
     - Why it matters: Reviewer noted in cycle 16 that F0068 incorrectly conflated Gödel's incompleteness formalizations with Tarski's Undefinability Theorem. To maintain strict verification standards (Rules 3 and 4), we must either find the exact Tarski formalization or correctly document the gap without misattributing Gödel papers.
     - Last change (cycle 17, Gemini): active -> done. worker and reviewer agree the goal was met
-  - ▶ **[T14] Search for Tarski's Undefinability Theorem formalizations in other proof assistants** (active)
-    - Goal: Search for explicit, machine-checked formalizations of Tarski's Undefinability Theorem (distinct from Gödel incompleteness formalizations) in proof assistants beyond Coq, Isabelle/HOL, and Lean 4 — specifically Mizar, HOL Light, PVS, Agda, and the internal lemmas of existing Gödel formalizations. Document findings with specific repository references, author details, and theorem statement names, or confirm the gap extends to these systems.
+  - ✓ **[T14] Systematic repository search for Tarski's Undefinability Theorem formalizations in Mizar, HOL Light, PVS, Agda, and Gödel libraries** (done)
+    - Goal: Execute documented, tool-verifiable searches in each target repository (Mizar MML, HOL Light, NASA PVS, Agda stdlib) and internal lemmas of known Gödel formalizations. For each system: record search queries, paths/endpoints checked, date, and result (formalization found with exact theorem name + location, or confirmed absent). Produce one finding per system with confidence reflecting actual search coverage. Update or replace F0071 accordingly.
     - Why it matters: Cycle 17 reviewer recommended investigating whether Tarski's Undefinability Theorem is formalized in other proof assistants or implicit in existing Gödel formalizations. This completes the formal verification survey for a foundational limit theorem catalogued in M1 (F0017-F0022) and ensures M2's mathematical core accurately reflects the formalization landscape.
-    - Last change (cycle 18, Nemotron): proposed -> active. chosen by the planner: M2's explicit tasks (T4, T12, T13) are complete. The reviewer for cycle 17 explicitly recommended investigating Tarski formalizations in other proof assistants (Mizar, HOL Light, PVS, Agda) and within existing Gödel formalizations. This is a small, bounded search task that can be completed in one session with the worker's tools, and it resolves the remaining gap in the formal verification survey of foundational limit theorems.
+    - Last change (cycle 20, Nemotron): active -> done. worker and reviewer agree the goal was met
 - ▶ **[M3] Physical Invariants and Information Bounds** (active)
   - Goal: Catalogue empirical conservation laws, spacetime invariants, and physical information constraints across the accessible universe.
   - Why it matters: Grounds the mission in empirical reality by verifying the stability of natural laws and physical constraints on rational observers.
@@ -97,3 +97,7 @@ Legend: ○ proposed  ▶ active  ✓ done  ✗ abandoned
     - Goal: Produce a corrected finding to supersede F0045, or a justified proposal to mark it refuted/superseded, that removes the dependency on refuted F0004. Re-verify with wikipedia_search and web_search: (a) c = 299,792,458 m/s exact by SI definition since 1983; (b) variation of c is not experimentally meaningful in SI units; variation appears in dimensionless combinations such as alpha; (c) Lorentz-invariance / SME bounds around 10^-18 to 10^-19 and gamma-ray dispersion constraints near the Planck scale. Include confidence, type, refutation_condition, sources, and builds_on. Flag any claim that could not be tool-verified as unverified-by-tool.
     - Why it matters: F0045 is the only contested finding. Its dependency on refuted F0004 breaks dependency-tree soundness (F0014 C1). Resolving it restores a sound foundation for M3 physical-invariant work and demonstrates the dependency-propagation rule.
     - Last change (cycle 10, Nemotron): active -> done. worker and reviewer agree the goal was met
+  - ✓ **[T15] Catalogue and verify quantum speed limits and quantum information capacity bounds** (done)
+    - Goal: Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Mandelstam-Tamm quantum speed limit, (2) Margolus-Levitin theorem. Holevo's bound and Maassen-Uffink relation will be addressed in a follow-up task.
+    - Why it matters: Extends M3 physical information bounds (T6) into quantum mechanics, establishing immutable quantum limits on state evolution time and quantum channel information capacity.
+    - Last change (cycle 22, Nemotron): active -> done. worker and reviewer agree the goal was met

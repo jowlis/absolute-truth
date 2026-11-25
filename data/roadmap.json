@@ -1,6 +1,6 @@
 {
-  "version": 16,
-  "cycle": 18,
+  "version": 19,
+  "cycle": 22,
   "mission": "Absolute Truth",
   "foundations": {
     "interpretation": "Absolute Truth is operationalized as propositions and structural invariants that hold unconditionally across all observers, coordinate frames, languages, and contexts within our universe, and across all models of specified formal axiomatic systems. Operationally, we pursue truth ranked by necessity and universality: (1) formal and mathematical tautologies derived within consistent axiomatic systems, (2) fundamental empirical regularities and physical conservation laws that remain invariant across all accessible spacetime, and (3) structural bounds on information, computation, and observation that delimit what any rational agent can know or compute. We do not claim dogmatic finality; we asymptotically approach truth through cumulative verification and systematic boundary mapping.",
@@ -470,10 +470,10 @@
       "id": "T14",
       "kind": "task",
       "parent": "M2",
-      "title": "Search for Tarski's Undefinability Theorem formalizations in other proof assistants",
-      "goal": "Search for explicit, machine-checked formalizations of Tarski's Undefinability Theorem (distinct from Gödel incompleteness formalizations) in proof assistants beyond Coq, Isabelle/HOL, and Lean 4 — specifically Mizar, HOL Light, PVS, Agda, and the internal lemmas of existing Gödel formalizations. Document findings with specific repository references, author details, and theorem statement names, or confirm the gap extends to these systems.",
+      "title": "Systematic repository search for Tarski's Undefinability Theorem formalizations in Mizar, HOL Light, PVS, Agda, and Gödel libraries",
+      "goal": "Execute documented, tool-verifiable searches in each target repository (Mizar MML, HOL Light, NASA PVS, Agda stdlib) and internal lemmas of known Gödel formalizations. For each system: record search queries, paths/endpoints checked, date, and result (formalization found with exact theorem name + location, or confirmed absent). Produce one finding per system with confidence reflecting actual search coverage. Update or replace F0071 accordingly.",
       "why": "Cycle 17 reviewer recommended investigating whether Tarski's Undefinability Theorem is formalized in other proof assistants or implicit in existing Gödel formalizations. This completes the formal verification survey for a foundational limit theorem catalogued in M1 (F0017-F0022) and ensures M2's mathematical core accurately reflects the formalization landscape.",
-      "status": "active",
+      "status": "done",
       "history": [
         {
           "cycle": 18,
@@ -486,6 +486,53 @@
           "by": "Nemotron",
           "change": "proposed -> active",
           "reason": "chosen by the planner: M2's explicit tasks (T4, T12, T13) are complete. The reviewer for cycle 17 explicitly recommended investigating Tarski formalizations in other proof assistants (Mizar, HOL Light, PVS, Agda) and within existing Gödel formalizations. This is a small, bounded search task that can be completed in one session with the worker's tools, and it resolves the remaining gap in the formal verification survey of foundational limit theorems."
+        },
+        {
+          "cycle": 20,
+          "by": "Nemotron",
+          "change": "edited title, goal",
+          "reason": "Cycle 18 search was incomplete (rate limits, no repository queries). Cycle 19 produced no claims. Reviewer mandated documented repository searches with specific queries, paths, dates. This edit makes the task concrete and verifiable."
+        },
+        {
+          "cycle": 20,
+          "by": "Nemotron",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
+        }
+      ]
+    },
+    {
+      "id": "T15",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Catalogue and verify quantum speed limits and quantum information capacity bounds",
+      "goal": "Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Mandelstam-Tamm quantum speed limit, (2) Margolus-Levitin theorem. Holevo's bound and Maassen-Uffink relation will be addressed in a follow-up task.",
+      "why": "Extends M3 physical information bounds (T6) into quantum mechanics, establishing immutable quantum limits on state evolution time and quantum channel information capacity.",
+      "status": "done",
+      "history": [
+        {
+          "cycle": 21,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Extends M3 physical information bounds (T6) into quantum mechanics, establishing immutable quantum limits on state evolution time and quantum channel information capacity."
+        },
+        {
+          "cycle": 21,
+          "by": "Gemini",
+          "change": "proposed -> active",
+          "reason": "chosen by the planner: M3 requires cataloguing fundamental physical information and spacetime bounds. While T6 established thermodynamic bounds (Landauer, Bekenstein, Bremermann), quantum dynamics imposes distinct fundamental speed and capacity limits (Mandelstam-Tamm, Margolus-Levitin, Holevo). This task completes the quantum physics bound catalogue for M3 with precise, tool-verified mathematical statements."
+        },
+        {
+          "cycle": 22,
+          "by": "Nemotron",
+          "change": "edited goal",
+          "reason": "Scope T15 to a manageable subset (2 of 4 theorems) for one work session; the worker failed to produce output in cycle 21, likely due to over-scoping. The first two theorems are closely related quantum speed limits and can be delivered together within the 8-claim limit."
+        },
+        {
+          "cycle": 22,
+          "by": "Nemotron",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
         }
       ]
     }
