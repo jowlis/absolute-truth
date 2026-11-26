@@ -1,4 +1,4 @@
-# Roadmap (version 19, cycle 22)
+# Roadmap (version 22, cycle 25)
 
 **Mission:** Absolute Truth
 
@@ -101,3 +101,15 @@ Legend: ○ proposed  ▶ active  ✓ done  ✗ abandoned
     - Goal: Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Mandelstam-Tamm quantum speed limit, (2) Margolus-Levitin theorem. Holevo's bound and Maassen-Uffink relation will be addressed in a follow-up task.
     - Why it matters: Extends M3 physical information bounds (T6) into quantum mechanics, establishing immutable quantum limits on state evolution time and quantum channel information capacity.
     - Last change (cycle 22, Nemotron): active -> done. worker and reviewer agree the goal was met
+  - ✓ **[T16] Catalogue and verify Holevo's bound and Maassen-Uffink entropic uncertainty relation** (done)
+    - Goal: Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Holevo's bound on accessible information in quantum states, and (2) Maassen-Uffink entropic uncertainty relation for mutually unbiased bases.
+    - Why it matters: Completes the M3 quantum information capacity and measurement constraint catalogue following the quantum speed limits established in T15.
+    - Last change (cycle 23, Gemini): active -> done. worker and reviewer agree the goal was met
+  - ✓ **[T17] Catalogue and verify Berta et al. entropic uncertainty relation with quantum memory and extensions** (done)
+    - Goal: Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Berta et al. (2010) entropic uncertainty relation with quantum memory (EUR-QM), (2) the conditional entropy formulation H(A|B) + H(C|B) ≥ log₂(1/c) + H(A|B), (3) subsequent extensions including tight bounds with quantum side information, (4) applications to quantum cryptography (e.g., QKD security proofs) and quantum steering.
+    - Why it matters: Completes the M3 quantum measurement constraint catalogue by adding the quantum-memory-assisted entropic uncertainty relation, which generalizes Maassen-Uffink (F0083-F0086) to scenarios with quantum side information. This is a cornerstone result for modern quantum cryptography and quantum information theory, establishing fundamental limits on simultaneous measurement predictability when an observer holds quantum memory.
+    - Last change (cycle 24, Nemotron): active -> done. worker and reviewer agree the goal was met
+  - ▶ **[T18] Resolve contested finding F0089 on Berta et al. entropic uncertainty relation with quantum memory** (active)
+    - Goal: Formulate corrected, mathematically exact findings to supersede contested F0089 (and refine F0090-F0093 as needed), accurately defining the overlap parameter c (or c²), clarifying tripartite duality derivation logic, specifying exact Hilbert space domain bounds (attributing continuous-variable extensions to Furrer et al. 2012), and correcting literature citations.
+    - Why it matters: F0089 is currently contested due to a factor-of-2 error in the basis overlap parameter definition. Resolving it restores mathematical precision and dependency-tree soundness to the M3 quantum information catalog.
+    - Last change (cycle 25, Gemini): proposed -> active. chosen by the planner: F0089 is currently the only contested finding in the knowledge base. Resolving it immediately restores dependency soundness to M3 and ensures the quantum uncertainty bounds catalog is mathematically flawless before moving to subsequent milestones.

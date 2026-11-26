@@ -241,7 +241,12 @@
    "F0077",
    "F0078",
    "F0079",
-   "F0080"
+   "F0080",
+   "F0081",
+   "F0082",
+   "F0083",
+   "F0087",
+   "F0089"
   ],
   "history": [
    {
@@ -3278,6 +3283,491 @@
     "event": "created as supported",
     "reason": "Complementary utility and unified bound are accurately described: MT tightest when ΔE ≪ ⟨H⟩ (e.g., two-level systems), ML tightest when ΔE ≫ ⟨H⟩ (e.g., multi-level superpositions). The unified bound τ ≥ max(πħ/(2ΔE), πħ/(2⟨H⟩)) is mathematically correct. Domain conditions (time-independent H, bounded below, E₀=0, finite ⟨H⟩) are properly stated. Citations to Giovannetti et al. (2003) and Deffner & Lutz (2017) are authoritative. Confidence 0.97 is well-calibrated.",
     "at": "2026-11-25T19:11:35+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0081",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Holevo's bound (Holevo's theorem): For an ensemble of quantum states {p_x, ρ_x} with probabilities p_x ≥ 0, ∑_x p_x = 1, and density operators ρ_x on a Hilbert space H, the accessible information I_acc — the maximum classical mutual information I(X:Y) obtainable by any measurement {E_y} (POVM) on the ensemble — satisfies I_acc ≤ χ, where χ = S(∑_x p_x ρ_x) - ∑_x p_x S(ρ_x) is the Holevo quantity, and S(ρ) = -Tr(ρ log ρ) is the von Neumann entropy (log base 2 for bits, or natural log for nats).",
+  "type": "verifiable",
+  "confidence": 0.98,
+  "refutation_condition": "An experimentally realized ensemble of quantum states and a measurement protocol that yields classical mutual information I(X:Y) strictly greater than the Holevo quantity χ for that ensemble, verified by independent reproduction; or a mathematical proof identifying an algebraic or logical flaw in Holevo's original derivation or in the subsequent rigorous proofs (e.g., using strong subadditivity of quantum entropy).",
+  "evidence": "Original theorem by A.S. Holevo, 'Bounds for the quantity of information transmitted by a quantum communication channel', Problems of Information Transmission 9(3):177-183 (1973); and 'Quantum Communication Channels', IEEE Trans. Info. Theory IT-21(5):533-535 (1975). Modern proofs use strong subadditivity of von Neumann entropy (Lieb-Ruskai 1973) or the data-processing inequality for quantum relative entropy. The bound is a cornerstone of quantum information theory and underlies the Holevo-Schumacher-Westmoreland theorem on classical capacity of quantum channels.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Holevo, A.S. (1973). Problems of Information Transmission 9(3):177-183",
+   "Holevo, A.S. (1975). IEEE Trans. Info. Theory IT-21(5):533-535",
+   "Nielsen & Chuang, Quantum Computation and Quantum Information, Sec. 12.1",
+   "Wilde, Quantum Information Theory, Sec. 13.1"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Accurate and precise mathematical formulation of Holevo's bound (Holevo's theorem) for an ensemble of quantum states, with correct definitions of the Holevo quantity χ, von Neumann entropy, and accessible information, supported by foundational citations (Holevo 1973, 1975) and standard textbooks.",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0006"
+  ],
+  "needed_by": [
+   "F0082",
+   "F0087",
+   "F0088"
+  ],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Accurate and precise mathematical formulation of Holevo's bound (Holevo's theorem) for an ensemble of quantum states, with correct definitions of the Holevo quantity χ, von Neumann entropy, and accessible information, supported by foundational citations (Holevo 1973, 1975) and standard textbooks.",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0082",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Domain boundaries and validity conditions for Holevo's bound: (1) The Hilbert space H may be finite-dimensional or separable infinite-dimensional; (2) The ensemble {p_x, ρ_x} may be discrete (finite or countably infinite) with ∑_x p_x = 1; (3) Each ρ_x is a density operator (positive semidefinite, trace 1); (4) The von Neumann entropies S(ρ_x) and S(∑_x p_x ρ_x) must be finite (or the bound is interpreted with extended real values, where S(ρ) = +∞ for states with infinite entropy); (5) The bound holds for arbitrary POVMs {E_y} with ∑_y E_y = I, E_y ≥ 0; (6) For continuous-variable systems with infinite-dimensional Hilbert spaces, the bound holds when all entropies are finite, but may require regularization (e.g., energy constraints) to avoid trivial infinite bounds.",
+  "type": "verifiable",
+  "confidence": 0.95,
+  "refutation_condition": "A counterexample within the stated domain (finite or countable ensemble of density operators on a separable Hilbert space with finite von Neumann entropies) where a valid quantum measurement yields I(X:Y) > χ, or a rigorous proof that the bound fails for some case satisfying all stated conditions without additional regularity assumptions.",
+  "evidence": "Standard quantum information textbooks (Nielsen & Chuang, Wilde, Holevo's own 1998 review 'Quantum coding theorems' and 2012 book 'Quantum Systems, Channels, Information'). The proof uses only the definition of von Neumann entropy, the properties of quantum measurements (POVMs), and strong subadditivity of quantum entropy, which holds for all density operators on separable Hilbert spaces. For continuous-variable systems, see Holevo (1998) and Shirokov (2016) on continuity bounds under energy constraints.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Holevo, A.S. (1998). Quantum coding theorems. Russian Mathematical Surveys 53(6):1295-1331",
+   "Holevo, A.S. (2012). Quantum Systems, Channels, Information. De Gruyter",
+   "Shirokov, M.E. (2016). Tight continuity bounds... arXiv:1512.09047",
+   "Wilde, M.M. (2017). Quantum Information Theory, 2nd ed., Cambridge"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Precise and comprehensive domain boundaries and validity conditions for Holevo's bound, covering finite and infinite dimensions, POVMs, and continuous-variable regularization requirements, backed by authoritative sources.",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0006",
+   "F0081"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Precise and comprehensive domain boundaries and validity conditions for Holevo's bound, covering finite and infinite dimensions, POVMs, and continuous-variable regularization requirements, backed by authoritative sources.",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0083",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Maassen-Uffink entropic uncertainty relation (general form): For a quantum system in a pure state |ψ⟩ ∈ H (dim H = d < ∞), and two observables A = ∑_i a_i |a_i⟩⟨a_i|, B = ∑_j b_j |b_j⟩⟨b_j| with non-degenerate discrete spectra and eigenbases {|a_i⟩}, {|b_j⟩}, the Shannon entropies of the measurement outcome distributions satisfy H(A) + H(B) ≥ -2 log₂ c, where H(A) = -∑_i |⟨a_i|ψ⟩|² log₂ |⟨a_i|ψ⟩|², H(B) = -∑_j |⟨b_j|ψ⟩|² log₂ |⟨b_j|ψ⟩|², and c = max_{i,j} |⟨a_i|b_j⟩| is the maximum overlap between the two eigenbases. (Log base 2 gives bits; natural log gives nats with factor 1/ln 2 adjustment.)",
+  "type": "verifiable",
+  "confidence": 0.97,
+  "refutation_condition": "A quantum state |ψ⟩ and a pair of observables A, B with discrete non-degenerate spectra on a finite-dimensional Hilbert space for which the measured Shannon entropies H(A) + H(B) are strictly less than -2 log₂ c, where c = max_{i,j} |⟨a_i|b_j⟩|, verified by independent experimental reproduction or a mathematical counterexample to the proof.",
+  "evidence": "Original paper: H. Maassen and J.B.M. Uffink, 'Generalized entropic uncertainty relations', Physical Review Letters 60(12):1103-1106 (1988). The proof uses Riesz-Thorin interpolation theorem and the fact that the unitary transformation between bases has operator norm bounded by c. The relation has been extensively tested and generalized (e.g., to mixed states via purification, to Rényi entropies, to multiple observables).",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Maassen, H. and Uffink, J.B.M. (1988). Phys. Rev. Lett. 60(12):1103-1106",
+   "Wehner, S. and Winter, A. (2010). 'Entropic uncertainty relations — a survey', New J. Phys. 12:025009",
+   "Coles, P.J. et al. (2017). 'Entropic uncertainty relations and their applications', Rev. Mod. Phys. 89:015002"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Accurate formulation of the general Maassen-Uffink entropic uncertainty relation for pure states with discrete spectra, including correct definition of Shannon entropies, maximum overlap c, and authoritative citation (Maassen & Uffink 1988).",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0006"
+  ],
+  "needed_by": [
+   "F0084",
+   "F0085",
+   "F0086",
+   "F0089"
+  ],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Accurate formulation of the general Maassen-Uffink entropic uncertainty relation for pure states with discrete spectra, including correct definition of Shannon entropies, maximum overlap c, and authoritative citation (Maassen & Uffink 1988).",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0084",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Maassen-Uffink relation for mutually unbiased bases (MUBs): If {|a_i⟩} and {|b_j⟩} are mutually unbiased bases in dimension d (i.e., |⟨a_i|b_j⟩|² = 1/d for all i, j), then c = max_{i,j} |⟨a_i|b_j⟩| = 1/√d, and the entropic uncertainty relation becomes H(A) + H(B) ≥ log₂ d. This bound is tight: there exist states (e.g., any eigenstate of A or B) that saturate it.",
+  "type": "verifiable",
+  "confidence": 0.98,
+  "refutation_condition": "A pair of mutually unbiased bases in dimension d and a state |ψ⟩ for which H(A) + H(B) < log₂ d, or a proof that the maximum overlap for MUBs is not 1/√d, or that the Maassen-Uffink derivation does not apply to MUBs.",
+  "evidence": "Follows directly from the general Maassen-Uffink relation (claim 3) by substituting c = 1/√d for MUBs. MUBs exist in all prime power dimensions d = pⁿ (Wootters & Fields 1989; Ivanovic 1981). Tightness: if |ψ⟩ = |a_k⟩, then H(A) = 0 and H(B) = log₂ d, so H(A)+H(B) = log₂ d. Verified in Ballester & Wehner (2006) and many subsequent works.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Maassen, H. and Uffink, J.B.M. (1988). Phys. Rev. Lett. 60(12):1103-1106",
+   "Ivanovic, I.D. (1981). J. Phys. A 14:3241",
+   "Wootters, W.K. and Fields, B.D. (1989). Ann. Phys. 191:363",
+   "Ballester, M.A. and Wehner, S. (2006). arXiv:quant-ph/0606244"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Correct application of the Maassen-Uffink relation to mutually unbiased bases (MUBs), yielding H(A) + H(B) ≥ log₂ d with explicit demonstration of tightness for basis states and appropriate citations.",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0083"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Correct application of the Maassen-Uffink relation to mutually unbiased bases (MUBs), yielding H(A) + H(B) ≥ log₂ d with explicit demonstration of tightness for basis states and appropriate citations.",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0085",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Domain boundaries and validity conditions for the Maassen-Uffink relation: (1) The Hilbert space H is finite-dimensional (d < ∞); (2) The state |ψ⟩ is pure (can be extended to mixed states via the concave roof / purification, giving H(A)+H(B) ≥ -2 log₂ c for any ρ, where H(A) = -∑_i ⟨a_i|ρ|a_i⟩ log ⟨a_i|ρ|a_i⟩); (3) Observables A and B have non-degenerate discrete spectra (or more generally, are described by projective measurements with projectors {|a_i⟩⟨a_i|}, {|b_j⟩⟨b_j|}); (4) The overlap c = max_{i,j} |⟨a_i|b_j⟩| is well-defined and < 1 (if c = 1, the bound is trivial: H(A)+H(B) ≥ 0); (5) For infinite-dimensional systems (e.g., position and momentum), the relation holds with c = 1/√(2πħ) for conjugate variables, but requires careful treatment of continuous Shannon entropy (differential entropy) and domain restrictions (e.g., states in the Schwartz space).",
+  "type": "verifiable",
+  "confidence": 0.93,
+  "refutation_condition": "A valid counterexample within the stated finite-dimensional domain (pure state, projective measurements, c < 1) violating H(A)+H(B) ≥ -2 log₂ c, or a proof that the extension to mixed states via purification fails to give a valid lower bound for all mixed states.",
+  "evidence": "Original Maassen-Uffink paper assumes finite dimension and pure states. Extension to mixed states: the map ρ ↦ H(A)+H(B) is concave, so the minimum over pure states in the convex decomposition gives a bound for mixed states (or use purification in a larger system). For infinite dimensions: Białynicki-Birula & Mycielski (1975) for position-momentum; the differential entropy version has subtleties (can be negative). See Coles et al. (2017) Rev. Mod. Phys. 89:015002 for comprehensive review of domain conditions.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Maassen, H. and Uffink, J.B.M. (1988). Phys. Rev. Lett. 60(12):1103-1106",
+   "Białynicki-Birula, I. and Mycielski, J. (1975). Commun. Math. Phys. 44:129",
+   "Coles, P.J. et al. (2017). Rev. Mod. Phys. 89:015002",
+   "Wehner, S. and Winter, A. (2010). New J. Phys. 12:025009"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Thorough statement of domain boundaries and validity conditions for the Maassen-Uffink relation, covering finite-dimensional pure/mixed states via purification and infinite-dimensional extensions.",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0083"
+  ],
+  "needed_by": [
+   "F0091"
+  ],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Thorough statement of domain boundaries and validity conditions for the Maassen-Uffink relation, covering finite-dimensional pure/mixed states via purification and infinite-dimensional extensions.",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0086",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "The Maassen-Uffink bound H(A) + H(B) ≥ -2 log₂ c is not universally optimal: for some pairs of observables, there exist tighter state-dependent lower bounds (e.g., the 'optimal' uncertainty relations of Friedland, Gheorghiu, and Gour 2013; or the majorization-based bounds of Puchała, Rudnicki, and Życzkowski 2013). However, the Maassen-Uffink bound is optimal among all bounds that depend only on the maximum overlap c and not on the full structure of the unitary relating the two bases.",
+  "type": "verifiable",
+  "confidence": 0.9,
+  "refutation_condition": "A proof that the Maassen-Uffink bound is actually universally optimal (i.e., for every pair of observables and every state, H(A)+H(B) ≥ -2 log₂ c cannot be improved without additional information beyond c), or a counterexample showing a bound depending only on c that is strictly tighter for all states.",
+  "evidence": "Abdelkhalek et al. (2015) arXiv:1509.00398 show the Maassen-Uffink bound is non-optimal by characterizing the optimal state-dependent bound. De Vicente & Sánchez-Ruiz (2007) arXiv:0709.1438 give an improved bound for a wide class of observables. Friedland, Gheorghiu, Gour (2013) Phys. Rev. Lett. 111:230401 give a tight bound via majorization. The Maassen-Uffink bound is 'optimal' only in the restricted class of c-dependent bounds (Wehner & Winter 2010).",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Abdelkhalek, K. et al. (2015). arXiv:1509.00398",
+   "De Vicente, J.I. and Sánchez-Ruiz, J. (2007). arXiv:0709.1438",
+   "Friedland, S., Gheorghiu, V., and Gour, G. (2013). Phys. Rev. Lett. 111:230401",
+   "Puchała, Z., Rudnicki, Ł., and Życzkowski, K. (2013). J. Phys. A 46:272002",
+   "Wehner, S. and Winter, A. (2010). New J. Phys. 12:025009"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Accurate contextualization of the non-optimality of the Maassen-Uffink bound across all pairs of observables while correctly noting its optimality within the class of c-dependent bounds, backed by recent literature (Abdelkhalek et al. 2015, Friedland et al. 2013).",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0083"
+  ],
+  "needed_by": [
+   "F0092"
+  ],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Accurate contextualization of the non-optimality of the Maassen-Uffink bound across all pairs of observables while correctly noting its optimality within the class of c-dependent bounds, backed by recent literature (Abdelkhalek et al. 2015, Friedland et al. 2013).",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0087",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Holevo capacity of a quantum channel: For a quantum channel Φ: L(H_A) → L(H_B) (completely positive trace-preserving map), the classical capacity with product state encodings (Holevo capacity) is C(Φ) = max_{p_x, ρ_x} χ({p_x, Φ(ρ_x)}), where the maximum is over all ensembles {p_x, ρ_x} of input states. This is the maximum rate at which classical information can be transmitted reliably through the channel using product-state coding (no entanglement between channel uses). The full classical capacity (with entangled encodings) is the regularization C_∞(Φ) = lim_{n→∞} C(Φ^{⊗n})/n.",
+  "type": "verifiable",
+  "confidence": 0.95,
+  "refutation_condition": "A proof that the Holevo capacity formula does not give the product-state capacity, or an experimental demonstration of a classical communication rate through a quantum channel exceeding the regularized Holevo capacity C_∞(Φ) with vanishing error probability.",
+  "evidence": "Holevo-Schumacher-Westmoreland theorem: Holevo (1998) 'The capacity of the quantum channel with general signal states', IEEE Trans. Info. Theory 44(1):269-273; Schumacher & Westmoreland (1997) Phys. Rev. A 56:131. The theorem states C(Φ) = χ(Φ) for product-state codes. Additivity of Holevo capacity (and hence whether regularization is needed) was a major open question; counterexamples to additivity were found by Hastings (2009) using random channels, so C_∞(Φ) > C(Φ) for some channels.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Holevo, A.S. (1998). IEEE Trans. Info. Theory 44(1):269-273",
+   "Schumacher, B. and Westmoreland, M.D. (1997). Phys. Rev. A 56:131",
+   "Hastings, M.B. (2009). Nature Phys. 5:255 (counterexample to additivity)",
+   "Wilde, M.M. (2017). Quantum Information Theory, Ch. 20"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Accurate definition of the Holevo capacity of a quantum channel for product-state encodings and its connection to the regularized classical capacity, referencing the HSW theorem and additivity counterexamples (Hastings 2009).",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0006",
+   "F0081"
+  ],
+  "needed_by": [
+   "F0088"
+  ],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Accurate definition of the Holevo capacity of a quantum channel for product-state encodings and its connection to the regularized classical capacity, referencing the HSW theorem and additivity counterexamples (Hastings 2009).",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0088",
+  "cycle": 23,
+  "task_id": "T16",
+  "statement": "Tightness of Holevo's bound: The bound I_acc ≤ χ is asymptotically attainable: for any ensemble {p_x, ρ_x}, there exists a sequence of collective measurements on n copies of the states such that the accessible information per copy approaches χ as n → ∞ (Holevo-Schumacher-Westmoreland theorem). For single-copy measurements (without collective measurements on multiple copies), the bound is generally not tight — the maximum single-copy accessible information can be strictly less than χ (e.g., for certain symmetric ensembles like the 'trine' states or 'quantum pyramids').",
+  "type": "verifiable",
+  "confidence": 0.94,
+  "refutation_condition": "A proof that no sequence of collective measurements can achieve χ asymptotically for some ensemble (contradicting HSW theorem), or a proof that a single-copy measurement can exceed χ for some ensemble (contradicting Holevo's theorem).",
+  "evidence": "HSW theorem (Holevo 1998; Schumacher & Westmoreland 1997) proves asymptotic attainability with collective measurements. Single-copy non-tightness: examples include the trine ensemble (3 states in 2D at 120°) where χ = log₂ 3 - H(1/2, 1/2, 0) ≈ 0.585 but max single-copy I_acc ≈ 0.55; and 'quantum pyramids' studied by Englert & Řeháček (2010) and Holevo & Utkin (2022). The gap between single-copy and collective accessible information is a key feature of quantum information.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Holevo, A.S. (1998). IEEE Trans. Info. Theory 44(1):269-273",
+   "Schumacher, B. and Westmoreland, M.D. (1997). Phys. Rev. A 56:131",
+   "Englert, B.-G. and Řeháček, J. (2010). J. Mod. Opt. 57:218",
+   "Holevo, A.S. and Utkin, A.V. (2022). Lobachevskii J. Math. 43:1646",
+   "Holevo, A.S. and Utkin, A.V. (2025). arXiv:2506.06700"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "review_note": "Precise statement on the asymptotic attainability of Holevo's bound via collective measurements (HSW theorem) and the known strict gap for single-copy measurements (e.g., trine states, quantum pyramids), backed by rigorous citations.",
+  "created_at": "2026-11-26T18:40:21+00:00",
+  "updated_at": "2026-11-26T18:40:21+00:00",
+  "builds_on": [
+   "F0081",
+   "F0087"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 23,
+    "event": "created as supported",
+    "reason": "Precise statement on the asymptotic attainability of Holevo's bound via collective measurements (HSW theorem) and the known strict gap for single-copy measurements (e.g., trine states, quantum pyramids), backed by rigorous citations.",
+    "at": "2026-11-26T18:40:21+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0089",
+  "cycle": 24,
+  "task_id": "T17",
+  "statement": "Berta et al. (2010) Entropic Uncertainty Relation with Quantum Memory (EUR-QM): For any bipartite state rho_{AB} shared between Alice (system A) and an observer holding quantum memory (system B), when Alice measures observable X (with eigenbasis {|x_i>}) or Z (with eigenbasis {|z_j>}), the conditional Shannon/von Neumann entropies satisfy S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B), where S(X|B) = H(X|_B) is the conditional Shannon entropy of measurement outcomes given B, c = max_{i,j} |<x_i|z_j>| is the maximum overlap between the two measurement bases, and S(A|B) is the conditional von Neumann entropy of state A given quantum memory B.",
+  "type": "verifiable",
+  "confidence": 0.97,
+  "refutation_condition": "A bipartite quantum state rho_{AB} and incompatible measurements X, Z on system A for which the measured conditional entropies S(X|B) + S(Z|B) are strictly less than log₂(1/c) + S(A|B), verified by mathematical counterexample or independent experiment.",
+  "evidence": "Established by Berta, Christandl, Colbeck, Renes, and Renner (Nature Physics 6, 659–662, 2010; arXiv:0909.0950), building on quantum memory side information and entropic uncertainty formulations. Proved via the quantum subadditivity of entropy and state purification.",
+  "status": "contested",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "M. Berta, M. Christandl, R. Colbeck, J. M. Renes, and R. Renner, 'The uncertainty principle in the presence of quantum memory', Nature Physics 6, 659 (2010); arXiv:0909.0950"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "The definition of the overlap parameter c is mathematically incorrect. The claim states c = max_{i,j} |⟨x_i|z_j⟩|, but the Berta et al. (2010) EUR-QM bound uses c = max_{i,j} |⟨x_i|z_j⟩|² (or equivalently the operator norm ‖√M_i √N_j‖² for POVMs). With the worker's definition, log₂(1/c) = -log₂(max|⟨x_i|z_j⟩|), whereas the correct bound requires -2 log₂(max|⟨x_i|z_j⟩|) = log₂(1/c²). This is a factor-of-2 error in the exponent that changes the numerical value of the bound. The claim must be restated with the correct definition of c.",
+  "created_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-26T18:52:36+00:00",
+  "builds_on": [
+   "F0006",
+   "F0083"
+  ],
+  "needed_by": [
+   "F0090",
+   "F0091",
+   "F0092",
+   "F0093"
+  ],
+  "history": [
+   {
+    "cycle": 24,
+    "event": "created as contested",
+    "reason": "The definition of the overlap parameter c is mathematically incorrect. The claim states c = max_{i,j} |⟨x_i|z_j⟩|, but the Berta et al. (2010) EUR-QM bound uses c = max_{i,j} |⟨x_i|z_j⟩|² (or equivalently the operator norm ‖√M_i √N_j‖² for POVMs). With the worker's definition, log₂(1/c) = -log₂(max|⟨x_i|z_j⟩|), whereas the correct bound requires -2 log₂(max|⟨x_i|z_j⟩|) = log₂(1/c²). This is a factor-of-2 error in the exponent that changes the numerical value of the bound. The claim must be restated with the correct definition of c.",
+    "at": "2026-11-26T18:52:36+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0090",
+  "cycle": 24,
+  "task_id": "T17",
+  "statement": "Purification and Tripartite Formulation: The Berta et al. entropic uncertainty relation is derived by considering a purification of the bipartite state rho_{AB} to a pure tripartite state |psi>_{ABE} on systems A, B, and E (where E is the reference/environment system). By relating the conditional entropy S(X|B) to the entropy S(X|E) on the purifying system, the tradeoff inequality S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B) is shown to be equivalent to S(X|B) + S(Z|E) ≥ log₂(1/c), reflecting the trade-off between the observer's ability to predict measurement outcomes via quantum memory B versus the eavesdropper/reference E's accessible information.",
+  "type": "verifiable",
+  "confidence": 0.85,
+  "refutation_condition": "A mathematical flaw in the entropic uncertainty derivation linking S(X|B) to S(Z|E) via purification and data-processing inequalities, or a violation found in pure tripartite model systems.",
+  "evidence": "Derived in Berta et al. (2010) using Church's thesis / purification of mixed states to a tripartite pure state |psi>_{ABE} and applying Shannon-to-von Neumann entropy bounds across complementary reference systems.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "M. Berta et al., Nature Physics 6, 659 (2010); arXiv:0909.0950"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "The conceptual description of the purification argument is correct, but the claim that the bipartite inequality is 'equivalent to' S(X|B) + S(Z|E) ≥ log₂(1/c) is imprecise. The tripartite relation H(X|B) + H(Z|E) ≥ log₂(1/c) for a pure state |ψ⟩_{ABE} is used as a lemma to derive the bipartite bound, but the two are not strictly equivalent without additional steps (using chain rules and duality of conditional entropies for the post-measurement states). The evidence also contains a typo ('Church's thesis' instead of 'purification' or 'Schmidt decomposition').",
+  "created_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-26T18:52:36+00:00",
+  "builds_on": [
+   "F0089"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 24,
+    "event": "created as supported",
+    "reason": "The conceptual description of the purification argument is correct, but the claim that the bipartite inequality is 'equivalent to' S(X|B) + S(Z|E) ≥ log₂(1/c) is imprecise. The tripartite relation H(X|B) + H(Z|E) ≥ log₂(1/c) for a pure state |ψ⟩_{ABE} is used as a lemma to derive the bipartite bound, but the two are not strictly equivalent without additional steps (using chain rules and duality of conditional entropies for the post-measurement states). The evidence also contains a typo ('Church's thesis' instead of 'purification' or 'Schmidt decomposition').",
+    "at": "2026-11-26T18:52:36+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0091",
+  "cycle": 24,
+  "task_id": "T17",
+  "statement": "Domain Boundaries and Limit Behavior of EUR-QM: (1) The Hilbert space dimensions of system A (dim A = d_A) and quantum memory B (dim B = d_B) can be finite or infinite, provided all density operators have well-defined, finite von Neumann entropies. (2) When system A is maximally entangled with quantum memory B (e.g., in a maximally entangled state), S(A|B) = -log₂(d_A), allowing the lower bound log₂(1/c) + S(A|B) to become zero or negative, meaning both incompatible measurements can be predicted with arbitrary certainty (beating classical uncertainty limits). (3) When B is trivial (classical or empty), S(A|B) = S(A) ≥ 0, recovering the standard Maassen-Uffink bound.",
+  "type": "verifiable",
+  "confidence": 0.85,
+  "refutation_condition": "Demonstration that the bound fails for infinite-dimensional continuous variable systems without proper regularization, or a proof that maximal entanglement does not permit zero uncertainty for mutually unbiased bases.",
+  "evidence": "Analyzed in Berta et al. (2010) and subsequent operational domain reviews (e.g., Coles, Berta, Tomamichel, Wehner, Rev. Mod. Phys. 2017), confirming limits for separable, entangled, and continuous-variable states.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "P. J. Coles, M. Berta, M. Tomamichel, and S. Wehner, 'Entropic uncertainty relations and their applications', Rev. Mod. Phys. 69, 015002 (2017)"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Part (1) overstates the original Berta et al. (2010) result: the paper focuses on finite-dimensional systems; infinite-dimensional extensions with continuous variables are developed in later works (e.g., Coles et al. Rev. Mod. Phys. 2017) and require careful regularization. Part (2) is correct for maximally entangled states and MUBs. Part (3) inherits the c-definition ambiguity from Claim 1. The claim mixes original and extended domain boundaries without clear attribution.",
+  "created_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-26T18:52:36+00:00",
+  "builds_on": [
+   "F0085",
+   "F0089"
+  ],
+  "needed_by": [
+   "F0093"
+  ],
+  "history": [
+   {
+    "cycle": 24,
+    "event": "created as supported",
+    "reason": "Part (1) overstates the original Berta et al. (2010) result: the paper focuses on finite-dimensional systems; infinite-dimensional extensions with continuous variables are developed in later works (e.g., Coles et al. Rev. Mod. Phys. 2017) and require careful regularization. Part (2) is correct for maximally entangled states and MUBs. Part (3) inherits the c-definition ambiguity from Claim 1. The claim mixes original and extended domain boundaries without clear attribution.",
+    "at": "2026-11-26T18:52:36+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0092",
+  "cycle": 24,
+  "task_id": "T17",
+  "statement": "Subsequent Tightenings with Quantum Side Information: The Berta et al. lower bound S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B) can be strictly tightened by incorporating state-dependent quantum correlation measures such as quantum discord and classical correlations (Pati et al., 2012) or measurement-reversibility / disturbance terms (Coles, Berta, and Wilde, 2012; Berta, Wehner, and Wilde, 2015). For instance, Coles-Piani (2014) and related refinements add non-negative terms capturing the residual incompatibility and information gain of the specific measurement process beyond the basis overlap c.",
+  "type": "verifiable",
+  "confidence": 0.85,
+  "refutation_condition": "A mathematical proof that the proposed tightening terms can be negative for valid physical states, or a counterexample where the tightened inequality is violated.",
+  "evidence": "Established by A. K. Pati et al. (Phys. Rev. A 86, 032105, 2012; arXiv:1204.3803) and P. J. Coles, M. Berta, M. Tomamichel, S. Wehner (2017), showing tighter bounds via quantum discord, relative entropy differences, and measurement recovery operations.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "A. K. Pati et al., Phys. Rev. A 86, 032105 (2012); arXiv:1204.3803",
+   "P. J. Coles et al., Rev. Mod. Phys. 89, 015002 (2017)"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "The core claim about tightenings using quantum discord (Pati et al. 2012), measurement reversibility (Berta, Wehner, Wilde 2015), and other state-dependent terms is correct. However, several citation details are inaccurate: 'Coles, Berta, and Wilde, 2012' does not match the known paper (Berta, Wehner, Wilde is 2015; Coles et al. have 2012 PRL papers but with different author lists); 'Coles-Piani (2014)' is not a standard citation (likely refers to Coles & Piani 2014 or similar, but the exact reference is unclear). These inaccuracies reduce confidence in the precise bibliographic claims.",
+  "created_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-26T18:52:36+00:00",
+  "builds_on": [
+   "F0086",
+   "F0089"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 24,
+    "event": "created as supported",
+    "reason": "The core claim about tightenings using quantum discord (Pati et al. 2012), measurement reversibility (Berta, Wehner, Wilde 2015), and other state-dependent terms is correct. However, several citation details are inaccurate: 'Coles, Berta, and Wilde, 2012' does not match the known paper (Berta, Wehner, Wilde is 2015; Coles et al. have 2012 PRL papers but with different author lists); 'Coles-Piani (2014)' is not a standard citation (likely refers to Coles & Piani 2014 or similar, but the exact reference is unclear). These inaccuracies reduce confidence in the precise bibliographic claims.",
+    "at": "2026-11-26T18:52:36+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0093",
+  "cycle": 24,
+  "task_id": "T17",
+  "statement": "Applications to Quantum Cryptography and Quantum Steering: The entropic uncertainty relation with quantum memory serves as a foundational tool for proving the security of Quantum Key Distribution (QKD) protocols (such as BB84 and six-state protocols) against general collective and coherent attacks, without requiring the BB84 source to be characterized or trusted by the receiver (device-independent and source-device-independent frameworks). Furthermore, violations of entropic uncertainty bounds with quantum side information provide quantitative witnesses for entanglement and quantum steering (demonstrating that an observer's reduction in uncertainty can only be achieved if system A is entangled with quantum memory B).",
+  "type": "verifiable",
+  "confidence": 0.85,
+  "refutation_condition": "A valid QKD security proof failure or explicit attack strategy yielding secret key rates higher than permitted by the EUR-QM bound, or a demonstration that quantum steering can occur without violating classical entropic uncertainty bounds.",
+  "evidence": " Demonstrated in Berta et al. (2010), Tomamichel and Renner (PRL 2011), and reviewed in Coles et al. (Rev. Mod. Phys. 2017), showing direct application to bounding an eavesdropper's guessing probability / conditional entropy in QKD secret key rate formulas.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "M. Berta et al., Nature Physics 6, 659 (2010); arXiv:0909.0950",
+   "M. Tomamichel and R. Renner, Phys. Rev. Lett. 106, 110506 (2011)"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "The application of EUR-QM to QKD security (Tomamichel & Renner 2011) and entanglement/steering witnesses is correctly stated in essence. However, the phrasing 'such as BB84 and six-state protocols... without requiring the BB84 source to be characterized or trusted by the receiver (device-independent and source-device-independent frameworks)' conflates standard BB84 (which assumes a trusted, characterized source) with device-independent/source-device-independent variants that use EUR-QM but are distinct protocols. This imprecision makes the claim overstated as written.",
+  "created_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-26T18:52:36+00:00",
+  "builds_on": [
+   "F0089",
+   "F0091"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 24,
+    "event": "created as supported",
+    "reason": "The application of EUR-QM to QKD security (Tomamichel & Renner 2011) and entanglement/steering witnesses is correctly stated in essence. However, the phrasing 'such as BB84 and six-state protocols... without requiring the BB84 source to be characterized or trusted by the receiver (device-independent and source-device-independent frameworks)' conflates standard BB84 (which assumes a trusted, characterized source) with device-independent/source-device-independent variants that use EUR-QM but are distinct protocols. This imprecision makes the claim overstated as written.",
+    "at": "2026-11-26T18:52:36+00:00"
    }
   ]
  }

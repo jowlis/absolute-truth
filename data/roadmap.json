@@ -1,6 +1,6 @@
 {
-  "version": 19,
-  "cycle": 22,
+  "version": 22,
+  "cycle": 25,
   "mission": "Absolute Truth",
   "foundations": {
     "interpretation": "Absolute Truth is operationalized as propositions and structural invariants that hold unconditionally across all observers, coordinate frames, languages, and contexts within our universe, and across all models of specified formal axiomatic systems. Operationally, we pursue truth ranked by necessity and universality: (1) formal and mathematical tautologies derived within consistent axiomatic systems, (2) fundamental empirical regularities and physical conservation laws that remain invariant across all accessible spacetime, and (3) structural bounds on information, computation, and observation that delimit what any rational agent can know or compute. We do not claim dogmatic finality; we asymptotically approach truth through cumulative verification and systematic boundary mapping.",
@@ -533,6 +533,87 @@
           "by": "Nemotron",
           "change": "active -> done",
           "reason": "worker and reviewer agree the goal was met"
+        }
+      ]
+    },
+    {
+      "id": "T16",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Catalogue and verify Holevo's bound and Maassen-Uffink entropic uncertainty relation",
+      "goal": "Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Holevo's bound on accessible information in quantum states, and (2) Maassen-Uffink entropic uncertainty relation for mutually unbiased bases.",
+      "why": "Completes the M3 quantum information capacity and measurement constraint catalogue following the quantum speed limits established in T15.",
+      "status": "done",
+      "history": [
+        {
+          "cycle": 23,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Completes the M3 quantum information capacity and measurement constraint catalogue following the quantum speed limits established in T15."
+        },
+        {
+          "cycle": 23,
+          "by": "Gemini",
+          "change": "proposed -> active",
+          "reason": "chosen by the planner: In cycle 22, task T15 successfully catalogued the Mandelstam-Tamm and Margolus-Levitin quantum speed limits but deferred Holevo's bound and the Maassen-Uffink relation to a follow-up. This task naturally extends M3 by establishing quantum information capacity and measurement bounds."
+        },
+        {
+          "cycle": 23,
+          "by": "Gemini",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
+        }
+      ]
+    },
+    {
+      "id": "T17",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Catalogue and verify Berta et al. entropic uncertainty relation with quantum memory and extensions",
+      "goal": "Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) Berta et al. (2010) entropic uncertainty relation with quantum memory (EUR-QM), (2) the conditional entropy formulation H(A|B) + H(C|B) ≥ log₂(1/c) + H(A|B), (3) subsequent extensions including tight bounds with quantum side information, (4) applications to quantum cryptography (e.g., QKD security proofs) and quantum steering.",
+      "why": "Completes the M3 quantum measurement constraint catalogue by adding the quantum-memory-assisted entropic uncertainty relation, which generalizes Maassen-Uffink (F0083-F0086) to scenarios with quantum side information. This is a cornerstone result for modern quantum cryptography and quantum information theory, establishing fundamental limits on simultaneous measurement predictability when an observer holds quantum memory.",
+      "status": "done",
+      "history": [
+        {
+          "cycle": 24,
+          "by": "Nemotron",
+          "change": "created",
+          "reason": "Completes the M3 quantum measurement constraint catalogue by adding the quantum-memory-assisted entropic uncertainty relation, which generalizes Maassen-Uffink (F0083-F0086) to scenarios with quantum side information. This is a cornerstone result for modern quantum cryptography and quantum information theory, establishing fundamental limits on simultaneous measurement predictability when an observer holds quantum memory."
+        },
+        {
+          "cycle": 24,
+          "by": "Nemotron",
+          "change": "proposed -> active",
+          "reason": "chosen by the planner: M3's quantum information bounds catalogue has systematically covered Landauer/Bekenstein/Bremermann (T6), quantum speed limits MT/ML (T15, F0077-F0080), and Holevo/Maassen-Uffink (T16, F0081-F0088). The Berta et al. EUR with quantum memory is the natural completion of the quantum measurement uncertainty sequence, generalizing the Maassen-Uffink relation (F0083-F0086) to scenarios where an observer holds quantum side information. This is a verified, high-impact result with direct applications to quantum cryptography security proofs. The worker (Gemini) has demonstrated capability with similar formal quantum information tasks in cycles 22-23."
+        },
+        {
+          "cycle": 24,
+          "by": "Nemotron",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
+        }
+      ]
+    },
+    {
+      "id": "T18",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Resolve contested finding F0089 on Berta et al. entropic uncertainty relation with quantum memory",
+      "goal": "Formulate corrected, mathematically exact findings to supersede contested F0089 (and refine F0090-F0093 as needed), accurately defining the overlap parameter c (or c²), clarifying tripartite duality derivation logic, specifying exact Hilbert space domain bounds (attributing continuous-variable extensions to Furrer et al. 2012), and correcting literature citations.",
+      "why": "F0089 is currently contested due to a factor-of-2 error in the basis overlap parameter definition. Resolving it restores mathematical precision and dependency-tree soundness to the M3 quantum information catalog.",
+      "status": "active",
+      "history": [
+        {
+          "cycle": 25,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "F0089 is currently contested due to a factor-of-2 error in the basis overlap parameter definition. Resolving it restores mathematical precision and dependency-tree soundness to the M3 quantum information catalog."
+        },
+        {
+          "cycle": 25,
+          "by": "Gemini",
+          "change": "proposed -> active",
+          "reason": "chosen by the planner: F0089 is currently the only contested finding in the knowledge base. Resolving it immediately restores dependency soundness to M3 and ensures the quantum uncertainty bounds catalog is mathematically flawless before moving to subsequent milestones."
         }
       ]
     }
