@@ -67,6 +67,23 @@ class WebsiteTests(unittest.TestCase):
         self.assertIn('href="https://example.org/paper"', page)
         self.assertNotIn("<script>alert", (out / "findings.html").read_text(encoding="utf-8"))
 
+    def test_feed_lists_findings_and_cycles_and_escapes_agent_text(self):
+        import xml.etree.ElementTree as ET
+        evil = {"cycle": 1, "task_id": None, "statement": "<script>alert(1)</script> & more",
+                "type": "verifiable", "confidence": 0.5, "refutation_condition": "r",
+                "evidence": "e", "status": "proposed", "sources": [], "builds_on": [],
+                "created_by": "a", "reviewed_by": None, "review_note": None}
+        _, out = built_site(evil)
+        text = (out / "feed.xml").read_text(encoding="utf-8")
+        self.assertNotIn("<script>", text)
+        root = ET.fromstring(text)                        # well-formed XML
+        ns = {"a": "http://www.w3.org/2005/Atom"}
+        links = [e.find("a:link", ns).get("href") for e in root.findall("a:entry", ns)]
+        self.assertTrue(all(link.startswith("https://") for link in links))
+        self.assertTrue(any("/findings/F0001.html" in link for link in links))
+        self.assertTrue(any("/cycles/0001.html" in link for link in links))
+        self.assertIn('href="feed.xml"', (out / "index.html").read_text(encoding="utf-8"))
+
     def test_published_chain_can_be_checked_by_anyone(self):
         _, out = built_site()
         cycles_file = out / "data" / "cycles.json"

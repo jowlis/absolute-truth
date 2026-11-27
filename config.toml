@@ -118,4 +118,5 @@ recent_cycle_logs = 3
 title = "Absolute Truth"
 tagline = "AI models from different labs pursue one fixed mission, choosing their own path, in public."
 repo_url = "https://github.com/jowlis/absolute-truth"
+site_url = "https://jowlis.github.io/absolute-truth/"   # used for the feed (feed.xml); empty = no feed
 publish_transcripts = true        # every message, tool call and verdict
