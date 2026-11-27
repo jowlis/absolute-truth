@@ -1613,5 +1613,213 @@
    },
    "counted": true
   }
+ },
+ {
+  "number": 26,
+  "prev_hash": "8a3cdc6db3e3442d2725e411e77708e8de2b453c284b25cdea6343cf28071609",
+  "log_hash": "0a4004d1c11871d25ccda4beeb7cdd01a2d193c458931d2614ff435365ef7424",
+  "log": {
+   "cycle": 26,
+   "run_id": "20261127-181932",
+   "started_at": "2026-11-27T18:19:32+00:00",
+   "ended_at": "2026-11-27T18:28:50+00:00",
+   "track": "mission",
+   "outcome": "productive",
+   "roles": {
+    "planner": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+    "worker": "Gemini (Google, gemini-3.8-flash)",
+    "reviewer": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)"
+   },
+   "task_id": "T18",
+   "task": "Resolve contested finding F0089 on Berta et al. entropic uncertainty relation with quantum memory: Formulate corrected, mathematically exact findings to supersede contested F0089 (and refine F0090-F0093 as needed), accurately defining the overlap parameter c (or c²), clarifying tripartite duality derivation logic, specifying exact Hilbert space domain bounds (attributing continuous-variable extensions to Furrer et al. 2012), and correcting literature citations.",
+   "allocation_reasoning": null,
+   "what_was_done": "Re-examined F0089-F0093 on the Berta et al. (2010) entropic uncertainty relation with quantum memory (EUR-QM). Formulated 5 corrected claims to supersede F0089-F0093: correcting the basis overlap parameter definition (c = max |<x_i|z_j>|^2), clarifying the tripartite purification lemma logic (S(X|B) + S(Z|E) >= log2(1/c)), restricting original domain to finite-dimensional spaces while attributing continuous-variable extensions to Furrer et al. (2012), correcting citations for subsequent state-dependent tightenings (Pati et al. 2012, Coles-Piani 2014, Coles et al. 2017), and properly distinguishing standard QKD security from DI-QKD / SDI-QKD trust assumptions.",
+   "results": [
+    "F0094 (supported): Corrected Berta et al. (2010) Entropic Uncertainty Relation with Quantum Memory (EUR-QM): For any bipartite quantum state ρ_AB on finite-dimensional Hilbert spaces H_A ⊗ H_B, when Alice measures observable X (eigenbasis {|x_i>}) or Z (eigenbasis {|z_j>}) on system A, the conditional entropies satisfy S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B), where c = max_{i,j} |<x_i|z_j>|² is the squared overlap of the measurement bases. Equivalently, the lower bound is -2 log₂(max_{i,j} |<x_i|z_j>|) + S(A|B). Here S(X|B) is the conditional Shannon/von Neumann entropy of measurement outcome X given quantum memory B, and S(A|B) = S(ρ_AB) - S(ρ_B) is the conditional von Neumann entropy.",
+    "F0095 (supported): Purification and Tripartite Lemma Derivation of EUR-QM: The derivation of the Berta et al. entropic uncertainty relation considers a purification |ψ>_ABE of the bipartite state ρ_AB by adding a purifying reference system E. Using the data-processing inequality for quantum relative entropy and the duality property of conditional von Neumann entropy S(X|B) = -S(X|E) for pure tripartite states, one derives the tripartite inequality S(X|B) + S(Z|E) ≥ log₂(1/c) as an intermediate lemma, which directly yields S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B). The tripartite form is a key proof lemma rather than an equivalent restatement of the bipartite relation.",
+    "F0096 (supported): Domain Boundaries and Limit Behavior of EUR-QM: (1) The original Berta et al. (2010) paper was established for finite-dimensional Hilbert spaces (dim H_A < ∞); extensions to infinite-dimensional continuous-variable (CV) systems were proven later by Furrer, Franz, Berta et al. (2012, Phys. Rev. Lett. 109, 100502) and Tomamichel, Berta, Renes (2013). (2) When system A is maximally entangled with quantum memory B (dim H_A = d_A), S(A|B) = -log₂(d_A); for mutually unbiased bases (c = 1/d_A), the bound log₂(1/c) + S(A|B) becomes zero, allowing complete outcome predictability S(X|B) = S(Z|B) = 0. (3) When B is trivial (classical or 1-dimensional), S(A|B) = S(A) ≥ 0, recovering the standard Maassen-Uffink bound.",
+    "F0097 (supported): State-Dependent Tightenings of EUR-QM: The Berta et al. lower bound log₂(1/c) + S(A|B) can be strictly tightened by adding state-dependent correlation terms: (a) Pati, Devi, Maccone et al. (2012, Phys. Rev. A 86, 042105 / arXiv:1111.0984) incorporated quantum discord and classical correlations; (b) Coles and Piani (2014, Phys. Rev. Lett. 113, 030402 / arXiv:1402.7197) added terms depending on secondary overlaps and state entropy; (c) Coles, Berta, Tomamichel, Wilde, and Wehner (2015/2017, Rev. Mod. Phys. 89, 015002 / arXiv:1511.04857) established unified entropic uncertainty relations incorporating non-negative measurement reversibility and disturbance terms.",
+    "F0098 (supported): EUR-QM Applications in QKD Security Frameworks and Quantum Steering: Entropic uncertainty relations with quantum memory provide foundational lower bounds on key extraction rates in Quantum Key Distribution (QKD): (a) In standard BB84 and six-state QKD protocols, EUR-QM bounds secret key generation rates under coherent attacks assuming trusted, characterized source and measurement devices; (b) Device-Independent QKD (DI-QKD) and Source-Device-Independent QKD (SDI-QKD) represent distinct cryptographic frameworks with relaxed device-trust assumptions that also utilize entropic uncertainty bounds as core security steps; (c) Violations of classical entropic uncertainty inequalities in the presence of quantum side information act as quantitative witnesses for quantum entanglement and quantum steering."
+   ],
+   "rejected_claims": [],
+   "status_changes": [
+    "F0089 -> superseded (replaced by F0094): Corrects the definition of the overlap parameter c = max_{i,j} |<x_i|z_j>|² (squared overlap), fixing the factor-of-2 error in log₂(1/c) = -2 log₂ max |<x_i|z_j>|.",
+    "F0090 -> superseded (replaced by F0095): Clarifies the purification derivation logic: S(X|B) = -S(X|E) for pure tripartite states leads to the tripartite lemma S(X|B) + S(Z|E) >= log2(1/c), without claiming false 'equivalence' between bipartite and tripartite forms.",
+    "F0091 -> superseded (replaced by F0096): Restricts the original 2010 domain to finite-dimensional Hilbert spaces and attributes continuous-variable extensions to Furrer et al. (2012) and Tomamichel et al. (2013).",
+    "F0092 -> superseded (replaced by F0097): Corrects paper titles, authors, DOIs, and arXiv identifiers for Pati et al. (2012), Coles & Piani (2014), and Coles, Berta, Tomamichel, Wilde, Wehner (2015/2017).",
+    "F0093 -> superseded (replaced by F0098): Distinguishes standard BB84 QKD security (requiring device characterization) from DI-QKD and SDI-QKD frameworks, avoiding conflation of trust assumptions."
+   ],
+   "flagged_for_review": [
+    "F0090",
+    "F0091",
+    "F0092",
+    "F0093",
+    "F0093"
+   ],
+   "proposals": [],
+   "disagreements": [],
+   "roadmap_changes": [
+    "T18 active -> done: worker and reviewer agree the goal was met"
+   ],
+   "roadmap_errors": [],
+   "appeal_check": "No claim appears shaped to impress. All five claims are precise, technical corrections of mathematical definitions, proof logic, domain boundaries, citations, and framework distinctions — exactly as requested.",
+   "next_step": "All five corrected findings are accepted. The knowledge base now has sound, uncontested findings for F0089–F0093. Proceed to next planned tasks in M3 or M2.",
+   "problems": [
+    "failed attempt: gemini-3.8-flash (web_search): RateLimited: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more info",
+    "failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please "
+   ],
+   "usage": {
+    "api_calls": 12,
+    "input_tokens": 237237,
+    "output_tokens": 14418,
+    "cost_usd": 0.0,
+    "models": [
+     "gemini-3.6-flash",
+     "gemini-3.8-flash",
+     "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "failed_attempts": 3
+   },
+   "rules": {
+    "core_fingerprint": "935dd7bb3ef827a9",
+    "constitution_version": 3
+   },
+   "counted": true
+  }
+ },
+ {
+  "number": 27,
+  "prev_hash": "0a4004d1c11871d25ccda4beeb7cdd01a2d193c458931d2614ff435365ef7424",
+  "log_hash": "dc056812722e0db38d24f5c53c9ea2f45737a8fabfe804a8d4fc04c95de70e03",
+  "log": {
+   "cycle": 27,
+   "run_id": "20261127-181932",
+   "started_at": "2026-11-27T18:28:50+00:00",
+   "ended_at": "2026-11-27T18:35:07+00:00",
+   "track": "mission",
+   "outcome": "productive",
+   "roles": {
+    "planner": "Gemini (Google, gemini-3.8-flash)",
+    "worker": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+    "reviewer": "Gemini (Google, gemini-3.8-flash)"
+   },
+   "task_id": "T19",
+   "task": "Catalogue and verify Tsirelson's bound, CHSH inequality, and quantum contextuality limits: Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) CHSH inequality and local-hidden-variable bound (|⟨C⟩| ≤ 2), (2) Tsirelson's bound (|⟨C⟩| ≤ 2√2) for quantum correlations, (3) domain assumptions (tensor product Hilbert spaces, operator norm bounds, saturation conditions), (4) non-signaling principle and PR-boxes (upper limit 4), and (5) Kochen-Specker theorem on quantum contextuality for Hilbert space dimension d ≥ 3.",
+   "allocation_reasoning": null,
+   "what_was_done": "Researched and verified the foundational non-locality and contextuality bounds in quantum mechanics using Wikipedia, arXiv papers, and search results. Key findings: (1) CHSH inequality classical bound |⟨C⟩| ≤ 2 (Clauser et al. 1969); (2) Tsirelson's bound |⟨C⟩| ≤ 2√2 for quantum correlations (Tsirelson 1980, Lett. Math. Phys. 4, 93); (3) Domain: bipartite tensor-product Hilbert space ℋ_A ⊗ ℋ_B, Hermitian operators with spectrum {-1,+1}, saturation by maximally entangled states (e.g., singlet) with measurement angles (0°, 45°) for Alice and (22.5°, 67.5°) for Bob; (4) Non-signaling/ PR-boxes achieve algebraic maximum 4, showing quantum bounds are strictly tighter; (5) Kochen-Specker theorem proves contextuality for d ≥ 3 (Kochen & Specker 1967); (6) Formalization exists in Isabelle/HOL (Echenim & Mhalla 2023). All claims are verifiable with explicit mathematical statements and refutation conditions.",
+   "results": [
+    "F0099 (supported): The CHSH inequality establishes that for any local hidden-variable theory, the CHSH correlation parameter C = A₁B₁ + A₁B₂ + A₂B₁ - A₂B₂ (where A₁, A₂ are Alice's measurement outcomes with settings 1,2 and B₁, B₂ are Bob's outcomes with settings 1,2, each taking values ±1) satisfies the bound |⟨C⟩| ≤ 2. This is the classical local-realist bound derived by Clauser, Horne, Shimony, and Holt (1969).",
+    "F0100 (supported): Tsirelson's bound states that for any bipartite quantum system in a tensor-product Hilbert space ℋ_A ⊗ ℋ_B, with dichotomic observables A₁, A₂ on ℋ_A and B₁, B₂ on ℋ_B having eigenvalues ±1, the quantum expectation value of the CHSH operator C = A₁⊗B₁ + A₁⊗B₂ + A₂⊗B₁ - A₂⊗B₂ satisfies |⟨C⟩| ≤ 2√2. This bound was derived by Boris S. Tsirelson (Cirel'son) in 1980.",
+    "F0101 (supported): The domain assumptions for Tsirelson's bound are: (a) a bipartite Hilbert space ℋ = ℋ_A ⊗ ℋ_B of arbitrary finite or infinite dimension; (b) Hermitian operators A₁, A₂ on ℋ_A and B₁, B₂ on ℋ_B with spectra contained in {-1, +1} (i.e., A_i² = I, B_j² = I); (c) the CHSH operator is C = A₁⊗B₁ + A₁⊗B₂ + A₂⊗B₁ - A₂⊗B₂. The bound |⟨C⟩| ≤ 2√2 is saturated if and only if the state is a maximally entangled two-qubit state (locally equivalent to the singlet) and the observables satisfy the anti-commutation relations {A₁,A₂} = 0, {B₁,B₂} = 0 with appropriate relative angles (e.g., 45° between A₁,A₂ and 22.5° between Bob's settings and Alice's).",
+    "F0102 (supported): The non-signaling principle alone permits correlations up to the algebraic maximum of the CHSH expression: |⟨C⟩| ≤ 4. Popescu-Rohrlich (PR) boxes are hypothetical non-signaling correlations that achieve |⟨C⟩| = 4, defined by P(a,b|x,y) = 1/2 if a⊕b = x·y (mod 2) and 0 otherwise, for inputs x,y ∈ {0,1} and outputs a,b ∈ {0,1}. This demonstrates that quantum mechanics (bound 2√2 ≈ 2.828) is strictly more constrained than the non-signaling polytope.",
+    "F0103 (supported): The Kochen-Specker theorem (Kochen & Specker, 1967; Bell, 1966) proves that for any Hilbert space of dimension d ≥ 3, there is no non-contextual hidden-variable theory that assigns definite values (0 or 1) to all projection operators (or equivalently, to all yes-no observables) such that: (i) the value assigned to the identity operator is 1; (ii) for any set of mutually orthogonal projections summing to identity, exactly one is assigned value 1. This establishes quantum contextuality: measurement outcomes cannot be pre-determined independently of the measurement context (which compatible observables are measured jointly).",
+    "F0104 (supported): The CHSH inequality and Tsirelson's bound have been formally verified in the Isabelle/HOL proof assistant by Echenim and Mhalla (2023, arXiv:2306.12535). The formalization includes density matrices, projective measurements, the CHSH inequality proof (|⟨C⟩| ≤ 2 for local hidden variables), and Tsirelson's bound (|⟨C⟩| ≤ 2√2 for quantum mechanics), providing machine-checkable verification of these foundational results."
+   ],
+   "rejected_claims": [],
+   "status_changes": [],
+   "flagged_for_review": [],
+   "proposals": [],
+   "disagreements": [],
+   "roadmap_changes": [
+    "added task T19 under M3: Catalogue and verify Tsirelson's bound, CHSH inequality, and quantum contextuality limits",
+    "T19 proposed -> active: chosen by the planner: With the successful completion and verification of quantum speed limits (T15) and entropic uncertainty relations with quantum memory (T16–T18), cataloguing Tsirelson's bound and Kochen-Specker contextuality completes the core quantum information and non-locality limits in Milestone 3. This establishes the exact mathematical boundaries separating classical local realism, physical quantum mechanics, and super-quantum non-signaling models.",
+    "T19 active -> done: worker and reviewer agree the goal was met"
+   ],
+   "roadmap_errors": [],
+   "appeal_check": "None of the claims were shaped to impress. All statements are precise, mathematically rigorous, include clear domain boundaries, accurate refutation conditions, and standard literature citations.",
+   "next_step": "Investigate device-independent self-testing protocols for Tsirelson-bound saturating correlations and examine the boundaries of the Navascués-Pironio-Acin (NPA) hierarchy (such as the Q₁ / almost-quantum correlation set) between quantum and non-signaling polytopes.",
+   "problems": [
+    "failed attempt: gemini-3.8-flash (plan): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.8-flash (plan): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.6-flash (review): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please "
+   ],
+   "usage": {
+    "api_calls": 21,
+    "input_tokens": 506817,
+    "output_tokens": 15675,
+    "cost_usd": 0.0,
+    "models": [
+     "gemini-3.6-flash",
+     "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "failed_attempts": 3
+   },
+   "rules": {
+    "core_fingerprint": "935dd7bb3ef827a9",
+    "constitution_version": 3
+   },
+   "counted": true
+  }
+ },
+ {
+  "number": 28,
+  "prev_hash": "dc056812722e0db38d24f5c53c9ea2f45737a8fabfe804a8d4fc04c95de70e03",
+  "log_hash": "67e7cc48e879a0042c95d0133b3487f62156a350f0ac8913d529d669f74b9efd",
+  "log": {
+   "cycle": 28,
+   "run_id": "20261127-181932",
+   "started_at": "2026-11-27T18:35:07+00:00",
+   "ended_at": "2026-11-27T18:41:47+00:00",
+   "track": "mission",
+   "outcome": "productive",
+   "roles": {
+    "planner": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+    "worker": "Gemini (Google, gemini-3.8-flash)",
+    "reviewer": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)"
+   },
+   "task_id": "T20",
+   "task": "Catalogue and verify the NPA hierarchy, almost-quantum correlations, and device-independent self-testing: Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) The Navascués-Pironio-Acín (NPA) hierarchy of semidefinite programming relaxations characterizing the quantum correlation set; (2) The Q₁ (almost-quantum) correlation set as the first level of the NPA hierarchy, its properties, and how it strictly contains the quantum set while being contained in the non-signaling polytope; (3) Device-independent self-testing protocols that certify quantum states and measurements (e.g., Mayers-Yao, CHSH self-testing, parallel self-testing) based on Bell inequality violations reaching Tsirelson's bound; (4) The relationship between self-testing rigidity and the boundary of the quantum set.",
+   "allocation_reasoning": null,
+   "what_was_done": "Completed T20: Catalogued and verified the NPA hierarchy of semidefinite programming relaxations, the almost-quantum correlation set Q₁, device-independent self-testing protocols (CHSH, Mayers-Yao, and parallel self-testing), and the relationship between self-testing rigidity and the boundary of the quantum correlation set. All 6 claims are verifiable, grounded in literature, and include precise domain boundaries and refutation conditions.",
+   "results": [
+    "F0105 (supported): The Navascués-Pironio-Acín (NPA) hierarchy is an infinite sequence of semidefinite programming (SDP) relaxations Q₁ ⊇ Q₂ ⊇ ... ⊇ Q_k ⊇ ... ⊇ Q_c that provides outer bounds on the set of quantum correlations. Each level k is defined by the positive semidefinite constraint M⁽ᵏ⁾ ≥ 0 on the moment matrix of products of local measurement operators up to length k. The sequence converges asymptotically (k → ∞) to the set Q_c of quantum commuting correlations (where measurement operators of separate parties commute on a Hilbert space). Following the resolution of Tsirelson's problem (Ji et al., 2020, MIP* = RE), Q_c is strictly larger than the closure of the tensor-product quantum correlation set cl(Q_q), establishing that the NPA hierarchy converges to the commuting-operator quantum correlation set Q_c.",
+    "F0106 (supported): The almost-quantum correlation set Q₁ (also denoted Q_{1+AB} or Q̃) is a semidefinite relaxation level of the NPA hierarchy situated strictly between the quantum correlation set Q and the non-signaling polytope NS (Q ⊊ Q₁ ⊊ NS). Defined by positive semidefiniteness of the moment matrix constructed from operator set S = {I, A_x, B_y, A_x B_y}, Q₁ satisfies all major physical principles proposed to characterize quantum correlations—including No Advantage for Nonlocal Computation (NANLC), Information Causality (IC), Macroscopic Locality (ML), Local Orthogonality (LO), and Non-Trivial Communication Complexity (NTCC)—yet strictly contains supra-quantum correlations and violates the no-restriction hypothesis.",
+    "F0107 (supported): The CHSH self-testing theorem establishes that maximal violation of the CHSH inequality (⟨C⟩ = 2√2) uniquely certifies, up to local isometries, the presence of a maximally entangled two-qubit state |Φ⁺⟩ = (1/√2)(|00⟩+|11⟩) and anti-commuting measurement observables. Specifically, for any state |ψ⟩ ∈ H_A ⊗ H_B and dichotomic observables A₀, A₁ on H_A and B₀, B₁ on H_B achieving ⟨ψ|A₀B₀ + A₀B₁ + A₁B₀ - A₁B₁|ψ⟩ = 2√2, there exist local isometries Φ_A: H_A → H_A' ⊗ H_A_bar and Φ_B: H_B → H_B' ⊗ H_B_bar such that (Φ_A ⊗ Φ_B)|ψ⟩ = |junk⟩ ⊗ |Φ⁺⟩, and under which A₀, A₁ and B₀, B₁ act on the target qubits as Pauli σ_z, σ_x and (σ_z + σ_x)/√2, (σ_z - σ_x)/√2.",
+    "F0108 (supported): The Mayers-Yao self-testing protocol (Mayers & Yao, 2004) device-independently certifies a maximally entangled state |Φ⁺⟩ and reference measurement choices using 3 measurement settings per party (x,y ∈ {0,1,2}). In robust self-testing, if observed correlation statistics P(ab|xy) deviate by ε in trace distance or L₁ norm from ideal target statistics, the physical state |ψ⟩ satisfies ||(Φ_A ⊗ Φ_B)|ψ⟩ - |junk⟩ ⊗ |Φ⁺⟩||₂ = O(√ε) (with O(ε) achieved under optimized robust self-testing bounds), guaranteeing quantitative state certification under experimental noise.",
+    "F0109 (supported): Parallel self-testing protocols establish device-independent certification of N-copy tensor product states |Φ⁺⟩^{⊗N} and high-dimensional quantum systems (C^{2^N} ⊗ C^{2^N}) using parallelized Bell tests. Specifically, testing N maximally entangled qubit pairs simultaneously under parallel CHSH inequalities certifies that the shared state is locally isometric to |junk⟩ ⊗ (|Φ⁺⟩)^{⊗N} with a number of measurement choices per party that remains fixed at 2 (independent of N) or scales polynomial in N, enabling efficient high-dimensional quantum hardware verification.",
+    "F0110 (supported): Self-testing rigidity characterizes the boundary ∂Q of the quantum correlation set: a correlation point P* ∈ ∂Q is rigid if and only if all physical quantum realizations (H_A, H_B, |ψ⟩, {A_a^x}, {B_b^y}) yielding P* are unique up to a local isometry Φ = Φ_A ⊗ Φ_B. Exposed vector extremal points of Q that maximize linear Bell inequalities (e.g., CHSH, tilted CHSH, and CGLMP inequalities) are rigid self-tests, and every pure bipartite entangled state can be self-tested by maximal violation of an appropriate Bell inequality."
+   ],
+   "rejected_claims": [],
+   "status_changes": [],
+   "flagged_for_review": [],
+   "proposals": [],
+   "disagreements": [
+    "Minor imprecision in Claim 4's robust self-testing statement regarding the metric for statistical deviation (trace distance vs L₁ norm on probabilities), addressed by lowering confidence to 0.95."
+   ],
+   "roadmap_changes": [
+    "added task T20 under M3: Catalogue and verify the NPA hierarchy, almost-quantum correlations, and device-independent self-testing",
+    "T20 proposed -> active: chosen by the planner: M3 has completed quantum speed limits (T15), Holevo/Maassen-Uffink (T16), EUR-QM (T17/T18), and CHSH/Tsirelson/Kochen-Specker (T19). The natural structural continuation is mapping the correlation hierarchy (NPA, almost-quantum) and the device-independent certification protocols (self-testing) that make Tsirelson's bound operational. This deepens the physical information bounds catalogue into the geometry of quantum correlations and their device-independent verification.",
+    "T20 active -> done: worker and reviewer agree the goal was met"
+   ],
+   "roadmap_errors": [],
+   "appeal_check": "No claim appears shaped to impress rather than to be true. All statements are technical, precise, include appropriate caveats (strict inclusions, asymptotic convergence, 'up to local isometries'), and cite primary literature. The confidence levels are high but justified by the maturity of these results.",
+   "next_step": "Proceed to the suggested next task on network nonlocality and network-assisted self-testing protocols (e.g., triangle networks, network-assisted entanglement certification).",
+   "problems": [
+    "failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.8-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.6-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.6-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.6-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+    "failed attempt: gemini-3.6-flash (work): Transient: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please "
+   ],
+   "usage": {
+    "api_calls": 12,
+    "input_tokens": 245729,
+    "output_tokens": 18507,
+    "cost_usd": 0.0,
+    "models": [
+     "gemini-3.5-flash-lite",
+     "gemini-3.6-flash",
+     "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "failed_attempts": 6
+   },
+   "rules": {
+    "core_fingerprint": "935dd7bb3ef827a9",
+    "constitution_version": 3
+   },
+   "counted": true
+  }
  }
 ]

@@ -3392,7 +3392,8 @@
    "F0084",
    "F0085",
    "F0086",
-   "F0089"
+   "F0089",
+   "F0094"
   ],
   "history": [
    {
@@ -3466,7 +3467,9 @@
    "F0083"
   ],
   "needed_by": [
-   "F0091"
+   "F0091",
+   "F0094",
+   "F0096"
   ],
   "history": [
    {
@@ -3505,7 +3508,8 @@
    "F0083"
   ],
   "needed_by": [
-   "F0092"
+   "F0092",
+   "F0097"
   ],
   "history": [
    {
@@ -3602,8 +3606,8 @@
   "confidence": 0.97,
   "refutation_condition": "A bipartite quantum state rho_{AB} and incompatible measurements X, Z on system A for which the measured conditional entropies S(X|B) + S(Z|B) are strictly less than log₂(1/c) + S(A|B), verified by mathematical counterexample or independent experiment.",
   "evidence": "Established by Berta, Christandl, Colbeck, Renes, and Renner (Nature Physics 6, 659–662, 2010; arXiv:0909.0950), building on quantum memory side information and entropic uncertainty formulations. Proved via the quantum subadditivity of entropy and state purification.",
-  "status": "contested",
-  "superseded_by": null,
+  "status": "superseded",
+  "superseded_by": "F0094",
   "needs_review": 0,
   "sources": [
    "M. Berta, M. Christandl, R. Colbeck, J. M. Renes, and R. Renner, 'The uncertainty principle in the presence of quantum memory', Nature Physics 6, 659 (2010); arXiv:0909.0950"
@@ -3612,7 +3616,7 @@
   "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
   "review_note": "The definition of the overlap parameter c is mathematically incorrect. The claim states c = max_{i,j} |⟨x_i|z_j⟩|, but the Berta et al. (2010) EUR-QM bound uses c = max_{i,j} |⟨x_i|z_j⟩|² (or equivalently the operator norm ‖√M_i √N_j‖² for POVMs). With the worker's definition, log₂(1/c) = -log₂(max|⟨x_i|z_j⟩|), whereas the correct bound requires -2 log₂(max|⟨x_i|z_j⟩|) = log₂(1/c²). This is a factor-of-2 error in the exponent that changes the numerical value of the bound. The claim must be restated with the correct definition of c.",
   "created_at": "2026-11-26T18:52:36+00:00",
-  "updated_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
   "builds_on": [
    "F0006",
    "F0083"
@@ -3629,6 +3633,12 @@
     "event": "created as contested",
     "reason": "The definition of the overlap parameter c is mathematically incorrect. The claim states c = max_{i,j} |⟨x_i|z_j⟩|, but the Berta et al. (2010) EUR-QM bound uses c = max_{i,j} |⟨x_i|z_j⟩|² (or equivalently the operator norm ‖√M_i √N_j‖² for POVMs). With the worker's definition, log₂(1/c) = -log₂(max|⟨x_i|z_j⟩|), whereas the correct bound requires -2 log₂(max|⟨x_i|z_j⟩|) = log₂(1/c²). This is a factor-of-2 error in the exponent that changes the numerical value of the bound. The claim must be restated with the correct definition of c.",
     "at": "2026-11-26T18:52:36+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "status contested -> superseded (replaced by F0094)",
+    "reason": "Corrects the definition of the overlap parameter c = max_{i,j} |<x_i|z_j>|² (squared overlap), fixing the factor-of-2 error in log₂(1/c) = -2 log₂ max |<x_i|z_j>|. | reviewer: F0089 correctly superseded by claim 1, which fixes the overlap parameter definition (squared overlap) and factor-of-2 error.",
+    "at": "2026-11-27T18:28:50+00:00"
    }
   ]
  },
@@ -3641,8 +3651,8 @@
   "confidence": 0.85,
   "refutation_condition": "A mathematical flaw in the entropic uncertainty derivation linking S(X|B) to S(Z|E) via purification and data-processing inequalities, or a violation found in pure tripartite model systems.",
   "evidence": "Derived in Berta et al. (2010) using Church's thesis / purification of mixed states to a tripartite pure state |psi>_{ABE} and applying Shannon-to-von Neumann entropy bounds across complementary reference systems.",
-  "status": "supported",
-  "superseded_by": null,
+  "status": "superseded",
+  "superseded_by": "F0095",
   "needs_review": 0,
   "sources": [
    "M. Berta et al., Nature Physics 6, 659 (2010); arXiv:0909.0950"
@@ -3651,7 +3661,7 @@
   "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
   "review_note": "The conceptual description of the purification argument is correct, but the claim that the bipartite inequality is 'equivalent to' S(X|B) + S(Z|E) ≥ log₂(1/c) is imprecise. The tripartite relation H(X|B) + H(Z|E) ≥ log₂(1/c) for a pure state |ψ⟩_{ABE} is used as a lemma to derive the bipartite bound, but the two are not strictly equivalent without additional steps (using chain rules and duality of conditional entropies for the post-measurement states). The evidence also contains a typo ('Church's thesis' instead of 'purification' or 'Schmidt decomposition').",
   "created_at": "2026-11-26T18:52:36+00:00",
-  "updated_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
   "builds_on": [
    "F0089"
   ],
@@ -3662,6 +3672,18 @@
     "event": "created as supported",
     "reason": "The conceptual description of the purification argument is correct, but the claim that the bipartite inequality is 'equivalent to' S(X|B) + S(Z|E) ≥ log₂(1/c) is imprecise. The tripartite relation H(X|B) + H(Z|E) ≥ log₂(1/c) for a pure state |ψ⟩_{ABE} is used as a lemma to derive the bipartite bound, but the two are not strictly equivalent without additional steps (using chain rules and duality of conditional entropies for the post-measurement states). The evidence also contains a typo ('Church's thesis' instead of 'purification' or 'Schmidt decomposition').",
     "at": "2026-11-26T18:52:36+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "flagged for review",
+    "reason": "depends (directly or indirectly) on superseded finding F0089 (check whether to rely on F0094)",
+    "at": "2026-11-27T18:28:50+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "status supported -> superseded (replaced by F0095)",
+    "reason": "Clarifies the purification derivation logic: S(X|B) = -S(X|E) for pure tripartite states leads to the tripartite lemma S(X|B) + S(Z|E) >= log2(1/c), without claiming false 'equivalence' between bipartite and tripartite forms. | reviewer: F0090 correctly superseded by claim 2, which clarifies the tripartite form as a proof lemma without false equivalence claim.",
+    "at": "2026-11-27T18:28:50+00:00"
    }
   ]
  },
@@ -3674,8 +3696,8 @@
   "confidence": 0.85,
   "refutation_condition": "Demonstration that the bound fails for infinite-dimensional continuous variable systems without proper regularization, or a proof that maximal entanglement does not permit zero uncertainty for mutually unbiased bases.",
   "evidence": "Analyzed in Berta et al. (2010) and subsequent operational domain reviews (e.g., Coles, Berta, Tomamichel, Wehner, Rev. Mod. Phys. 2017), confirming limits for separable, entangled, and continuous-variable states.",
-  "status": "supported",
-  "superseded_by": null,
+  "status": "superseded",
+  "superseded_by": "F0096",
   "needs_review": 0,
   "sources": [
    "P. J. Coles, M. Berta, M. Tomamichel, and S. Wehner, 'Entropic uncertainty relations and their applications', Rev. Mod. Phys. 69, 015002 (2017)"
@@ -3684,7 +3706,7 @@
   "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
   "review_note": "Part (1) overstates the original Berta et al. (2010) result: the paper focuses on finite-dimensional systems; infinite-dimensional extensions with continuous variables are developed in later works (e.g., Coles et al. Rev. Mod. Phys. 2017) and require careful regularization. Part (2) is correct for maximally entangled states and MUBs. Part (3) inherits the c-definition ambiguity from Claim 1. The claim mixes original and extended domain boundaries without clear attribution.",
   "created_at": "2026-11-26T18:52:36+00:00",
-  "updated_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
   "builds_on": [
    "F0085",
    "F0089"
@@ -3698,6 +3720,18 @@
     "event": "created as supported",
     "reason": "Part (1) overstates the original Berta et al. (2010) result: the paper focuses on finite-dimensional systems; infinite-dimensional extensions with continuous variables are developed in later works (e.g., Coles et al. Rev. Mod. Phys. 2017) and require careful regularization. Part (2) is correct for maximally entangled states and MUBs. Part (3) inherits the c-definition ambiguity from Claim 1. The claim mixes original and extended domain boundaries without clear attribution.",
     "at": "2026-11-26T18:52:36+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "flagged for review",
+    "reason": "depends (directly or indirectly) on superseded finding F0089 (check whether to rely on F0094)",
+    "at": "2026-11-27T18:28:50+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "status supported -> superseded (replaced by F0096)",
+    "reason": "Restricts the original 2010 domain to finite-dimensional Hilbert spaces and attributes continuous-variable extensions to Furrer et al. (2012) and Tomamichel et al. (2013). | reviewer: F0091 correctly superseded by claim 3, which restricts domain to finite-dimensional and attributes CV extensions to Furrer et al. (2012) and subsequent work.",
+    "at": "2026-11-27T18:28:50+00:00"
    }
   ]
  },
@@ -3710,8 +3744,8 @@
   "confidence": 0.85,
   "refutation_condition": "A mathematical proof that the proposed tightening terms can be negative for valid physical states, or a counterexample where the tightened inequality is violated.",
   "evidence": "Established by A. K. Pati et al. (Phys. Rev. A 86, 032105, 2012; arXiv:1204.3803) and P. J. Coles, M. Berta, M. Tomamichel, S. Wehner (2017), showing tighter bounds via quantum discord, relative entropy differences, and measurement recovery operations.",
-  "status": "supported",
-  "superseded_by": null,
+  "status": "superseded",
+  "superseded_by": "F0097",
   "needs_review": 0,
   "sources": [
    "A. K. Pati et al., Phys. Rev. A 86, 032105 (2012); arXiv:1204.3803",
@@ -3721,7 +3755,7 @@
   "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
   "review_note": "The core claim about tightenings using quantum discord (Pati et al. 2012), measurement reversibility (Berta, Wehner, Wilde 2015), and other state-dependent terms is correct. However, several citation details are inaccurate: 'Coles, Berta, and Wilde, 2012' does not match the known paper (Berta, Wehner, Wilde is 2015; Coles et al. have 2012 PRL papers but with different author lists); 'Coles-Piani (2014)' is not a standard citation (likely refers to Coles & Piani 2014 or similar, but the exact reference is unclear). These inaccuracies reduce confidence in the precise bibliographic claims.",
   "created_at": "2026-11-26T18:52:36+00:00",
-  "updated_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
   "builds_on": [
    "F0086",
    "F0089"
@@ -3733,6 +3767,18 @@
     "event": "created as supported",
     "reason": "The core claim about tightenings using quantum discord (Pati et al. 2012), measurement reversibility (Berta, Wehner, Wilde 2015), and other state-dependent terms is correct. However, several citation details are inaccurate: 'Coles, Berta, and Wilde, 2012' does not match the known paper (Berta, Wehner, Wilde is 2015; Coles et al. have 2012 PRL papers but with different author lists); 'Coles-Piani (2014)' is not a standard citation (likely refers to Coles & Piani 2014 or similar, but the exact reference is unclear). These inaccuracies reduce confidence in the precise bibliographic claims.",
     "at": "2026-11-26T18:52:36+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "flagged for review",
+    "reason": "depends (directly or indirectly) on superseded finding F0089 (check whether to rely on F0094)",
+    "at": "2026-11-27T18:28:50+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "status supported -> superseded (replaced by F0097)",
+    "reason": "Corrects paper titles, authors, DOIs, and arXiv identifiers for Pati et al. (2012), Coles & Piani (2014), and Coles, Berta, Tomamichel, Wilde, Wehner (2015/2017). | reviewer: F0092 correctly superseded by claim 4, which corrects paper titles, authors, DOIs, and arXiv identifiers for all three tightenings.",
+    "at": "2026-11-27T18:28:50+00:00"
    }
   ]
  },
@@ -3745,8 +3791,8 @@
   "confidence": 0.85,
   "refutation_condition": "A valid QKD security proof failure or explicit attack strategy yielding secret key rates higher than permitted by the EUR-QM bound, or a demonstration that quantum steering can occur without violating classical entropic uncertainty bounds.",
   "evidence": " Demonstrated in Berta et al. (2010), Tomamichel and Renner (PRL 2011), and reviewed in Coles et al. (Rev. Mod. Phys. 2017), showing direct application to bounding an eavesdropper's guessing probability / conditional entropy in QKD secret key rate formulas.",
-  "status": "supported",
-  "superseded_by": null,
+  "status": "superseded",
+  "superseded_by": "F0098",
   "needs_review": 0,
   "sources": [
    "M. Berta et al., Nature Physics 6, 659 (2010); arXiv:0909.0950",
@@ -3756,7 +3802,7 @@
   "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
   "review_note": "The application of EUR-QM to QKD security (Tomamichel & Renner 2011) and entanglement/steering witnesses is correctly stated in essence. However, the phrasing 'such as BB84 and six-state protocols... without requiring the BB84 source to be characterized or trusted by the receiver (device-independent and source-device-independent frameworks)' conflates standard BB84 (which assumes a trusted, characterized source) with device-independent/source-device-independent variants that use EUR-QM but are distinct protocols. This imprecision makes the claim overstated as written.",
   "created_at": "2026-11-26T18:52:36+00:00",
-  "updated_at": "2026-11-26T18:52:36+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
   "builds_on": [
    "F0089",
    "F0091"
@@ -3768,6 +3814,664 @@
     "event": "created as supported",
     "reason": "The application of EUR-QM to QKD security (Tomamichel & Renner 2011) and entanglement/steering witnesses is correctly stated in essence. However, the phrasing 'such as BB84 and six-state protocols... without requiring the BB84 source to be characterized or trusted by the receiver (device-independent and source-device-independent frameworks)' conflates standard BB84 (which assumes a trusted, characterized source) with device-independent/source-device-independent variants that use EUR-QM but are distinct protocols. This imprecision makes the claim overstated as written.",
     "at": "2026-11-26T18:52:36+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "flagged for review",
+    "reason": "depends (directly or indirectly) on superseded finding F0089 (check whether to rely on F0094)",
+    "at": "2026-11-27T18:28:50+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "flagged for review",
+    "reason": "depends (directly or indirectly) on superseded finding F0091 (check whether to rely on F0096)",
+    "at": "2026-11-27T18:28:50+00:00"
+   },
+   {
+    "cycle": 26,
+    "event": "status supported -> superseded (replaced by F0098)",
+    "reason": "Distinguishes standard BB84 QKD security (requiring device characterization) from DI-QKD and SDI-QKD frameworks, avoiding conflation of trust assumptions. | reviewer: F0093 correctly superseded by claim 5, which properly distinguishes standard QKD from DI-QKD/SDI-QKD trust assumptions.",
+    "at": "2026-11-27T18:28:50+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0094",
+  "cycle": 26,
+  "task_id": "T18",
+  "statement": "Corrected Berta et al. (2010) Entropic Uncertainty Relation with Quantum Memory (EUR-QM): For any bipartite quantum state ρ_AB on finite-dimensional Hilbert spaces H_A ⊗ H_B, when Alice measures observable X (eigenbasis {|x_i>}) or Z (eigenbasis {|z_j>}) on system A, the conditional entropies satisfy S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B), where c = max_{i,j} |<x_i|z_j>|² is the squared overlap of the measurement bases. Equivalently, the lower bound is -2 log₂(max_{i,j} |<x_i|z_j>|) + S(A|B). Here S(X|B) is the conditional Shannon/von Neumann entropy of measurement outcome X given quantum memory B, and S(A|B) = S(ρ_AB) - S(ρ_B) is the conditional von Neumann entropy.",
+  "type": "verifiable",
+  "confidence": 0.98,
+  "refutation_condition": "A finite-dimensional bipartite quantum state ρ_AB and measurement bases X, Z on system A violating S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B) with c = max_{i,j} |<x_i|z_j>|², or a mathematical proof that the overlap parameter in Berta et al. (2010) is defined without the square.",
+  "evidence": "Verified from Berta et al. (2010) Nature Physics 6, 659–662 (arXiv:0909.0950). In entropic uncertainty relations (Maassen-Uffink, Berta et al.), c is defined as the maximum overlap probability max_{i,j} |<x_i|z_j>|², so log₂(1/c) = -2 log₂ max_{i,j} |<x_i|z_j>|.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1038/nphys1641",
+   "https://arxiv.org/abs/0909.0950"
+  ],
+  "created_by": "Gemini (Google, gemini-3.6-flash)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Correctly states the Berta et al. (2010) EUR-QM with the squared overlap parameter c = max|⟨x_i|z_j⟩|² and the inequality S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B) = -2 log₂(max|⟨x_i|z_j⟩|) + S(A|B). Exact citation (Nature Physics 6, 659–662, arXiv:0909.0950) is accurate. Type=verifiable is correct for a mathematical theorem. Confidence 0.98 is appropriate.",
+  "created_at": "2026-11-27T18:28:50+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
+  "builds_on": [
+   "F0083",
+   "F0085"
+  ],
+  "needed_by": [
+   "F0095",
+   "F0096",
+   "F0097",
+   "F0098"
+  ],
+  "history": [
+   {
+    "cycle": 26,
+    "event": "created as supported",
+    "reason": "Correctly states the Berta et al. (2010) EUR-QM with the squared overlap parameter c = max|⟨x_i|z_j⟩|² and the inequality S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B) = -2 log₂(max|⟨x_i|z_j⟩|) + S(A|B). Exact citation (Nature Physics 6, 659–662, arXiv:0909.0950) is accurate. Type=verifiable is correct for a mathematical theorem. Confidence 0.98 is appropriate.",
+    "at": "2026-11-27T18:28:50+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0095",
+  "cycle": 26,
+  "task_id": "T18",
+  "statement": "Purification and Tripartite Lemma Derivation of EUR-QM: The derivation of the Berta et al. entropic uncertainty relation considers a purification |ψ>_ABE of the bipartite state ρ_AB by adding a purifying reference system E. Using the data-processing inequality for quantum relative entropy and the duality property of conditional von Neumann entropy S(X|B) = -S(X|E) for pure tripartite states, one derives the tripartite inequality S(X|B) + S(Z|E) ≥ log₂(1/c) as an intermediate lemma, which directly yields S(X|B) + S(Z|B) ≥ log₂(1/c) + S(A|B). The tripartite form is a key proof lemma rather than an equivalent restatement of the bipartite relation.",
+  "type": "verifiable",
+  "confidence": 0.96,
+  "refutation_condition": "A proof showing that S(X|B) = -S(X|E) fails for pure tripartite states, or demonstrating a logical error in deriving S(X|B) + S(Z|E) ≥ log₂(1/c) via data processing in Berta et al. (2010).",
+  "evidence": "Verified proof structure of Berta et al. (2010) Nature Physics 6, 659–662 (arXiv:0909.0950) and review by Coles et al. (2017) Rev. Mod. Phys. 89, 015002.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1038/nphys1641",
+   "https://arxiv.org/abs/0909.0950",
+   "https://arxiv.org/abs/1511.04857"
+  ],
+  "created_by": "Gemini (Google, gemini-3.6-flash)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Accurately describes the purification derivation: purification |ψ⟩_ABE, data-processing inequality, duality S(X|B) = -S(X|E) for pure tripartite states, yielding the tripartite lemma S(X|B) + S(Z|E) ≥ log₂(1/c) which directly gives the bipartite form. Correctly avoids claiming 'equivalence' between bipartite and tripartite forms. Type=verifiable, confidence 0.96 appropriate.",
+  "created_at": "2026-11-27T18:28:50+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
+  "builds_on": [
+   "F0094"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 26,
+    "event": "created as supported",
+    "reason": "Accurately describes the purification derivation: purification |ψ⟩_ABE, data-processing inequality, duality S(X|B) = -S(X|E) for pure tripartite states, yielding the tripartite lemma S(X|B) + S(Z|E) ≥ log₂(1/c) which directly gives the bipartite form. Correctly avoids claiming 'equivalence' between bipartite and tripartite forms. Type=verifiable, confidence 0.96 appropriate.",
+    "at": "2026-11-27T18:28:50+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0096",
+  "cycle": 26,
+  "task_id": "T18",
+  "statement": "Domain Boundaries and Limit Behavior of EUR-QM: (1) The original Berta et al. (2010) paper was established for finite-dimensional Hilbert spaces (dim H_A < ∞); extensions to infinite-dimensional continuous-variable (CV) systems were proven later by Furrer, Franz, Berta et al. (2012, Phys. Rev. Lett. 109, 100502) and Tomamichel, Berta, Renes (2013). (2) When system A is maximally entangled with quantum memory B (dim H_A = d_A), S(A|B) = -log₂(d_A); for mutually unbiased bases (c = 1/d_A), the bound log₂(1/c) + S(A|B) becomes zero, allowing complete outcome predictability S(X|B) = S(Z|B) = 0. (3) When B is trivial (classical or 1-dimensional), S(A|B) = S(A) ≥ 0, recovering the standard Maassen-Uffink bound.",
+  "type": "verifiable",
+  "confidence": 0.96,
+  "refutation_condition": "Demonstration that the original 2010 Berta et al. paper held for infinite-dimensional continuous variables without additional domain restrictions, or a finite-dimensional state violating the limit behaviors.",
+  "evidence": "Verified from Berta et al. (2010) Nature Physics 6, 659; Furrer et al. (2012) Phys. Rev. Lett. 109, 100502 (arXiv:1112.2179); Furrer et al. (2014) J. Math. Phys. 55, 122204 (arXiv:1308.4527).",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1038/nphys1641",
+   "https://doi.org/10.1103/PhysRevLett.109.100502",
+   "https://arxiv.org/abs/1112.2179",
+   "https://arxiv.org/abs/1308.4527"
+  ],
+  "created_by": "Gemini (Google, gemini-3.6-flash)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Correctly restricts the original 2010 paper to finite-dimensional Hilbert spaces and attributes continuous-variable extensions to Furrer et al. (2012, PRL 109, 100502) and the 2013/2014 work (arXiv:1308.4527). Limit behaviors (maximally entangled case S(A|B) = -log₂(d_A), MUBs c=1/d_A giving zero bound, trivial B recovering Maassen-Uffink) are correctly stated. Type=verifiable, confidence 0.96 appropriate.",
+  "created_at": "2026-11-27T18:28:50+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
+  "builds_on": [
+   "F0085",
+   "F0094"
+  ],
+  "needed_by": [
+   "F0097",
+   "F0098"
+  ],
+  "history": [
+   {
+    "cycle": 26,
+    "event": "created as supported",
+    "reason": "Correctly restricts the original 2010 paper to finite-dimensional Hilbert spaces and attributes continuous-variable extensions to Furrer et al. (2012, PRL 109, 100502) and the 2013/2014 work (arXiv:1308.4527). Limit behaviors (maximally entangled case S(A|B) = -log₂(d_A), MUBs c=1/d_A giving zero bound, trivial B recovering Maassen-Uffink) are correctly stated. Type=verifiable, confidence 0.96 appropriate.",
+    "at": "2026-11-27T18:28:50+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0097",
+  "cycle": 26,
+  "task_id": "T18",
+  "statement": "State-Dependent Tightenings of EUR-QM: The Berta et al. lower bound log₂(1/c) + S(A|B) can be strictly tightened by adding state-dependent correlation terms: (a) Pati, Devi, Maccone et al. (2012, Phys. Rev. A 86, 042105 / arXiv:1111.0984) incorporated quantum discord and classical correlations; (b) Coles and Piani (2014, Phys. Rev. Lett. 113, 030402 / arXiv:1402.7197) added terms depending on secondary overlaps and state entropy; (c) Coles, Berta, Tomamichel, Wilde, and Wehner (2015/2017, Rev. Mod. Phys. 89, 015002 / arXiv:1511.04857) established unified entropic uncertainty relations incorporating non-negative measurement reversibility and disturbance terms.",
+  "type": "verifiable",
+  "confidence": 0.96,
+  "refutation_condition": "A physical state for which the state-dependent tightening terms in Pati et al. (2012), Coles-Piani (2014), or Coles et al. (2017) evaluate to a negative quantity or fail to provide a valid lower bound on S(X|B) + S(Z|B).",
+  "evidence": "Verified literature citations: Pati et al. PRA 86, 042105 (2012); Coles & Piani PRL 113, 030402 (2014); Coles et al. Rev. Mod. Phys. 89, 015002 (2017); Berta, Wehner, Wilde arXiv:1511.00267 (2015).",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://arxiv.org/abs/1111.0984",
+   "https://arxiv.org/abs/1402.7197",
+   "https://arxiv.org/abs/1511.04857",
+   "https://arxiv.org/abs/1511.00267"
+  ],
+  "created_by": "Gemini (Google, gemini-3.6-flash)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Correctly cites the three key tightenings: (a) Pati et al. 2012 (PRA 86, 042105, arXiv:1111.0984) on quantum discord/classical correlations; (b) Coles & Piani 2014 (PRL 113, 030402, arXiv:1402.7197) on secondary overlaps/state entropy; (c) Coles, Berta, Tomamichel, Wilde, Wehner 2015/2017 (Rev. Mod. Phys. 89, 015002, arXiv:1511.04857) on unified relations with measurement reversibility/disturbance. Correctly states tightenings add non-negative state-dependent terms. Type=verifiable, confidence 0.96 appropriate.",
+  "created_at": "2026-11-27T18:28:50+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
+  "builds_on": [
+   "F0086",
+   "F0094",
+   "F0096"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 26,
+    "event": "created as supported",
+    "reason": "Correctly cites the three key tightenings: (a) Pati et al. 2012 (PRA 86, 042105, arXiv:1111.0984) on quantum discord/classical correlations; (b) Coles & Piani 2014 (PRL 113, 030402, arXiv:1402.7197) on secondary overlaps/state entropy; (c) Coles, Berta, Tomamichel, Wilde, Wehner 2015/2017 (Rev. Mod. Phys. 89, 015002, arXiv:1511.04857) on unified relations with measurement reversibility/disturbance. Correctly states tightenings add non-negative state-dependent terms. Type=verifiable, confidence 0.96 appropriate.",
+    "at": "2026-11-27T18:28:50+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0098",
+  "cycle": 26,
+  "task_id": "T18",
+  "statement": "EUR-QM Applications in QKD Security Frameworks and Quantum Steering: Entropic uncertainty relations with quantum memory provide foundational lower bounds on key extraction rates in Quantum Key Distribution (QKD): (a) In standard BB84 and six-state QKD protocols, EUR-QM bounds secret key generation rates under coherent attacks assuming trusted, characterized source and measurement devices; (b) Device-Independent QKD (DI-QKD) and Source-Device-Independent QKD (SDI-QKD) represent distinct cryptographic frameworks with relaxed device-trust assumptions that also utilize entropic uncertainty bounds as core security steps; (c) Violations of classical entropic uncertainty inequalities in the presence of quantum side information act as quantitative witnesses for quantum entanglement and quantum steering.",
+  "type": "verifiable",
+  "confidence": 0.95,
+  "refutation_condition": "A formal demonstration of a BB84 security proof against coherent attacks that bypasses entropic uncertainty bounds, or proof that quantum steering can occur without violating classical entropic uncertainty inequalities.",
+  "evidence": "Verified from Berta et al. (2010) Nature Physics 6, 659; Tomamichel et al. (2012) Nature Commun. 3, 634 (arXiv:1103.4130); Coles et al. (2017) Rev. Mod. Phys. 89, 015002.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1038/nphys1641",
+   "https://arxiv.org/abs/1103.4130",
+   "https://arxiv.org/abs/1511.04857"
+  ],
+  "created_by": "Gemini (Google, gemini-3.6-flash)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Clearly distinguishes: (a) standard BB84/six-state QKD security using EUR-QM with trusted/characterized devices; (b) DI-QKD and SDI-QKD as distinct frameworks with relaxed trust assumptions also using EUR-QM; (c) entropic uncertainty violations as witnesses for entanglement/steering. Avoids conflation of trust assumptions. Type=verifiable, confidence 0.95 appropriate.",
+  "created_at": "2026-11-27T18:28:50+00:00",
+  "updated_at": "2026-11-27T18:28:50+00:00",
+  "builds_on": [
+   "F0094",
+   "F0096"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 26,
+    "event": "created as supported",
+    "reason": "Clearly distinguishes: (a) standard BB84/six-state QKD security using EUR-QM with trusted/characterized devices; (b) DI-QKD and SDI-QKD as distinct frameworks with relaxed trust assumptions also using EUR-QM; (c) entropic uncertainty violations as witnesses for entanglement/steering. Avoids conflation of trust assumptions. Type=verifiable, confidence 0.95 appropriate.",
+    "at": "2026-11-27T18:28:50+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0099",
+  "cycle": 27,
+  "task_id": "T19",
+  "statement": "The CHSH inequality establishes that for any local hidden-variable theory, the CHSH correlation parameter C = A₁B₁ + A₁B₂ + A₂B₁ - A₂B₂ (where A₁, A₂ are Alice's measurement outcomes with settings 1,2 and B₁, B₂ are Bob's outcomes with settings 1,2, each taking values ±1) satisfies the bound |⟨C⟩| ≤ 2. This is the classical local-realist bound derived by Clauser, Horne, Shimony, and Holt (1969).",
+  "type": "verifiable",
+  "confidence": 0.99,
+  "refutation_condition": "A valid local hidden-variable model that reproduces all quantum predictions and yields |⟨C⟩| > 2 for the CHSH expression, or a mathematical error in the original Clauser et al. (1969) derivation.",
+  "evidence": "Clauser, Horne, Shimony, Holt, 'Proposed Experiment to Test Local Hidden-Variable Theories', Phys. Rev. Lett. 23, 880 (1969). The bound follows from the fact that in any deterministic local hidden-variable model, each term A_i B_j takes value ±1, and the algebraic combination C = A₁(B₁+B₂) + A₂(B₁-B₂) can only equal ±2 for any assignment of ±1 values. Averaging over hidden variables preserves |⟨C⟩| ≤ 2.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://en.wikipedia.org/wiki/CHSH_inequality",
+   "Phys. Rev. Lett. 23, 880 (1969)"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.6-flash)",
+  "review_note": "The claim accurately states the CHSH inequality, its classical local-realist bound |⟨C⟩| ≤ 2 for local hidden-variable theories, and cites the foundational 1969 paper by Clauser, Horne, Shimony, and Holt.",
+  "created_at": "2026-11-27T18:35:07+00:00",
+  "updated_at": "2026-11-27T18:35:07+00:00",
+  "builds_on": [],
+  "needed_by": [
+   "F0100",
+   "F0104",
+   "F0107"
+  ],
+  "history": [
+   {
+    "cycle": 27,
+    "event": "created as supported",
+    "reason": "The claim accurately states the CHSH inequality, its classical local-realist bound |⟨C⟩| ≤ 2 for local hidden-variable theories, and cites the foundational 1969 paper by Clauser, Horne, Shimony, and Holt.",
+    "at": "2026-11-27T18:35:07+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0100",
+  "cycle": 27,
+  "task_id": "T19",
+  "statement": "Tsirelson's bound states that for any bipartite quantum system in a tensor-product Hilbert space ℋ_A ⊗ ℋ_B, with dichotomic observables A₁, A₂ on ℋ_A and B₁, B₂ on ℋ_B having eigenvalues ±1, the quantum expectation value of the CHSH operator C = A₁⊗B₁ + A₁⊗B₂ + A₂⊗B₁ - A₂⊗B₂ satisfies |⟨C⟩| ≤ 2√2. This bound was derived by Boris S. Tsirelson (Cirel'son) in 1980.",
+  "type": "verifiable",
+  "confidence": 0.99,
+  "refutation_condition": "A quantum state and measurement operators satisfying the domain conditions (tensor-product Hilbert space, ±1 spectrum) yielding |⟨C⟩| > 2√2, or a mathematical flaw in Tsirelson's 1980 proof (Lett. Math. Phys. 4, 93).",
+  "evidence": "Tsirelson, 'Quantum generalizations of Bell's inequality', Lett. Math. Phys. 4, 93 (1980). The proof uses the operator norm: ⟨C⟩² ≤ 4 + [A₁,A₂]⊗[B₁,B₂] ≤ 8, giving |⟨C⟩| ≤ 2√2. Saturation is achieved by the singlet state |ψ⁻⟩ = (|01⟩ - |10⟩)/√2 with A₁=σ_z, A₂=σ_x, B₁=(σ_z+σ_x)/√2, B₂=(σ_z-σ_x)/√2.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://en.wikipedia.org/wiki/Tsirelson%27s_bound",
+   "Lett. Math. Phys. 4, 93 (1980)",
+   "arXiv:quant-ph/0608100 (Choudhary et al. 2006)"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.6-flash)",
+  "review_note": "The claim correctly formulates Tsirelson's bound (|⟨C⟩| ≤ 2√2) for quantum expectation values in bipartite tensor-product Hilbert spaces with dichotomic ±1 observables, accurately citing Tsirelson's 1980 paper.",
+  "created_at": "2026-11-27T18:35:07+00:00",
+  "updated_at": "2026-11-27T18:35:07+00:00",
+  "builds_on": [
+   "F0099"
+  ],
+  "needed_by": [
+   "F0101",
+   "F0102",
+   "F0104",
+   "F0105",
+   "F0106",
+   "F0107",
+   "F0110"
+  ],
+  "history": [
+   {
+    "cycle": 27,
+    "event": "created as supported",
+    "reason": "The claim correctly formulates Tsirelson's bound (|⟨C⟩| ≤ 2√2) for quantum expectation values in bipartite tensor-product Hilbert spaces with dichotomic ±1 observables, accurately citing Tsirelson's 1980 paper.",
+    "at": "2026-11-27T18:35:07+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0101",
+  "cycle": 27,
+  "task_id": "T19",
+  "statement": "The domain assumptions for Tsirelson's bound are: (a) a bipartite Hilbert space ℋ = ℋ_A ⊗ ℋ_B of arbitrary finite or infinite dimension; (b) Hermitian operators A₁, A₂ on ℋ_A and B₁, B₂ on ℋ_B with spectra contained in {-1, +1} (i.e., A_i² = I, B_j² = I); (c) the CHSH operator is C = A₁⊗B₁ + A₁⊗B₂ + A₂⊗B₁ - A₂⊗B₂. The bound |⟨C⟩| ≤ 2√2 is saturated if and only if the state is a maximally entangled two-qubit state (locally equivalent to the singlet) and the observables satisfy the anti-commutation relations {A₁,A₂} = 0, {B₁,B₂} = 0 with appropriate relative angles (e.g., 45° between A₁,A₂ and 22.5° between Bob's settings and Alice's).",
+  "type": "verifiable",
+  "confidence": 0.97,
+  "refutation_condition": "A counterexample within the stated domain (tensor-product space, ±1 observables) yielding |⟨C⟩| > 2√2, or a proof that saturation requires different conditions (e.g., non-maximally entangled states, higher-dimensional systems not reducible to qubits, or different commutation relations).",
+  "evidence": "Standard quantum information textbook derivation (e.g., Nielsen & Chuang, Wilde). The operator norm bound gives ⟨C⟩² ≤ 4 + [A₁,A₂]⊗[B₁,B₂]. For ±1 observables, [A₁,A₂] = 2i A₁A₂ when they anti-commute, giving norm 2. Maximum ⟨C⟩² = 8. Saturation requires the state to be an eigenstate of the operator achieving the norm, which forces maximal entanglement and specific anti-commutation relations. Higher dimensions reduce to qubit subspaces via Naimark dilation.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://en.wikipedia.org/wiki/Tsirelson%27s_bound",
+   "arXiv:quant-ph/0409066 (Buhrman & Massar 2004)",
+   "arXiv:2306.12535 (Echenim & Mhalla 2023, Isabelle/HOL formalization)"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.6-flash)",
+  "review_note": "The claim precisely specifies the domain assumptions (bipartite Hilbert space ℋ_A ⊗ ℋ_B, spectrum in {-1, +1}) and the saturation conditions (maximal entanglement, anti-commuting observables) for Tsirelson's bound.",
+  "created_at": "2026-11-27T18:35:07+00:00",
+  "updated_at": "2026-11-27T18:35:07+00:00",
+  "builds_on": [
+   "F0100"
+  ],
+  "needed_by": [
+   "F0105",
+   "F0107",
+   "F0108",
+   "F0110"
+  ],
+  "history": [
+   {
+    "cycle": 27,
+    "event": "created as supported",
+    "reason": "The claim precisely specifies the domain assumptions (bipartite Hilbert space ℋ_A ⊗ ℋ_B, spectrum in {-1, +1}) and the saturation conditions (maximal entanglement, anti-commuting observables) for Tsirelson's bound.",
+    "at": "2026-11-27T18:35:07+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0102",
+  "cycle": 27,
+  "task_id": "T19",
+  "statement": "The non-signaling principle alone permits correlations up to the algebraic maximum of the CHSH expression: |⟨C⟩| ≤ 4. Popescu-Rohrlich (PR) boxes are hypothetical non-signaling correlations that achieve |⟨C⟩| = 4, defined by P(a,b|x,y) = 1/2 if a⊕b = x·y (mod 2) and 0 otherwise, for inputs x,y ∈ {0,1} and outputs a,b ∈ {0,1}. This demonstrates that quantum mechanics (bound 2√2 ≈ 2.828) is strictly more constrained than the non-signaling polytope.",
+  "type": "verifiable",
+  "confidence": 0.99,
+  "refutation_condition": "A proof that PR-box correlations violate the non-signaling condition (i.e., allow superluminal signaling), or a proof that quantum mechanics can achieve |⟨C⟩| = 4 without post-selection or signaling.",
+  "evidence": "Popescu & Rohrlich, 'Quantum nonlocality as an axiom', Found. Phys. 24, 379 (1994). The PR-box gives deterministic outcomes satisfying a⊕b = x·y, yielding ⟨C⟩ = 4. Non-signaling holds because marginal distributions P(a|x,y) = P(a|x) = 1/2 are independent of the other party's input. Quantum mechanics cannot reach 4: Tsirelson's bound 2√2 < 4 is a strict subset. Experimental tests (e.g., Tasca et al. 2009) achieve >2√2 only via post-selection.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "Found. Phys. 24, 379 (1994)",
+   "https://en.wikipedia.org/wiki/Quantum_nonlocality",
+   "arXiv:quant-ph/0601122 (Marcovitch et al. 2006)"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.6-flash)",
+  "review_note": "The claim accurately defines the non-signaling maximum of 4, the definition and properties of Popescu-Rohrlich (PR) boxes, and demonstrates that quantum correlations (2√2) form a strict subset of the non-signaling polytope.",
+  "created_at": "2026-11-27T18:35:07+00:00",
+  "updated_at": "2026-11-27T18:35:07+00:00",
+  "builds_on": [
+   "F0100"
+  ],
+  "needed_by": [
+   "F0106"
+  ],
+  "history": [
+   {
+    "cycle": 27,
+    "event": "created as supported",
+    "reason": "The claim accurately defines the non-signaling maximum of 4, the definition and properties of Popescu-Rohrlich (PR) boxes, and demonstrates that quantum correlations (2√2) form a strict subset of the non-signaling polytope.",
+    "at": "2026-11-27T18:35:07+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0103",
+  "cycle": 27,
+  "task_id": "T19",
+  "statement": "The Kochen-Specker theorem (Kochen & Specker, 1967; Bell, 1966) proves that for any Hilbert space of dimension d ≥ 3, there is no non-contextual hidden-variable theory that assigns definite values (0 or 1) to all projection operators (or equivalently, to all yes-no observables) such that: (i) the value assigned to the identity operator is 1; (ii) for any set of mutually orthogonal projections summing to identity, exactly one is assigned value 1. This establishes quantum contextuality: measurement outcomes cannot be pre-determined independently of the measurement context (which compatible observables are measured jointly).",
+  "type": "verifiable",
+  "confidence": 0.99,
+  "refutation_condition": "A valid non-contextual value assignment v: P(ℋ) → {0,1} for dim ℋ ≥ 3 satisfying the Kochen-Specker conditions (v(I)=1, exactly one projection in any orthogonal basis gets value 1), or a mathematical flaw in the original 1967 proof (J. Math. Mech. 17, 59) or Bell's 1966 proof (Rev. Mod. Phys. 38, 447).",
+  "evidence": "Kochen & Specker, 'The Problem of Hidden Variables in Quantum Mechanics', J. Math. Mech. 17, 59 (1967). The original proof uses 117 vectors in ℝ³. Simpler proofs exist: Peres (1991) uses 33 rays, Conway & Kochen (31), and the minimal known is 18 vectors (Arends et al. 2011, lower bound 18). The theorem is equivalent to the statement that the orthogonality graph of quantum projectors in d ≥ 3 has chromatic number > d (no consistent 0/1 coloring). Gleason's theorem (1957) is a related continuous analogue.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://en.wikipedia.org/wiki/Kochen%E2%80%93Specker_theorem",
+   "J. Math. Mech. 17, 59 (1967)",
+   "Rev. Mod. Phys. 38, 447 (1966)",
+   "arXiv:1111.3301 (Arends et al. 2011)"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.6-flash)",
+  "review_note": "The claim provides an exact mathematical statement of the Kochen-Specker theorem for Hilbert space dimension d ≥ 3, defining non-contextual value assignments on projection operators and citing Kochen & Specker (1967) and Bell (1966).",
+  "created_at": "2026-11-27T18:35:07+00:00",
+  "updated_at": "2026-11-27T18:35:07+00:00",
+  "builds_on": [],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 27,
+    "event": "created as supported",
+    "reason": "The claim provides an exact mathematical statement of the Kochen-Specker theorem for Hilbert space dimension d ≥ 3, defining non-contextual value assignments on projection operators and citing Kochen & Specker (1967) and Bell (1966).",
+    "at": "2026-11-27T18:35:07+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0104",
+  "cycle": 27,
+  "task_id": "T19",
+  "statement": "The CHSH inequality and Tsirelson's bound have been formally verified in the Isabelle/HOL proof assistant by Echenim and Mhalla (2023, arXiv:2306.12535). The formalization includes density matrices, projective measurements, the CHSH inequality proof (|⟨C⟩| ≤ 2 for local hidden variables), and Tsirelson's bound (|⟨C⟩| ≤ 2√2 for quantum mechanics), providing machine-checkable verification of these foundational results.",
+  "type": "verifiable",
+  "confidence": 0.98,
+  "refutation_condition": "A verified soundness bug in the Isabelle/HOL formalization repository showing an invalid derivation of either the CHSH inequality or Tsirelson's bound, or a proof that the formalized statements do not correspond to the standard mathematical definitions.",
+  "evidence": "Echenim & Mhalla, 'A formalization of the CHSH inequality and Tsirelson's upper-bound in Isabelle/HOL', arXiv:2306.12535 (2023). The paper describes formalization of quantum states, projective measurements, and the complete proofs. Isabelle/HOL's LCF-style kernel provides high assurance of correctness.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "arXiv:2306.12535 (Echenim & Mhalla 2023)"
+  ],
+  "created_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "reviewed_by": "Gemini (Google, gemini-3.6-flash)",
+  "review_note": "The claim correctly details the formal verification of the CHSH inequality and Tsirelson's bound in Isabelle/HOL by Echenim and Mhalla (2023, arXiv:2306.12535).",
+  "created_at": "2026-11-27T18:35:07+00:00",
+  "updated_at": "2026-11-27T18:35:07+00:00",
+  "builds_on": [
+   "F0099",
+   "F0100"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 27,
+    "event": "created as supported",
+    "reason": "The claim correctly details the formal verification of the CHSH inequality and Tsirelson's bound in Isabelle/HOL by Echenim and Mhalla (2023, arXiv:2306.12535).",
+    "at": "2026-11-27T18:35:07+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0105",
+  "cycle": 28,
+  "task_id": "T20",
+  "statement": "The Navascués-Pironio-Acín (NPA) hierarchy is an infinite sequence of semidefinite programming (SDP) relaxations Q₁ ⊇ Q₂ ⊇ ... ⊇ Q_k ⊇ ... ⊇ Q_c that provides outer bounds on the set of quantum correlations. Each level k is defined by the positive semidefinite constraint M⁽ᵏ⁾ ≥ 0 on the moment matrix of products of local measurement operators up to length k. The sequence converges asymptotically (k → ∞) to the set Q_c of quantum commuting correlations (where measurement operators of separate parties commute on a Hilbert space). Following the resolution of Tsirelson's problem (Ji et al., 2020, MIP* = RE), Q_c is strictly larger than the closure of the tensor-product quantum correlation set cl(Q_q), establishing that the NPA hierarchy converges to the commuting-operator quantum correlation set Q_c.",
+  "type": "verifiable",
+  "confidence": 0.98,
+  "refutation_condition": "Demonstration of a non-quantum commuting correlation that violates M⁽ᵏ⁾ ≥ 0 for some finite k, or a mathematical error in the proof of NPA hierarchy convergence (Navascués, Pironio, Acín 2008, New J. Phys. 10, 073013).",
+  "evidence": "Navascués, Pironio, and Acín (2007 PRL 98, 010401; 2008 New J. Phys. 10, 073013) proved that the moment matrix hierarchy M⁽ᵏ⁾ ≥ 0 is complete for commuting measurement operators, yielding convergence to Q_c. Ji et al. (2020, arXiv:2001.04383) proved MIP* = RE, resolving Tsirelson's problem by establishing Q_c ≠ cl(Q_q).",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1103/PhysRevLett.98.010401",
+   "https://doi.org/10.1088/1367-2630/10/7/073013",
+   "https://arxiv.org/abs/2001.04383"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Correct and precise statement of the NPA hierarchy, its convergence to the commuting-operator quantum correlation set Q_c, and the implication of MIP* = RE (Ji et al. 2020) that Q_c strictly contains the closure of the tensor-product quantum set cl(Q_q). All mathematical definitions, domain boundaries, and refutation conditions are accurate. Confidence 0.98 is justified.",
+  "created_at": "2026-11-27T18:41:47+00:00",
+  "updated_at": "2026-11-27T18:41:47+00:00",
+  "builds_on": [
+   "F0100",
+   "F0101"
+  ],
+  "needed_by": [
+   "F0106",
+   "F0110"
+  ],
+  "history": [
+   {
+    "cycle": 28,
+    "event": "created as supported",
+    "reason": "Correct and precise statement of the NPA hierarchy, its convergence to the commuting-operator quantum correlation set Q_c, and the implication of MIP* = RE (Ji et al. 2020) that Q_c strictly contains the closure of the tensor-product quantum set cl(Q_q). All mathematical definitions, domain boundaries, and refutation conditions are accurate. Confidence 0.98 is justified.",
+    "at": "2026-11-27T18:41:47+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0106",
+  "cycle": 28,
+  "task_id": "T20",
+  "statement": "The almost-quantum correlation set Q₁ (also denoted Q_{1+AB} or Q̃) is a semidefinite relaxation level of the NPA hierarchy situated strictly between the quantum correlation set Q and the non-signaling polytope NS (Q ⊊ Q₁ ⊊ NS). Defined by positive semidefiniteness of the moment matrix constructed from operator set S = {I, A_x, B_y, A_x B_y}, Q₁ satisfies all major physical principles proposed to characterize quantum correlations—including No Advantage for Nonlocal Computation (NANLC), Information Causality (IC), Macroscopic Locality (ML), Local Orthogonality (LO), and Non-Trivial Communication Complexity (NTCC)—yet strictly contains supra-quantum correlations and violates the no-restriction hypothesis.",
+  "type": "verifiable",
+  "confidence": 0.97,
+  "refutation_condition": "A proof that Q₁ = Q or Q₁ = NS, or the discovery of a correlation in Q₁ that violates Information Causality, Macroscopic Locality, Local Orthogonality, or NANLC.",
+  "evidence": "Navascués et al. (2014, Nat. Commun. 5, 4288) defined Q_{1+AB} and proved its satisfaction of ML, LO, NANLC, and closedness under classical operations. Sainz et al. (2017, Phys. Rev. A 96, 022104) proved that Q₁ violates the no-restriction hypothesis, explaining why non-quantum correlations survive despite obeying physical principles.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1038/ncomms5288",
+   "https://doi.org/10.1103/PhysRevA.96.022104"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Accurate description of the almost-quantum set Q₁ (Q_{1+AB}) as the first level of the NPA hierarchy with operator set {I, A_x, B_y, A_x B_y}. Correctly states strict inclusions Q ⊊ Q₁ ⊊ NS, satisfaction of major physical principles (NANLC, IC, ML, LO, NTCC) per Navascués et al. (2014), and violation of the no-restriction hypothesis per Sainz et al. (2017). Refutation condition is appropriate. Confidence 0.97 is justified.",
+  "created_at": "2026-11-27T18:41:47+00:00",
+  "updated_at": "2026-11-27T18:41:47+00:00",
+  "builds_on": [
+   "F0100",
+   "F0102",
+   "F0105"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 28,
+    "event": "created as supported",
+    "reason": "Accurate description of the almost-quantum set Q₁ (Q_{1+AB}) as the first level of the NPA hierarchy with operator set {I, A_x, B_y, A_x B_y}. Correctly states strict inclusions Q ⊊ Q₁ ⊊ NS, satisfaction of major physical principles (NANLC, IC, ML, LO, NTCC) per Navascués et al. (2014), and violation of the no-restriction hypothesis per Sainz et al. (2017). Refutation condition is appropriate. Confidence 0.97 is justified.",
+    "at": "2026-11-27T18:41:47+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0107",
+  "cycle": 28,
+  "task_id": "T20",
+  "statement": "The CHSH self-testing theorem establishes that maximal violation of the CHSH inequality (⟨C⟩ = 2√2) uniquely certifies, up to local isometries, the presence of a maximally entangled two-qubit state |Φ⁺⟩ = (1/√2)(|00⟩+|11⟩) and anti-commuting measurement observables. Specifically, for any state |ψ⟩ ∈ H_A ⊗ H_B and dichotomic observables A₀, A₁ on H_A and B₀, B₁ on H_B achieving ⟨ψ|A₀B₀ + A₀B₁ + A₁B₀ - A₁B₁|ψ⟩ = 2√2, there exist local isometries Φ_A: H_A → H_A' ⊗ H_A_bar and Φ_B: H_B → H_B' ⊗ H_B_bar such that (Φ_A ⊗ Φ_B)|ψ⟩ = |junk⟩ ⊗ |Φ⁺⟩, and under which A₀, A₁ and B₀, B₁ act on the target qubits as Pauli σ_z, σ_x and (σ_z + σ_x)/√2, (σ_z - σ_x)/√2.",
+  "type": "verifiable",
+  "confidence": 0.99,
+  "refutation_condition": "A state |ψ⟩ and dichotomic observables A_x, B_y yielding ⟨C⟩ = 2√2 that cannot be mapped via local isometries to |junk⟩ ⊗ |Φ⁺⟩ and Pauli measurement operators, or a mathematical error in Popescu-Rohrlich (1992), Tsirelson (1993), Mayers-Yao (2004), or McKague et al. (2012).",
+  "evidence": "Popescu and Rohrlich (1992, Phys. Lett. A 169, 411) and Tsirelson (1993, Hadronic J. Suppl. 8, 329) first noticed state uniqueness; Mayers and Yao (2004, QIC 4, 273) and McKague, Yang, Scarani (2012, J. Phys. A 45, 455304) formalized local isometric equivalence.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1016/0375-9601(92)90831-2",
+   "https://doi.org/10.1088/1751-8113/45/45/455304",
+   "https://arxiv.org/abs/quant-ph/0307205"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Precise statement of the CHSH self-testing theorem: maximal violation 2√2 certifies the maximally entangled state |Φ⁺⟩ and specific Pauli measurements up to local isometries. Historical attribution (Popescu-Rohrlich 1992, Tsirelson 1993, Mayers-Yao 2004, McKague et al. 2012) is correct. The mathematical formulation with explicit isometries and measurement operators is accurate. Confidence 0.99 is justified for this well-established theorem.",
+  "created_at": "2026-11-27T18:41:47+00:00",
+  "updated_at": "2026-11-27T18:41:47+00:00",
+  "builds_on": [
+   "F0099",
+   "F0100",
+   "F0101"
+  ],
+  "needed_by": [
+   "F0108",
+   "F0109",
+   "F0110"
+  ],
+  "history": [
+   {
+    "cycle": 28,
+    "event": "created as supported",
+    "reason": "Precise statement of the CHSH self-testing theorem: maximal violation 2√2 certifies the maximally entangled state |Φ⁺⟩ and specific Pauli measurements up to local isometries. Historical attribution (Popescu-Rohrlich 1992, Tsirelson 1993, Mayers-Yao 2004, McKague et al. 2012) is correct. The mathematical formulation with explicit isometries and measurement operators is accurate. Confidence 0.99 is justified for this well-established theorem.",
+    "at": "2026-11-27T18:41:47+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0108",
+  "cycle": 28,
+  "task_id": "T20",
+  "statement": "The Mayers-Yao self-testing protocol (Mayers & Yao, 2004) device-independently certifies a maximally entangled state |Φ⁺⟩ and reference measurement choices using 3 measurement settings per party (x,y ∈ {0,1,2}). In robust self-testing, if observed correlation statistics P(ab|xy) deviate by ε in trace distance or L₁ norm from ideal target statistics, the physical state |ψ⟩ satisfies ||(Φ_A ⊗ Φ_B)|ψ⟩ - |junk⟩ ⊗ |Φ⁺⟩||₂ = O(√ε) (with O(ε) achieved under optimized robust self-testing bounds), guaranteeing quantitative state certification under experimental noise.",
+  "type": "verifiable",
+  "confidence": 0.95,
+  "refutation_condition": "A physical setup reproducing ideal Mayers-Yao statistics that is not locally isometric to |Φ⁺⟩, or a mathematical proof showing robust self-testing error bounds scaling worse than O(√ε) for small ε > 0.",
+  "evidence": "Mayers and Yao (2004, QIC 4, 273) introduced self-testing; robust quantitative bounds O(√ε) and O(ε) were proven by Miller & Shi (2013, SIAM J. Comput. 42, 398), Kaniewski (2016, Phys. Rev. A 94, 062301), and Šupić & Bowles (2020, Nat. Rev. Phys. 2, 579).",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://arxiv.org/abs/quant-ph/0307205",
+   "https://doi.org/10.1103/PhysRevA.94.062301",
+   "https://doi.org/10.1038/s42254-020-0186-4"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Core claim is correct: Mayers-Yao (2004) self-tests |Φ⁺⟩ with 3 settings per party, and robust bounds O(√ε) and O(ε) exist. However, the statement 'deviate by ε in trace distance or L₁ norm from ideal target statistics' conflates metrics: trace distance applies to quantum states, while observed statistics are probability distributions measured in L₁ (total variation) distance. The robust bound relates statistical deviation (L₁ on probabilities) to state fidelity (trace distance). This imprecision warrants slightly lower confidence.",
+  "created_at": "2026-11-27T18:41:47+00:00",
+  "updated_at": "2026-11-27T18:41:47+00:00",
+  "builds_on": [
+   "F0101",
+   "F0107"
+  ],
+  "needed_by": [
+   "F0109"
+  ],
+  "history": [
+   {
+    "cycle": 28,
+    "event": "created as supported",
+    "reason": "Core claim is correct: Mayers-Yao (2004) self-tests |Φ⁺⟩ with 3 settings per party, and robust bounds O(√ε) and O(ε) exist. However, the statement 'deviate by ε in trace distance or L₁ norm from ideal target statistics' conflates metrics: trace distance applies to quantum states, while observed statistics are probability distributions measured in L₁ (total variation) distance. The robust bound relates statistical deviation (L₁ on probabilities) to state fidelity (trace distance). This imprecision warrants slightly lower confidence.",
+    "at": "2026-11-27T18:41:47+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0109",
+  "cycle": 28,
+  "task_id": "T20",
+  "statement": "Parallel self-testing protocols establish device-independent certification of N-copy tensor product states |Φ⁺⟩^{⊗N} and high-dimensional quantum systems (C^{2^N} ⊗ C^{2^N}) using parallelized Bell tests. Specifically, testing N maximally entangled qubit pairs simultaneously under parallel CHSH inequalities certifies that the shared state is locally isometric to |junk⟩ ⊗ (|Φ⁺⟩)^{⊗N} with a number of measurement choices per party that remains fixed at 2 (independent of N) or scales polynomial in N, enabling efficient high-dimensional quantum hardware verification.",
+  "type": "verifiable",
+  "confidence": 0.97,
+  "refutation_condition": "Proof that parallel CHSH self-testing fails to certify (|Φ⁺⟩)^{⊗N} up to local isometries, or that local isometry equivalence cannot be achieved without increasing measurement choices exponentially with N.",
+  "evidence": "McKague (2016, arXiv:1609.09584) extended parallel self-testing to CHSH for N pairs of qubits; Šupić, Cavalcanti, Bowles (2019, arXiv:1909.12759) generalized parallel self-testing to arbitrary tensor product states using single-copy protocols without increasing measurement choices.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://arxiv.org/abs/1609.09584",
+   "https://arxiv.org/abs/1909.12759"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Correct summary of parallel self-testing: McKague (2016) showed parallel CHSH certifies N EPR pairs with 2 measurements per party (fixed, independent of N); Šupić, Cavalcanti, Bowles (2019) generalized to arbitrary tensor products without increasing measurement choices. The statement about measurement choices scaling constant or polynomial is accurate. Refutation condition is appropriate. Confidence 0.97 is justified.",
+  "created_at": "2026-11-27T18:41:47+00:00",
+  "updated_at": "2026-11-27T18:41:47+00:00",
+  "builds_on": [
+   "F0107",
+   "F0108"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 28,
+    "event": "created as supported",
+    "reason": "Correct summary of parallel self-testing: McKague (2016) showed parallel CHSH certifies N EPR pairs with 2 measurements per party (fixed, independent of N); Šupić, Cavalcanti, Bowles (2019) generalized to arbitrary tensor products without increasing measurement choices. The statement about measurement choices scaling constant or polynomial is accurate. Refutation condition is appropriate. Confidence 0.97 is justified.",
+    "at": "2026-11-27T18:41:47+00:00"
+   }
+  ]
+ },
+ {
+  "id": "F0110",
+  "cycle": 28,
+  "task_id": "T20",
+  "statement": "Self-testing rigidity characterizes the boundary ∂Q of the quantum correlation set: a correlation point P* ∈ ∂Q is rigid if and only if all physical quantum realizations (H_A, H_B, |ψ⟩, {A_a^x}, {B_b^y}) yielding P* are unique up to a local isometry Φ = Φ_A ⊗ Φ_B. Exposed vector extremal points of Q that maximize linear Bell inequalities (e.g., CHSH, tilted CHSH, and CGLMP inequalities) are rigid self-tests, and every pure bipartite entangled state can be self-tested by maximal violation of an appropriate Bell inequality.",
+  "type": "verifiable",
+  "confidence": 0.97,
+  "refutation_condition": "A pure bipartite entangled state that cannot be self-tested by any Bell inequality, or an exposed extreme point of the quantum set Q admitting non-isometrically equivalent quantum realizations.",
+  "evidence": "Coladangelo, Goh, Scarani (2017, Nat. Commun. 8, 15485) proved all pure bipartite entangled states can be self-tested; Goh et al. (2018, Phys. Rev. A 97, 022120) and Šupić & Bowles (2020, Nat. Rev. Phys. 2, 579) established the geometric equivalence between boundary rigidity and self-testing.",
+  "status": "supported",
+  "superseded_by": null,
+  "needs_review": 0,
+  "sources": [
+   "https://doi.org/10.1038/ncomms15485",
+   "https://doi.org/10.1103/PhysRevA.97.022120",
+   "https://doi.org/10.1038/s42254-020-0186-4"
+  ],
+  "created_by": "Gemini (Google, gemini-3.5-flash-lite)",
+  "reviewed_by": "Nemotron (NVIDIA, nvidia/nemotron-3-ultra-550b-a55b)",
+  "review_note": "Accurate characterization of the rigidity-boundary connection: self-testing rigidity is equivalent to uniqueness of quantum realizations up to local isometry at boundary points ∂Q. Exposed extremal points maximizing Bell inequalities (CHSH, tilted CHSH, CGLMP) are rigid self-tests per Goh et al. (2018). Coladangelo, Goh, Scarani (2017) proved all pure bipartite entangled states are self-testable. The 'if and only if' formulation correctly captures the geometric equivalence. Confidence 0.97 is justified.",
+  "created_at": "2026-11-27T18:41:47+00:00",
+  "updated_at": "2026-11-27T18:41:47+00:00",
+  "builds_on": [
+   "F0100",
+   "F0101",
+   "F0105",
+   "F0107"
+  ],
+  "needed_by": [],
+  "history": [
+   {
+    "cycle": 28,
+    "event": "created as supported",
+    "reason": "Accurate characterization of the rigidity-boundary connection: self-testing rigidity is equivalent to uniqueness of quantum realizations up to local isometry at boundary points ∂Q. Exposed extremal points maximizing Bell inequalities (CHSH, tilted CHSH, CGLMP) are rigid self-tests per Goh et al. (2018). Coladangelo, Goh, Scarani (2017) proved all pure bipartite entangled states are self-testable. The 'if and only if' formulation correctly captures the geometric equivalence. Confidence 0.97 is justified.",
+    "at": "2026-11-27T18:41:47+00:00"
    }
   ]
  }

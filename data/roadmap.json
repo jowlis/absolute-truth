@@ -1,6 +1,6 @@
 {
-  "version": 22,
-  "cycle": 25,
+  "version": 25,
+  "cycle": 28,
   "mission": "Absolute Truth",
   "foundations": {
     "interpretation": "Absolute Truth is operationalized as propositions and structural invariants that hold unconditionally across all observers, coordinate frames, languages, and contexts within our universe, and across all models of specified formal axiomatic systems. Operationally, we pursue truth ranked by necessity and universality: (1) formal and mathematical tautologies derived within consistent axiomatic systems, (2) fundamental empirical regularities and physical conservation laws that remain invariant across all accessible spacetime, and (3) structural bounds on information, computation, and observation that delimit what any rational agent can know or compute. We do not claim dogmatic finality; we asymptotically approach truth through cumulative verification and systematic boundary mapping.",
@@ -601,7 +601,7 @@
       "title": "Resolve contested finding F0089 on Berta et al. entropic uncertainty relation with quantum memory",
       "goal": "Formulate corrected, mathematically exact findings to supersede contested F0089 (and refine F0090-F0093 as needed), accurately defining the overlap parameter c (or c²), clarifying tripartite duality derivation logic, specifying exact Hilbert space domain bounds (attributing continuous-variable extensions to Furrer et al. 2012), and correcting literature citations.",
       "why": "F0089 is currently contested due to a factor-of-2 error in the basis overlap parameter definition. Resolving it restores mathematical precision and dependency-tree soundness to the M3 quantum information catalog.",
-      "status": "active",
+      "status": "done",
       "history": [
         {
           "cycle": 25,
@@ -614,6 +614,70 @@
           "by": "Gemini",
           "change": "proposed -> active",
           "reason": "chosen by the planner: F0089 is currently the only contested finding in the knowledge base. Resolving it immediately restores dependency soundness to M3 and ensures the quantum uncertainty bounds catalog is mathematically flawless before moving to subsequent milestones."
+        },
+        {
+          "cycle": 26,
+          "by": "Nemotron",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
+        }
+      ]
+    },
+    {
+      "id": "T19",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Catalogue and verify Tsirelson's bound, CHSH inequality, and quantum contextuality limits",
+      "goal": "Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) CHSH inequality and local-hidden-variable bound (|⟨C⟩| ≤ 2), (2) Tsirelson's bound (|⟨C⟩| ≤ 2√2) for quantum correlations, (3) domain assumptions (tensor product Hilbert spaces, operator norm bounds, saturation conditions), (4) non-signaling principle and PR-boxes (upper limit 4), and (5) Kochen-Specker theorem on quantum contextuality for Hilbert space dimension d ≥ 3.",
+      "why": "Establishes fundamental structural bounds on non-local correlations and contextuality in quantum mechanics, defining the precise boundary between classical local realism, quantum physical reality, and generalized non-signaling theories.",
+      "status": "done",
+      "history": [
+        {
+          "cycle": 27,
+          "by": "Gemini",
+          "change": "created",
+          "reason": "Establishes fundamental structural bounds on non-local correlations and contextuality in quantum mechanics, defining the precise boundary between classical local realism, quantum physical reality, and generalized non-signaling theories."
+        },
+        {
+          "cycle": 27,
+          "by": "Gemini",
+          "change": "proposed -> active",
+          "reason": "chosen by the planner: With the successful completion and verification of quantum speed limits (T15) and entropic uncertainty relations with quantum memory (T16–T18), cataloguing Tsirelson's bound and Kochen-Specker contextuality completes the core quantum information and non-locality limits in Milestone 3. This establishes the exact mathematical boundaries separating classical local realism, physical quantum mechanics, and super-quantum non-signaling models."
+        },
+        {
+          "cycle": 27,
+          "by": "Gemini",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
+        }
+      ]
+    },
+    {
+      "id": "T20",
+      "kind": "task",
+      "parent": "M3",
+      "title": "Catalogue and verify the NPA hierarchy, almost-quantum correlations, and device-independent self-testing",
+      "goal": "Formulate verifiable claims with precise mathematical statements, exact domain boundaries, refutation conditions, and citations for: (1) The Navascués-Pironio-Acín (NPA) hierarchy of semidefinite programming relaxations characterizing the quantum correlation set; (2) The Q₁ (almost-quantum) correlation set as the first level of the NPA hierarchy, its properties, and how it strictly contains the quantum set while being contained in the non-signaling polytope; (3) Device-independent self-testing protocols that certify quantum states and measurements (e.g., Mayers-Yao, CHSH self-testing, parallel self-testing) based on Bell inequality violations reaching Tsirelson's bound; (4) The relationship between self-testing rigidity and the boundary of the quantum set.",
+      "why": "Completes the M3 quantum correlation catalogue by mapping the structural hierarchy between classical, quantum, almost-quantum, and non-signaling correlations, and establishes the device-independent certification protocols that operationalize Tsirelson's bound (F0100) and CHSH (F0099) as rigid self-tests. This addresses the natural next step identified in cycle 27 review.",
+      "status": "done",
+      "history": [
+        {
+          "cycle": 28,
+          "by": "Nemotron",
+          "change": "created",
+          "reason": "Completes the M3 quantum correlation catalogue by mapping the structural hierarchy between classical, quantum, almost-quantum, and non-signaling correlations, and establishes the device-independent certification protocols that operationalize Tsirelson's bound (F0100) and CHSH (F0099) as rigid self-tests. This addresses the natural next step identified in cycle 27 review."
+        },
+        {
+          "cycle": 28,
+          "by": "Nemotron",
+          "change": "proposed -> active",
+          "reason": "chosen by the planner: M3 has completed quantum speed limits (T15), Holevo/Maassen-Uffink (T16), EUR-QM (T17/T18), and CHSH/Tsirelson/Kochen-Specker (T19). The natural structural continuation is mapping the correlation hierarchy (NPA, almost-quantum) and the device-independent certification protocols (self-testing) that make Tsirelson's bound operational. This deepens the physical information bounds catalogue into the geometry of quantum correlations and their device-independent verification."
+        },
+        {
+          "cycle": 28,
+          "by": "Nemotron",
+          "change": "active -> done",
+          "reason": "worker and reviewer agree the goal was met"
         }
       ]
     }
