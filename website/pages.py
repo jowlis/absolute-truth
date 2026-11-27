@@ -106,6 +106,7 @@ def layout(site: dict, title: str, body: str, active: str, depth: int = 0) -> st
                   for key, label, href in NAV)
     rules = site["rules"]
     source = (f' · <a href="{esc(site["repo_url"])}">source code</a>' if site.get("repo_url") else "")
+    source += (f' · <a href="{prefix}feed.xml">feed</a>' if site.get("site_url") else "")
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -114,6 +115,7 @@ def layout(site: dict, title: str, body: str, active: str, depth: int = 0) -> st
 <title>{esc(title)} · {esc(site["title"])}</title>
 <meta name="description" content="{esc(site["tagline"])}">
 <link rel="stylesheet" href="{prefix}style.css">
+{f'<link rel="alternate" type="application/atom+xml" title="{esc(site["title"])}" href="{prefix}feed.xml">' if site.get("site_url") else ""}
 </head>
 <body>
 <header>

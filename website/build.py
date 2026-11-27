@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:          # allow running this file directly
 
 from core import integrity              # noqa: E402
 from knowledge.db import KnowledgeBase  # noqa: E402
-from website import pages               # noqa: E402
+from website import feed, pages         # noqa: E402
 
 MARKER = ".generated-by-website-build"  # the builder only ever replaces a folder it made
 
@@ -71,6 +71,7 @@ def build(data_dir: Path, out_dir: Path, config: dict) -> dict:
         "title": settings.get("title", "Absolute Truth"),
         "tagline": settings.get("tagline", ""),
         "repo_url": settings.get("repo_url", ""),
+        "site_url": settings.get("site_url", ""),
         "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "rules": integrity.rules_in_force(),
         "cycle_count": len(logs),
@@ -87,6 +88,8 @@ def build(data_dir: Path, out_dir: Path, config: dict) -> dict:
     _write(out_dir / "findings.html", pages.findings_page(site, findings))
     _write(out_dir / "path.html", pages.path_page(site, logs))
     _write(out_dir / "verify.html", pages.verify_page(site, chain))
+    if site["site_url"]:
+        _write(out_dir / "feed.xml", feed.atom(site, findings, logs, updates))
 
     findings_data = []
     for f in findings:
