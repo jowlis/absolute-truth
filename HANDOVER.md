@@ -21,25 +21,26 @@ losing anything. Last updated: 2026-11-27.
 - Phases 1-3 are built (loop and knowledge base; locked core; public website and owner
   dashboard). Then the two-team design and cloud runs were built (2026-11-24).
 - By 2026-11-23 the truth team had run 14 cycles on the owner's computer (46 findings,
-  self-corrections included). That data sits in the owner's local `data/` until it is
-  committed (step 2 below).
+  self-corrections included). That data was committed on 2026-11-24, so the cloud continues
+  from it.
+- **Cloud runs are live (2026-11-24).** The owner approved constitution v3 and the core
+  changes, committed `data/`, created the private repository, its token and the Secrets.
+  The first cloud runs succeeded: truth team cycles 17-19, resource team, website rebuild.
+  Cycle 17 superseded F0068 with F0070 (a Goedel formalization had been misattributed to
+  Tarski's theorem). Cycle 19 did no work because every Gemini model answered 503.
+  The resource team workflow was started twice by hand (16 seconds apart); both succeeded,
+  so the private repository may hold duplicate entries from that day.
 - Phases 4-6 (donations, human volunteer tasks, self-evolution) are NOT built. Don't start
   them until the owner says so.
 
-### Waiting for the owner (in this order)
+### Waiting for the owner
 
-1. **Approve the core changes** in the dashboard (constitution v3, 50/50 budget split,
-   resource limits), then commit `core/manifest.json` and `core/CHANGELOG.md`. Until then
-   every run refuses, by design, and `test_the_real_core_is_exactly_as_approved` fails.
-2. **Commit the local `data/` folder once**, so the cloud continues from cycle 14 instead
-   of starting over.
-3. Create the private repository `absolute-truth-private` (with a README).
-4. Create a fine-grained token (Contents and Issues read/write, private repository only).
-5. Add Secrets: `GEMINI_API_KEY`, `NVIDIA_API_KEY`, `PRIVATE_REPO_TOKEN`.
-6. Start the first cloud runs by hand (Actions -> Run workflow), truth team, then resource
-   team. The resource models (Mistral Large 4, Gemma 4) have not answered a real request
-   yet; if Gemma fails, check the error first (it may not accept system instructions or
-   the Gemini API may not serve it).
+- Nothing is required. Agreed plan (2026-11-24): let the daily runs go for about a week
+  without new building, then decide on Phase 4 (donations). The resource team's proposals
+  in the private repository are a starting point for that decision.
+- The $20 per month stays unused while the free models work (owner agreed 2026-11-24).
+  Using it needs billing with a provider, its key in GitHub Secrets, and the model's real
+  price in `config.toml`; compare paid models (verified prices) after the stable week.
 
 ## Decisions and their reasons
 
