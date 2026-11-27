@@ -53,6 +53,32 @@ class ResourceTeamTests(unittest.TestCase):
         self.assertEqual(KnowledgeBase(data / "knowledge.db").public_updates(), [])
         self.assertTrue(any("accuracy check said no" in p for p in log["problems"]))
 
+    def test_owner_decisions_reach_the_team_and_proposals_file(self):
+        data, private, _ = project_with_findings()
+        runner = resource_runner(data, private)
+        runner.run_cycle()
+        notes = private / "owner_notes.md"
+        self.assertIn("## Decisions on proposals", notes.read_text(encoding="utf-8"))
+        self.assertIn("Your answer: none yet", (private / "proposals.md").read_text(encoding="utf-8"))
+
+        notes.write_text(notes.read_text(encoding="utf-8") + "- R0001: No - placeholder reason\n",
+                         encoding="utf-8")
+        runner.run_cycle()
+        self.assertIn("Your answer: No - placeholder reason",
+                      (private / "proposals.md").read_text(encoding="utf-8"))
+
+    def test_reading_owner_decisions(self):
+        from loop.resource_prompts import owner_decisions, proposals_summary
+        notes = ("For example: `- R0001: Later - x`\n"      # an example inside a sentence is ignored
+                 "- R0002: Yes\n* `R0003`: No - not needed\nR0004: Later\n- R0002: No - changed my mind\n")
+        self.assertEqual(owner_decisions(notes), {"R0002": "No - changed my mind",
+                                                  "R0003": "No - not needed", "R0004": "Later"})
+        summary = proposals_summary([{"id": "R0003", "cycle": 1, "title": "t", "proposal": "p"},
+                                     {"id": "R0005", "cycle": 2, "title": "t", "proposal": "p"}],
+                                    owner_decisions(notes))
+        self.assertIn("Owner's answer: No - not needed", summary)
+        self.assertIn("Owner's answer: none yet", summary)
+
     def test_recorder_rules_for_public_updates(self):
         kb = KnowledgeBase(temp_dir() / "k.db")
         fid = add(kb)

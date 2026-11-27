@@ -7,6 +7,7 @@ another lab confirms they match the findings (constitution rules 9-12).
 """
 
 import json
+import re
 
 from loop.prompts import CONSTITUTION, findings_summary
 from loop.schemas import EXAMPLES
@@ -41,7 +42,10 @@ SYSTEM_EXPLAINED = """How this project works (set by the human owner; you cannot
 - Your deliberations are private to the owner. You cannot post, email, contact anyone or
   spend money yourselves.
 - Budget limits, models and rules are set by the owner in a locked core. You may
-  recommend changes in a proposal."""
+  recommend changes in a proposal.
+- The owner answers proposals in the "Decisions" section of the owner's notes: Yes (the
+  owner will act on it), No (do not propose it again) or Later (leave it until the owner
+  raises it). Build on proposals marked Yes; a proposal with no answer is still waiting."""
 
 
 def system_prompt(agent, other, role: str) -> str:
@@ -224,10 +228,21 @@ def status(agents_by_team: dict, budget, limits: dict) -> str:
     return "\n".join(lines)
 
 
-def proposals_summary(proposals: list) -> str:
+DECISION_LINE = re.compile(r"^\s*[-*]?\s*`?(R\d{4})`?\s*:\s*(.+?)\s*$", re.MULTILINE)
+
+
+def owner_decisions(owner_notes: str) -> dict:
+    """The owner's answers in owner_notes.md, one line each: "- R0007: No - reason".
+    Returns {proposal id: answer}; a later line for the same id wins."""
+    return {pid: answer.strip("` ") for pid, answer in DECISION_LINE.findall(owner_notes)}
+
+
+def proposals_summary(proposals: list, decisions: dict | None = None) -> str:
     if not proposals:
         return "(none yet)"
-    return "\n".join(f"- {p['id']} (cycle {p['cycle']}): {p['title']}. {p['proposal'][:300]}"
+    decisions = decisions or {}
+    return "\n".join(f"- {p['id']} (cycle {p['cycle']}): {p['title']}. {p['proposal'][:300]}\n"
+                     f"  Owner's answer: {decisions.get(p['id'], 'none yet')}"
                      for p in proposals[-20:])
 
 

@@ -34,6 +34,12 @@ The more resources the project has, the better models and tools it can use and t
 faster it can pursue the mission. Resources depend on an audience willing to take part,
 by donating or by helping with tasks. Early on, effort on resources may be worth more;
 over time the balance should move towards the mission itself. You decide what to propose.
+
+## Decisions on proposals
+
+One line per proposal: its id, then Yes, No or Later, then a short reason if you like.
+For example: `- R0001: Later - not before donations exist`. Proposals without a line
+here have no answer yet.
 """
 
 
@@ -77,9 +83,10 @@ class ResourceRunner(CycleRunner):
         overview = resource_prompts.overview(roadmap, findings, self.public_kb.cycle_logs())
         status = resource_prompts.status({"truth": self.truth_agents, "resource": self.agents},
                                          self.budget, limits)
-        proposals = resource_prompts.proposals_summary(self.kb.resource_proposals())
-        updates = resource_prompts.updates_summary(self.public_kb.public_updates())
         notes = (self.data_dir / "owner_notes.md").read_text(encoding="utf-8")
+        decisions = resource_prompts.owner_decisions(notes)
+        proposals = resource_prompts.proposals_summary(self.kb.resource_proposals(), decisions)
+        updates = resource_prompts.updates_summary(self.public_kb.public_updates())
 
         # PLAN
         plan = self._ask(planner, worker, "planner", "resource_plan", resource_prompts.plan(
@@ -165,14 +172,19 @@ class ResourceRunner(CycleRunner):
 
     def _write_owner_files(self, n: int, log: dict) -> None:
         """proposals.md (everything so far) and the inbox (what is new this cycle)."""
+        notes = self.data_dir / "owner_notes.md"
+        decisions = resource_prompts.owner_decisions(
+            notes.read_text(encoding="utf-8") if notes.exists() else "")
         lines = ["# Proposals from the resource team", "",
-                 "Private to the owner. Agents cannot act on these; you decide.", ""]
+                 "Private to the owner. Agents cannot act on these; you decide.",
+                 "Answer each one in the Decisions section of owner_notes.md.", ""]
         for p in reversed(self.kb.resource_proposals()):
             lines += [f"## {p['id']}: {p['title']} (resource cycle {p['cycle']})", "",
                       p["proposal"], "", f"- Expected benefit: {p['expected_benefit']}",
                       f"- Costs and risks: {p['costs_and_risks']}",
                       f"- Proposed by {p['proposed_by']}; accepted by {p['reviewed_by']}: "
-                      f"{p['review_note']}", ""]
+                      f"{p['review_note']}",
+                      f"- Your answer: {decisions.get(p['id'], 'none yet')}", ""]
         (self.data_dir / "proposals.md").write_text("\n".join(lines), encoding="utf-8")
 
         new = [p for p in log.get("proposals", []) if " accepted: " in p]

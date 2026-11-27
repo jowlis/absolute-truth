@@ -3,7 +3,7 @@
 Read this together with `CLAUDE.md` (the principles every session follows) and `README.md`
 (how to run and read everything). This file records what was decided, why, where things
 stand, and what to watch, so that any new session or Claude Project can continue without
-losing anything. Last updated: 2026-11-24.
+losing anything. Last updated: 2026-11-27.
 
 ## Where everything lives
 
@@ -64,6 +64,16 @@ losing anything. Last updated: 2026-11-24.
   (1 cycle). Gemini's free quota resets at midnight Pacific time (08:00 UTC in winter).
 - **Website publishes everything the truth team does**, including full transcripts.
   Resource proposals are not published (they were briefly planned to be, then made private).
+- **Resource proposals are answered in `owner_notes.md`** (private repository), section
+  "Decisions on proposals", one line each: `- R0007: No - reason` (Yes / No / Later).
+  The resource team sees each answer next to its proposal; `proposals.md` shows them too.
+  "Accepted" only means the team's own reviewer approved it; nothing builds a proposal
+  automatically (constitution rule 10). Anything the owner says Yes to is built by a
+  Claude session with the owner, through a pull request. First answers (2026-11-27):
+  R0007 No (the publishing check already runs automatically), R0008 Yes to an RSS feed and
+  Later for a custom domain, R0009 Later (mostly phase 4). R0001-R0006 still unanswered.
+- **No public update has been published yet** (as of 2026-11-27): every article so far
+  failed the truth team's accuracy check for overstating findings. That is the check working.
 - **The owner prefers not to use PowerShell**: hence the dashboard and the cloud runs.
 
 ## Lessons learned (keep these in mind)
